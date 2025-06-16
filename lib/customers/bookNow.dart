@@ -2,8 +2,34 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'footer.dart';
-import 'proceedToPayment.dart';
+import 'proceedToPayment.dart' as payment;
+
+// TimeSlot and SlotStatus definitions
+class TimeSlot {
+  final String time;
+  SlotStatus status;
+
+  TimeSlot(this.time, this.status);
+}
+
+enum SlotStatus { selected, occupied, available }
+
+// Court model class
+class Court {
+  final String id;
+  final String name;
+  final String type;
+  final bool isAvailable;
+  final double hourlyRate;
+
+  Court({
+    required this.id,
+    required this.name,
+    required this.type,
+    required this.isAvailable,
+    required this.hourlyRate,
+  });
+}
 
 void main() {
   runApp(const MyApp());
@@ -106,10 +132,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
             ),
           ),
         ],
-      ),
-      bottomNavigationBar: AppFooter(
-        currentIndex: _currentIndex,
-        onTabSelected: _onTabSelected,
       ),
     );
   }
@@ -410,7 +432,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
   void _resetTimeSlotsForDate() {
     selectedSlots.clear();
     selectedForRemoval.clear();
-    
+
     for (var slot in timeSlots) {
       slot.status = SlotStatus.available;
     }
@@ -423,8 +445,9 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
   }
 
   void _updateDateView(DateTime newSelectedDate) {
-    final selectedIndex =
-        dateList.indexWhere((date) => _isSameDay(date, newSelectedDate));
+    final selectedIndex = dateList.indexWhere(
+      (date) => _isSameDay(date, newSelectedDate),
+    );
     if (selectedIndex != -1) {
       final newStartIndex = (selectedIndex - 2).clamp(0, dateList.length - 5);
       setState(() {
@@ -530,11 +553,13 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
   }
 
   void _showSplitTimeSlotDialog(List<List<int>> ranges) {
-    String slotRangesText = ranges.map((range) {
-      var startTime = timeSlots[range[0]].time;
-      var endTime = _formatEndTime(timeSlots[range[1]].time);
-      return '$startTime - $endTime';
-    }).join('\n');
+    String slotRangesText = ranges
+        .map((range) {
+          var startTime = timeSlots[range[0]].time;
+          var endTime = _formatEndTime(timeSlots[range[1]].time);
+          return '$startTime - $endTime';
+        })
+        .join('\n');
 
     showDialog(
       context: context,
@@ -542,7 +567,8 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
         return AlertDialog(
           title: const Text('Split Time Slots'),
           content: Text(
-              'Your selection will be divided into these time slots:\n\n$slotRangesText'),
+            'Your selection will be divided into these time slots:\n\n$slotRangesText',
+          ),
           actions: [
             TextButton(
               onPressed: () {
@@ -593,11 +619,12 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
       return {'formatted': '', 'minutes': 0, 'splits': []};
     }
 
-    var actuallySelectedTimes = timeSlots
-        .where((slot) => slot.status == SlotStatus.selected)
-        .map((slot) => slot.time)
-        .toList()
-      ..sort((a, b) => _parseTimeString(a).compareTo(_parseTimeString(b)));
+    var actuallySelectedTimes =
+        timeSlots
+            .where((slot) => slot.status == SlotStatus.selected)
+            .map((slot) => slot.time)
+            .toList()
+          ..sort((a, b) => _parseTimeString(a).compareTo(_parseTimeString(b)));
 
     if (actuallySelectedTimes.isEmpty) {
       return {'formatted': '', 'minutes': 0, 'splits': []};
@@ -627,9 +654,9 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     for (int i = 0; i < timeSlots.length; i++) {
       if (timeSlots[i].status == SlotStatus.selected) {
         if (currentRange.isEmpty ||
-            _parseTimeString(timeSlots[i].time)
-                    .difference(_parseTimeString(currentRange.last))
-                    .inMinutes ==
+            _parseTimeString(
+                  timeSlots[i].time,
+                ).difference(_parseTimeString(currentRange.last)).inMinutes ==
                 30) {
           currentRange.add(timeSlots[i].time);
         } else {
@@ -648,7 +675,9 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     List<String> formattedRanges = [];
     for (var range in timeRanges) {
       final startDateTime = parseTime(range.first);
-      final endDateTime = parseTime(range.last).add(const Duration(minutes: 30));
+      final endDateTime = parseTime(
+        range.last,
+      ).add(const Duration(minutes: 30));
 
       final startTimeStr = DateFormat('h:mm a').format(startDateTime);
       final endTimeStr = DateFormat('h:mm a').format(endDateTime);
@@ -672,8 +701,9 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
 
     if (timeRanges.length == 1) {
       final startDateTime = parseTime(actuallySelectedTimes.first);
-      final endDateTime = parseTime(actuallySelectedTimes.last)
-          .add(const Duration(minutes: 30));
+      final endDateTime = parseTime(
+        actuallySelectedTimes.last,
+      ).add(const Duration(minutes: 30));
 
       final startTimeStr = DateFormat('h:mm a').format(startDateTime);
       final endTimeStr = DateFormat('h:mm a').format(endDateTime);
@@ -682,14 +712,14 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
         'formatted': '$startTimeStr - $endTimeStr ($durationText)',
         'minutes': totalMinutes,
         'splits': formattedRanges,
-        'isSplit': false
+        'isSplit': false,
       };
     } else {
       return {
         'formatted': '($durationText)',
         'minutes': totalMinutes,
         'splits': formattedRanges,
-        'isSplit': true
+        'isSplit': true,
       };
     }
   }
@@ -699,7 +729,12 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
       final parsedTime = DateFormat('h:mm a').parse(timeStr);
       final now = DateTime.now();
       return DateTime(
-          now.year, now.month, now.day, parsedTime.hour, parsedTime.minute);
+        now.year,
+        now.month,
+        now.day,
+        parsedTime.hour,
+        parsedTime.minute,
+      );
     } catch (e) {
       return DateTime.now();
     }
@@ -764,8 +799,10 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
           children: [
             IconButton(
               onPressed: () {
-                final newDate =
-                    DateTime(selectedDate.year, selectedDate.month - 1);
+                final newDate = DateTime(
+                  selectedDate.year,
+                  selectedDate.month - 1,
+                );
                 _updateDateView(newDate);
               },
               icon: const Icon(Icons.chevron_left, color: Color(0xFF1B2C4F)),
@@ -780,8 +817,10 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
             ),
             IconButton(
               onPressed: () {
-                final newDate =
-                    DateTime(selectedDate.year, selectedDate.month + 1);
+                final newDate = DateTime(
+                  selectedDate.year,
+                  selectedDate.month + 1,
+                );
                 _updateDateView(newDate);
               },
               icon: const Icon(Icons.chevron_right, color: Color(0xFF1B2C4F)),
@@ -794,18 +833,20 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-                .map((day) => Expanded(
-                      child: Center(
-                        child: Text(
-                          day,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey[600],
-                          ),
+                .map(
+                  (day) => Expanded(
+                    child: Center(
+                      child: Text(
+                        day,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
                         ),
                       ),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
         ),
@@ -838,8 +879,11 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
                   }
                 });
               },
-              child: const Icon(Icons.chevron_left,
-                  color: Color(0xFF1B2C4F), size: 24),
+              child: const Icon(
+                Icons.chevron_left,
+                color: Color(0xFF1B2C4F),
+                size: 24,
+              ),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -862,8 +906,11 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
                   }
                 });
               },
-              child: const Icon(Icons.chevron_right,
-                  color: Color(0xFF1B2C4F), size: 24),
+              child: const Icon(
+                Icons.chevron_right,
+                color: Color(0xFF1B2C4F),
+                size: 24,
+              ),
             ),
           ],
         ),
@@ -888,10 +935,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
         _updateDateView(date);
       },
       child: Container(
-        constraints: const BoxConstraints(
-          minWidth: 48,
-          maxWidth: 64,
-        ),
+        constraints: const BoxConstraints(minWidth: 48, maxWidth: 64),
         width: isSelected ? 60 : 48,
         height: isSelected ? 60 : 48,
         decoration: BoxDecoration(
@@ -926,21 +970,18 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
 
   Widget _buildCalendarGrid() {
     final firstDayOfMonth = DateTime(selectedDate.year, selectedDate.month, 1);
-    final lastDayOfMonth =
-        DateTime(selectedDate.year, selectedDate.month + 1, 0);
+    final lastDayOfMonth = DateTime(
+      selectedDate.year,
+      selectedDate.month + 1,
+      0,
+    );
     final firstDayWeekday = firstDayOfMonth.weekday % 7;
     final daysInMonth = lastDayOfMonth.day;
 
     List<Widget> dayWidgets = [];
 
     for (int i = 0; i < firstDayWeekday; i++) {
-      dayWidgets.add(
-        const Expanded(
-          child: SizedBox(
-            height: 36,
-          ),
-        ),
-      );
+      dayWidgets.add(const Expanded(child: SizedBox(height: 36)));
     }
 
     for (int day = 1; day <= daysInMonth; day++) {
@@ -973,8 +1014,8 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
                     color: isSelected
                         ? Colors.white
                         : isToday
-                            ? const Color(0xFF1B2C4F)
-                            : const Color(0xFF2D3142),
+                        ? const Color(0xFF1B2C4F)
+                        : const Color(0xFF2D3142),
                   ),
                 ),
               ),
@@ -988,13 +1029,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     for (int i = 0; i < dayWidgets.length; i += 7) {
       final weekDays = dayWidgets.skip(i).take(7).toList();
       while (weekDays.length < 7) {
-        weekDays.add(
-          const Expanded(
-            child: SizedBox(
-              height: 36,
-            ),
-          ),
-        );
+        weekDays.add(const Expanded(child: SizedBox(height: 36)));
       }
 
       rows.add(Row(children: weekDays));
@@ -1115,29 +1150,49 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildResponsiveTimeSlot(timeSlots[rowIndex * 4], slotWidth,
-                      slotHeight, fontSize, smallFontSize),
+                  _buildResponsiveTimeSlot(
+                    timeSlots[rowIndex * 4],
+                    slotWidth,
+                    slotHeight,
+                    fontSize,
+                    smallFontSize,
+                  ),
                   SizedBox(width: smallSpacing),
 
                   if (rowIndex * 4 + 1 < timeSlots.length)
-                    _buildResponsiveTimeSlot(timeSlots[rowIndex * 4 + 1],
-                        slotWidth, slotHeight, fontSize, smallFontSize)
+                    _buildResponsiveTimeSlot(
+                      timeSlots[rowIndex * 4 + 1],
+                      slotWidth,
+                      slotHeight,
+                      fontSize,
+                      smallFontSize,
+                    )
                   else
                     SizedBox(width: slotWidth),
 
                   SizedBox(width: largeSpacing),
 
                   if (rowIndex * 4 + 2 < timeSlots.length)
-                    _buildResponsiveTimeSlot(timeSlots[rowIndex * 4 + 2],
-                        slotWidth, slotHeight, fontSize, smallFontSize)
+                    _buildResponsiveTimeSlot(
+                      timeSlots[rowIndex * 4 + 2],
+                      slotWidth,
+                      slotHeight,
+                      fontSize,
+                      smallFontSize,
+                    )
                   else
                     SizedBox(width: slotWidth),
 
                   SizedBox(width: smallSpacing),
 
                   if (rowIndex * 4 + 3 < timeSlots.length)
-                    _buildResponsiveTimeSlot(timeSlots[rowIndex * 4 + 3],
-                        slotWidth, slotHeight, fontSize, smallFontSize)
+                    _buildResponsiveTimeSlot(
+                      timeSlots[rowIndex * 4 + 3],
+                      slotWidth,
+                      slotHeight,
+                      fontSize,
+                      smallFontSize,
+                    )
                   else
                     SizedBox(width: slotWidth),
                 ],
@@ -1149,8 +1204,13 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     );
   }
 
-  Widget _buildResponsiveTimeSlot(TimeSlot slot, double width, double height,
-      double fontSize, double smallFontSize) {
+  Widget _buildResponsiveTimeSlot(
+    TimeSlot slot,
+    double width,
+    double height,
+    double fontSize,
+    double smallFontSize,
+  ) {
     Color backgroundColor;
     Color textColor;
 
@@ -1237,18 +1297,18 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     double iconSize = screenWidth < 350
         ? 20
         : screenWidth < 400
-            ? 22
-            : 26;
+        ? 22
+        : 26;
     double fontSize = screenWidth < 350
         ? 10
         : screenWidth < 400
-            ? 11
-            : 12;
+        ? 11
+        : 12;
     double spacing = screenWidth < 350
         ? 4
         : screenWidth < 400
-            ? 6
-            : 8;
+        ? 6
+        : 8;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -1346,13 +1406,9 @@ class _NumberOfPlayersSectionState extends State<NumberOfPlayersSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Number of Players',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF1B2C4F),
-            ),
+            style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 12),
           Container(
@@ -1367,12 +1423,12 @@ class _NumberOfPlayersSectionState extends State<NumberOfPlayersSection> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.purple.withOpacity(0.1),
+                    color: const Color(0xFF1B2C4F).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
-                    Icons.people_outline,
-                    color: Colors.purple,
+                    Icons.sports_soccer,
+                    color: Color(0xFF1B2C4F),
                     size: 20,
                   ),
                 ),
@@ -1505,7 +1561,7 @@ class PricingSummarySection extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const InvoiceScreen(),
+                    builder: (context) => const payment.PaymentScreen(),
                   ),
                 );
               },
@@ -1559,18 +1615,18 @@ class PricingSummarySection extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: const Icon(
-                      Icons.security,
-                      size: 14,
+                      Icons.currency_rupee,
                       color: Color(0xFF1B2C4F),
+                      size: 14,
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Secure payment',
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Total: LKR 0.00',
                     style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey[600],
+                      fontSize: 12,
                       fontWeight: FontWeight.w500,
+                      color: Color(0xFF666666),
                     ),
                   ),
                 ],
@@ -1581,35 +1637,4 @@ class PricingSummarySection extends StatelessWidget {
       ),
     );
   }
-}
-
-// Court model class
-class Court {
-  final String id;
-  final String name;
-  final String type;
-  final bool isAvailable;
-  final double hourlyRate;
-
-  Court({
-    required this.id,
-    required this.name,
-    required this.type,
-    required this.isAvailable,
-    required this.hourlyRate,
-  });
-}
-
-// TimeSlot and SlotStatus enums
-class TimeSlot {
-  final String time;
-  SlotStatus status;
-
-  TimeSlot(this.time, this.status);
-}
-
-enum SlotStatus {
-  selected,
-  occupied,
-  available,
 }
