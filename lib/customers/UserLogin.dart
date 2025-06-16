@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   bool _isLogin = true; // Toggle between login and signup
-  bool _isOwner = false; // Toggle between player and complex owner
+  // Toggle between player and complex owner
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _rememberMe = false;

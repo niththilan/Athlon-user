@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -239,7 +241,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
                   SizedBox(
-                      height: safeAreaBottom > 0 ? safeAreaBottom + 5 : 15),
+                    height: safeAreaBottom > 0 ? safeAreaBottom + 5 : 15,
+                  ),
                 ],
               ),
             ),

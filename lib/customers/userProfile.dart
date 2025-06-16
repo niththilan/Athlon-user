@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 
 // Constants for consistent styling - matching vendor screen
@@ -851,7 +853,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     // Extract user data to variables for easy access
     final name = _user!['full_name'] ?? 'User';
     final status = _user!['status'] ?? 'Sports Enthusiast';
-    final location = _user!['location'] ?? 'Sri Lanka';
     final address = _user!['address'] ?? 'Address not set';
     final email = _user!['email'] ?? 'email@example.com';
     final phone = _user!['phone'] ?? 'Phone not set';
