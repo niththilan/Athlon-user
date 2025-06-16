@@ -55,7 +55,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: const Text(
           "Settings",
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
             fontFamily: 'Poppins',
             color: Colors.white,
