@@ -34,19 +34,19 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.white,
         ),
       ),
-      home: const SportsVenueScreen1(),
+      home: const NearByVenueScreen(),
     );
   }
 }
 
-class SportsVenueScreen1 extends StatefulWidget {
-  const SportsVenueScreen1({super.key});
+class NearByVenueScreen extends StatefulWidget {
+  const NearByVenueScreen({super.key});
 
   @override
-  State<SportsVenueScreen1> createState() => _SportsVenueScreen1State();
+  State<NearByVenueScreen> createState() => _NearByVenueScreenState();
 }
 
-class _SportsVenueScreen1State extends State<SportsVenueScreen1>
+class _NearByVenueScreenState extends State<NearByVenueScreen>
     with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();

@@ -458,7 +458,7 @@ class FeatureCard extends StatelessWidget {
                     context,
                     PageRouteBuilder(
                       pageBuilder: (context, animation, secondaryAnimation) =>
-                          const venues.SportsVenueScreen1(),
+                          const venues.NearByVenueScreen(),
                       transitionDuration: Duration.zero,
                       reverseTransitionDuration: Duration.zero,
                     ),
@@ -734,7 +734,7 @@ class VenuesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -770,7 +770,7 @@ class VenuesSection extends StatelessWidget {
                     context,
                     PageRouteBuilder(
                       pageBuilder: (context, animation, secondaryAnimation) =>
-                          const venues.SportsVenueScreen1(),
+                          const venues.NearByVenueScreen(),
                       transitionDuration: Duration.zero,
                       reverseTransitionDuration: Duration.zero,
                     ),
@@ -786,7 +786,7 @@ class VenuesSection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 2),
+          SizedBox(height: 0),
           Row(
             children: [
               Expanded(

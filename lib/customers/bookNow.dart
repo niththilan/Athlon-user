@@ -51,19 +51,19 @@ class MyApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: const Color(0xFFF5F6FA),
       ),
-      home: const SportsVenueScreen(),
+      home: const BookNowScreen(),
     );
   }
 }
 
-class SportsVenueScreen extends StatefulWidget {
-  const SportsVenueScreen({super.key});
+class BookNowScreen extends StatefulWidget {
+  const BookNowScreen({super.key});
 
   @override
-  State<SportsVenueScreen> createState() => _SportsVenueScreenState();
+  State<BookNowScreen> createState() => _BookNowScreenState();
 }
 
-class _SportsVenueScreenState extends State<SportsVenueScreen> {
+class _BookNowScreenState extends State<BookNowScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
