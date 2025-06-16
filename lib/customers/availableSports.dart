@@ -57,87 +57,111 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
   List<Map<String, dynamic>> _venues = [];
   List<Map<String, dynamic>> _filteredVenues = [];
 
-  // Hardcoded venue data
+  // Hardcoded venue data with additional fields
   final List<Map<String, dynamic>> _sampleVenues = [
     {
       'id': '1',
       'title': 'SportsCentral Stadium',
-      'location': 'Downtown',
+      'location': 'Downtown, Colombo 00200',
       'sport': 'Football',
       'rating': 4.8,
-      'image_path': 'assets/images/venue1.jpg',
+      'image_path':
+          'https://images.unsplash.com/photo-1459865264687-595d652de67e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80',
       'distance': '2.3 km',
       'is_favorite': false,
+      'opening_hours': '6:00 AM - 10:00 PM',
+      'rate_per_hour': 'Rs. 2,500',
     },
     {
       'id': '2',
       'title': 'Galaxy Sports Complex',
-      'location': 'North Avenue',
+      'location': 'North Avenue, Colombo 00300',
       'sport': 'Basketball',
       'rating': 4.5,
-      'image_path': 'assets/images/venue2.jpg',
+      'image_path':
+          'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2060&q=80',
       'distance': '3.7 km',
       'is_favorite': false,
+      'opening_hours': '7:00 AM - 11:00 PM',
+      'rate_per_hour': 'Rs. 1,800',
     },
     {
       'id': '3',
       'title': 'Olympic Swimming Center',
-      'location': 'Lake View',
+      'location': 'Lake View, Colombo 00400',
       'sport': 'Swimming',
       'rating': 4.7,
-      'image_path': 'assets/images/venue3.jpg',
+      'image_path':
+          'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
       'distance': '5.2 km',
       'is_favorite': false,
+      'opening_hours': '5:30 AM - 9:30 PM',
+      'rate_per_hour': 'Rs. 1,200',
     },
     {
       'id': '4',
       'title': 'Tennis Court Complex',
-      'location': 'Green Hills',
+      'location': 'Green Hills, Colombo 00500',
       'sport': 'Tennis',
       'rating': 4.4,
-      'image_path': 'assets/images/venue4.jpg',
+      'image_path':
+          'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
       'distance': '1.8 km',
       'is_favorite': false,
+      'opening_hours': '6:00 AM - 8:00 PM',
+      'rate_per_hour': 'Rs. 2,000',
     },
     {
       'id': '5',
       'title': 'City Badminton Center',
-      'location': 'Central Park',
+      'location': 'Central Park, Colombo 00600',
       'sport': 'Badminton',
       'rating': 4.6,
-      'image_path': 'assets/images/venue5.jpg',
+      'image_path':
+          'https://images.unsplash.com/photo-1594736797933-d0201ba2fe65?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80',
       'distance': '4.1 km',
       'is_favorite': false,
+      'opening_hours': '6:30 AM - 10:30 PM',
+      'rate_per_hour': 'Rs. 1,500',
     },
     {
       'id': '6',
-      'title': 'Cricket Ground Arena',
-      'location': 'Sports District',
+      'title': 'CR7 FUTSAL & INDOOR CRICKET',
+      'location': '23 Mile Post Ave, Colombo 00300',
       'sport': 'Cricket',
-      'rating': 4.3,
-      'image_path': 'assets/images/venue6.jpg',
-      'distance': '6.5 km',
+      'rating': 4.75,
+      'image_path':
+          'https://images.unsplash.com/photo-1531415074968-036ba1b575da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2067&q=80',
+      'distance': '2.5 km',
       'is_favorite': false,
+      'opening_hours': '6:00 AM - 11:00 PM',
+      'rate_per_hour': 'Rs. 3,000',
     },
     {
       'id': '7',
       'title': 'Table Tennis Hub',
-      'location': 'City Center',
+      'location': 'City Center, Colombo 00100',
       'sport': 'Table Tennis',
       'rating': 4.2,
-      'image_path': 'assets/images/venue7.jpg',
+      'image_path':
+          'https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
       'distance': '3.0 km',
       'is_favorite': false,
+      'opening_hours': '7:00 AM - 10:00 PM',
+      'rate_per_hour': 'Rs. 800',
     },
     {
       'id': '8',
       'title': 'Baseball Diamond',
-      'location': 'West End',
+      'location': 'West End, Colombo 00700',
       'sport': 'Baseball',
       'rating': 4.1,
-      'image_path': 'assets/images/venue8.jpg',
+      'image_path':
+          'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
       'distance': '7.2 km',
       'is_favorite': false,
+      'opening_hours': '6:00 AM - 8:00 PM',
+      'rate_per_hour': 'Rs. 2,200',
     },
   ];
 
@@ -191,57 +215,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
         _isLoading = false;
       });
     }
-  }
-
-  // Refresh venues list
-
-  // Add more sample data if needed
-  void _addMoreSampleData() {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Add some additional venues
-    final additionalVenues = [
-      {
-        'id': '9',
-        'title': 'Elite Boxing Gym',
-        'location': 'Industrial Area',
-        'sport': 'Boxing',
-        'rating': 4.0,
-        'image_path': 'assets/images/venue9.jpg',
-        'distance': '8.1 km',
-        'is_favorite': false,
-      },
-      {
-        'id': '10',
-        'title': 'Golf Country Club',
-        'location': 'Hillside',
-        'sport': 'Golf',
-        'rating': 4.9,
-        'image_path': 'assets/images/venue10.jpg',
-        'distance': '12.3 km',
-        'is_favorite': false,
-      },
-    ];
-
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        setState(() {
-          _venues.addAll(additionalVenues);
-          _filteredVenues = _venues;
-          _isLoading = false;
-          _showVenues = true;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Added more venues!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    });
   }
 
   @override
@@ -329,24 +302,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
       });
     });
   }
-
-  /*void _onTabSelected(int index) {
-    if (index == _currentIndex) return; // No need to rebuild if same tab
-
-    setState(() {
-      _currentIndex = index;
-    });
-
-    if (index == 0) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const home.HomeScreen(),
-        ),
-      );
-    } else if (index == 2) {
-      _navigateToFavorites();
-    }
-  }*/
 
   void _navigateToFavorites() {
     // Force rebuild favorites list before navigating
@@ -446,6 +401,21 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     debugPrint('Removed from favorites: ${venue['title']}');
   }
 
+  Widget _buildStarRating(double rating) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(5, (index) {
+        if (index < rating.floor()) {
+          return const Icon(Icons.star, color: Colors.orange, size: 16);
+        } else if (index < rating) {
+          return const Icon(Icons.star_half, color: Colors.orange, size: 16);
+        } else {
+          return const Icon(Icons.star_border, color: Colors.grey, size: 16);
+        }
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Count favorites for badge display
@@ -533,7 +503,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Search Bar - Updated to match home.dart styling
+                // Search Bar
                 Padding(
                   padding: const EdgeInsets.only(
                     top: 20.0,
@@ -542,21 +512,15 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                     bottom: 8.0,
                   ),
                   child: Container(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 0,
-                    ), // Match home.dart
+                    margin: const EdgeInsets.symmetric(horizontal: 0),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(
-                        16,
-                      ), // Match home.dart
+                      borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(
-                            0xFF1B2C4F,
-                          ).withOpacity(0.08), // Match home.dart
-                          blurRadius: 12, // Match home.dart
-                          offset: const Offset(0, 3), // Match home.dart
+                          color: const Color(0xFF1B2C4F).withOpacity(0.08),
+                          blurRadius: 12,
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -564,18 +528,18 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 10,
-                      ), // Match home.dart
+                      ),
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(2), // Match home.dart
+                            padding: const EdgeInsets.all(2),
                             child: const Icon(
-                              Icons.search_rounded, // Match home.dart
-                              color: Color(0xFF1B2C4F), // Match home.dart
-                              size: 24, // Match home.dart
+                              Icons.search_rounded,
+                              color: Color(0xFF1B2C4F),
+                              size: 24,
                             ),
                           ),
-                          const SizedBox(width: 16), // Match home.dart
+                          const SizedBox(width: 16),
                           Expanded(
                             child: TextField(
                               controller: _searchController,
@@ -583,10 +547,9 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                 hintText:
                                     'Search venues by name or location...',
                                 hintStyle: TextStyle(
-                                  color: Colors.grey[400], // Match home.dart
-                                  fontSize: 14, // Match home.dart
-                                  fontWeight:
-                                      FontWeight.w400, // Match home.dart
+                                  color: Colors.grey[400],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
                                 ),
                                 border: InputBorder.none,
                                 isDense: true,
@@ -631,6 +594,328 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                   ),
                 ),
 
+                // Nearby Venues Section
+                if (_showVenues && _filteredVenues.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Nearby Venues',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: _themeNavyBlue,
+                          ),
+                        ),
+                        Text(
+                          '${_filteredVenues.length} venues',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  // Venues List
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    itemCount: _filteredVenues.length,
+                    itemBuilder: (context, index) {
+                      final venue = _filteredVenues[index];
+                      final bool isFavorite = venue['is_favorite'] ?? false;
+
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Image with favorite button
+                            Stack(
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(16),
+                                    topRight: Radius.circular(16),
+                                  ),
+                                  child: Container(
+                                    height: 200,
+                                    width: double.infinity,
+                                    color: Colors.grey[200],
+                                    child: Image.network(
+                                      venue['image_path'] ?? '',
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Container(
+                                              color: Colors.grey[300],
+                                              child: const Center(
+                                                child: Icon(
+                                                  Icons.image_not_supported,
+                                                  size: 40,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 12,
+                                  right: 12,
+                                  child: GestureDetector(
+                                    onTap: () => _toggleFavorite(index),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.9),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        isFavorite
+                                            ? Icons.favorite
+                                            : Icons.favorite_border,
+                                        color: isFavorite
+                                            ? Colors.red
+                                            : Colors.grey,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                            // Venue details
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Venue name and distance
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          venue['title'] ?? '',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF2D3142),
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        venue['distance'] ?? '',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 8),
+
+                                  // Location
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.location_on,
+                                        size: 16,
+                                        color: Colors.grey[600],
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          venue['location'] ?? '',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 8),
+
+                                  // Opening hours and rate
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        Icons.access_time,
+                                        size: 16,
+                                        color: Colors.grey[600],
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        venue['opening_hours'] ?? '',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Icon(
+                                        Icons.monetization_on,
+                                        size: 16,
+                                        color: Colors.green,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        venue['rate_per_hour'] ?? '',
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 2),
+
+                                  // Rating and Book Now button
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          _buildStarRating(
+                                            venue['rating']?.toDouble() ?? 0.0,
+                                          ),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            venue['rating']?.toString() ??
+                                                '0.0',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.grey[700],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          // Handle book now action
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Booking ${venue['title']}...',
+                                              ),
+                                              backgroundColor: _themeNavyBlue,
+                                            ),
+                                          );
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: _themeNavyBlue,
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                            vertical: 8,
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'Book Now',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 20),
+                ],
+
+                // Loading state
+                if (_isLoading)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(40.0),
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          _themeNavyBlue,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Empty state when no venues found
+                if (!_isLoading && _showVenues && _filteredVenues.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(40.0),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 64,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'No venues found',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _selectedSport.isNotEmpty
+                                ? 'No ${_selectedSport.toLowerCase()} venues available'
+                                : 'Try adjusting your search',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
                 // Empty space to fill remaining area
                 Container(
                   height: MediaQuery.of(context).size.height - 400,
@@ -641,10 +926,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
           ),
         ],
       ),
-      /*bottomNavigationBar: AppFooter(
-        currentIndex: _currentIndex,
-        onTabSelected: _onTabSelected,
-      ),*/
     );
   }
 }
