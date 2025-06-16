@@ -50,10 +50,10 @@ class UserProfileScreen extends StatefulWidget {
 // Mock Authentication Service
 class MockAuthService {
   Future<Map<String, dynamic>> getCurrentUser() async {
-    // Simulate network delay
-    await Future.delayed(const Duration(seconds: 1));
+    // Remove the artificial delay
+    // await Future.delayed(const Duration(seconds: 1));
 
-    // Return mock user data
+    // Return mock user data immediately
     return {
       'id': '12345',
       'full_name': 'John Doe',
@@ -91,9 +91,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final MockAuthService _authRepository = MockAuthService();
   final MockUserService _userRepository = MockUserService();
 
-  // User data and loading state
+  // User data and loading state - start with loading as false
   Map<String, dynamic>? _user;
-  bool _isLoading = true;
+  bool _isLoading = false; // Change from true to false
 
   // Add dropdown functionality
   bool _activitiesExpanded = false;
@@ -103,7 +103,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    _loadUserProfile();
+    _loadUserProfile(); // This will now load instantly
   }
 
   void _onScroll() {
@@ -126,16 +126,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   // Load user profile from repository
   Future<void> _loadUserProfile() async {
-    setState(() {
-      _isLoading = true;
-    });
+    // Remove the loading state delay
+    // setState(() {
+    //   _isLoading = true;
+    // });
 
     try {
       final userData = await _authRepository.getCurrentUser();
 
       setState(() {
         _user = userData;
-        _isLoading = false;
+        _isLoading = false; // Set loading to false immediately
       });
     } catch (e) {
       print('Error loading user profile: $e');

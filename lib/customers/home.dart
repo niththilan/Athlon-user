@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'userProfile.dart';
 
 // Explicitly import LoginPage
-import 'address_input.dart';
+
 import 'availableSports.dart'; // Add this import
 
 import 'footer.dart';
@@ -202,9 +202,11 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  NoAnimationRoute(
-                    builder: (context) =>
-                        const UserProfileScreen(), // Correct class name from userProfile.dart
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const UserProfileScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
                   ),
                 );
               },
@@ -299,22 +301,6 @@ class _HomeScreenState extends State<HomeScreen> {
           Align(
             alignment: Alignment.bottomRight,
             child: GestureDetector(
-              onTap: () async {
-                // Navigate to address input screen
-                final result = await Navigator.push(
-                  context,
-                  NoAnimationRoute(
-                    builder: (context) => AddressInputScreen(
-                      initialAddress: 'Colombo, Sri Lanka',
-                    ),
-                  ),
-                );
-                // Handle the result if needed
-                if (result != null && result is String) {
-                  // You can add state management here to update the location
-                  print('New location selected: $result');
-                }
-              },
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
