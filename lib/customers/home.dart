@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'userProfile.dart';
 
 import 'UserLogin.dart' show LoginPage; // Explicitly import LoginPage
 import 'address_input.dart';
@@ -215,6 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _navigateToNotifications(), // Match facility owner's behavior
               tooltip: 'Notifications',
             ),
+            // 2. Then replace the profile IconButton in your AppBar actions with this:
             IconButton(
               icon: const Icon(
                 Icons.person_outline,
@@ -222,62 +224,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 size: 28,
               ),
               onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return Container(
-                      padding: const EdgeInsets.all(30),
-                      height: 300,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Profile',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          const ListTile(
-                            leading: Icon(Icons.person),
-                            title: Text('My Account'),
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.settings),
-                            title: const Text('Settings'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                NoAnimationRoute(
-                                  builder: (context) => const SettingsScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.exit_to_app),
-                            title: const Text('Logout'),
-                            onTap: () async {
-                              Navigator.pop(context);
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (context) => const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Color(0xFF1B2C4F),
-                                  ),
-                                ),
-                              );
-                              Navigator.of(context).pop();
-                              await _signOut(context);
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                Navigator.push(
+                  context,
+                  NoAnimationRoute(
+                    builder: (context) =>
+                        const UserProfileScreen(), // Correct class name from userProfile.dart
+                  ),
                 );
               },
               tooltip: 'Profile',

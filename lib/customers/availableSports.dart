@@ -58,91 +58,115 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
   final Color _themeNavyBlue = const Color(0xFF1B2C4F);
   final Color _themeLightNavyBlue = const Color(0xFFF0F4FF);
 
-  // Venue data - now using hardcoded data instead of Supabase
+  // Venue data - enhanced with opening hours and rates
   List<Map<String, dynamic>> _venues = [];
   List<Map<String, dynamic>> _filteredVenues = [];
 
-  // Hardcoded venue data
+  // Enhanced venue data with all required information
   final List<Map<String, dynamic>> _sampleVenues = [
     {
       'id': '1',
       'title': 'SportsCentral Stadium',
-      'location': 'Downtown',
+      'location': 'Downtown, Colombo 03',
       'sport': 'Football',
       'rating': 4.8,
       'image_path': 'assets/images/venue1.jpg',
       'distance': '2.3 km',
       'is_favorite': false,
+      'opening_hours': '6:00 AM - 11:00 PM',
+      'rate_per_hour': 'Rs. 2,500',
+      'description': 'Professional football ground with modern facilities',
     },
     {
       'id': '2',
       'title': 'Galaxy Sports Complex',
-      'location': 'North Avenue',
+      'location': 'North Avenue, Colombo 05',
       'sport': 'Basketball',
       'rating': 4.5,
       'image_path': 'assets/images/venue2.jpg',
       'distance': '3.7 km',
       'is_favorite': false,
+      'opening_hours': '5:30 AM - 10:30 PM',
+      'rate_per_hour': 'Rs. 1,800',
+      'description': 'Indoor basketball court with air conditioning',
     },
     {
       'id': '3',
       'title': 'Olympic Swimming Center',
-      'location': 'Lake View',
+      'location': 'Lake View, Colombo 07',
       'sport': 'Swimming',
       'rating': 4.7,
       'image_path': 'assets/images/venue3.jpg',
       'distance': '5.2 km',
       'is_favorite': false,
+      'opening_hours': '5:00 AM - 9:00 PM',
+      'rate_per_hour': 'Rs. 1,200',
+      'description': 'Olympic-size swimming pool with certified lifeguards',
     },
     {
       'id': '4',
       'title': 'Tennis Court Complex',
-      'location': 'Green Hills',
+      'location': 'Green Hills, Colombo 04',
       'sport': 'Tennis',
       'rating': 4.4,
       'image_path': 'assets/images/venue4.jpg',
       'distance': '1.8 km',
       'is_favorite': false,
+      'opening_hours': '6:00 AM - 10:00 PM',
+      'rate_per_hour': 'Rs. 2,200',
+      'description': 'Clay and hard courts available with equipment rental',
     },
     {
       'id': '5',
       'title': 'City Badminton Center',
-      'location': 'Central Park',
+      'location': 'Central Park, Colombo 02',
       'sport': 'Badminton',
       'rating': 4.6,
       'image_path': 'assets/images/venue5.jpg',
       'distance': '4.1 km',
       'is_favorite': false,
+      'opening_hours': '5:30 AM - 11:30 PM',
+      'rate_per_hour': 'Rs. 1,500',
+      'description': '8 premium badminton courts with wooden flooring',
     },
     {
       'id': '6',
       'title': 'Cricket Ground Arena',
-      'location': 'Sports District',
+      'location': 'Sports District, Colombo 06',
       'sport': 'Cricket',
       'rating': 4.3,
       'image_path': 'assets/images/venue6.jpg',
       'distance': '6.5 km',
       'is_favorite': false,
+      'opening_hours': '6:30 AM - 9:30 PM',
+      'rate_per_hour': 'Rs. 3,000',
+      'description': 'Full-size cricket ground with practice nets',
     },
     {
       'id': '7',
       'title': 'Table Tennis Hub',
-      'location': 'City Center',
+      'location': 'City Center, Colombo 01',
       'sport': 'Table Tennis',
       'rating': 4.2,
       'image_path': 'assets/images/venue7.jpg',
       'distance': '3.0 km',
       'is_favorite': false,
+      'opening_hours': '7:00 AM - 10:00 PM',
+      'rate_per_hour': 'Rs. 800',
+      'description': '12 professional table tennis tables available',
     },
     {
       'id': '8',
       'title': 'Baseball Diamond',
-      'location': 'West End',
+      'location': 'West End, Colombo 08',
       'sport': 'Baseball',
       'rating': 4.1,
       'image_path': 'assets/images/venue8.jpg',
       'distance': '7.2 km',
       'is_favorite': false,
+      'opening_hours': '6:00 AM - 8:00 PM',
+      'rate_per_hour': 'Rs. 2,800',
+      'description': 'Regulation baseball field with dugouts',
     },
   ];
 
@@ -163,7 +187,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     });
   }
 
-  // Load venues from local data instead of Supabase
+  // Load venues from local data
   Future<void> _loadVenues() async {
     if (!mounted) return;
 
@@ -208,55 +232,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
   Future<void> _refreshVenues() async {
     await _loadVenues();
     return;
-  }
-
-  // Add more sample data if needed
-  void _addMoreSampleData() {
-    setState(() {
-      _isLoading = true;
-    });
-
-    // Add some additional venues
-    final additionalVenues = [
-      {
-        'id': '9',
-        'title': 'Elite Boxing Gym',
-        'location': 'Industrial Area',
-        'sport': 'Boxing',
-        'rating': 4.0,
-        'image_path': 'assets/images/venue9.jpg',
-        'distance': '8.1 km',
-        'is_favorite': false,
-      },
-      {
-        'id': '10',
-        'title': 'Golf Country Club',
-        'location': 'Hillside',
-        'sport': 'Golf',
-        'rating': 4.9,
-        'image_path': 'assets/images/venue10.jpg',
-        'distance': '12.3 km',
-        'is_favorite': false,
-      },
-    ];
-
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        setState(() {
-          _venues.addAll(additionalVenues);
-          _filteredVenues = _venues;
-          _isLoading = false;
-          _showVenues = true;
-        });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Added more venues!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    });
   }
 
   @override
@@ -345,24 +320,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     });
   }
 
-  /*void _onTabSelected(int index) {
-    if (index == _currentIndex) return; // No need to rebuild if same tab
-
-    setState(() {
-      _currentIndex = index;
-    });
-
-    if (index == 0) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const home.HomeScreen(),
-        ),
-      );
-    } else if (index == 2) {
-      _navigateToFavorites();
-    }
-  }*/
-
   void _navigateToFavorites() {
     // Force rebuild favorites list before navigating
     List<Map<String, dynamic>> currentFavorites = [];
@@ -371,11 +328,9 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     for (var venue in _venues) {
       if (venue['is_favorite'] == true) {
         currentFavorites.add(Map<String, dynamic>.from(venue));
-        // Add debug logs to trace favorites
         debugPrint('Adding to favorites: ${venue['title']}');
       }
     }
-    // Add count debug log
     debugPrint('Total favorites count: ${currentFavorites.length}');
 
     // Show a message if no favorites are found
@@ -415,7 +370,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
             _venues[originalIndex]['is_favorite'];
       });
 
-      // Debug log for toggling
       debugPrint(
         'Toggled favorite for: ${_venues[originalIndex]['title']} to ${_venues[originalIndex]['is_favorite']}',
       );
@@ -459,6 +413,16 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     });
 
     debugPrint('Removed from favorites: ${venue['title']}');
+  }
+
+  // Book now functionality
+  void _bookVenue(Map<String, dynamic> venue) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => BookingBottomSheet(venue: venue),
+    );
   }
 
   @override
@@ -548,7 +512,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Search Bar - Updated to match home.dart styling
+                // Search Bar
                 Padding(
                   padding: const EdgeInsets.only(
                     top: 20.0,
@@ -557,21 +521,15 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                     bottom: 8.0,
                   ),
                   child: Container(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 0,
-                    ), // Match home.dart
+                    margin: const EdgeInsets.symmetric(horizontal: 0),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(
-                        16,
-                      ), // Match home.dart
+                      borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(
-                            0xFF1B2C4F,
-                          ).withOpacity(0.08), // Match home.dart
-                          blurRadius: 12, // Match home.dart
-                          offset: const Offset(0, 3), // Match home.dart
+                          color: const Color(0xFF1B2C4F).withOpacity(0.08),
+                          blurRadius: 12,
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -579,18 +537,18 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
                         vertical: 10,
-                      ), // Match home.dart
+                      ),
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(2), // Match home.dart
+                            padding: const EdgeInsets.all(2),
                             child: const Icon(
-                              Icons.search_rounded, // Match home.dart
-                              color: Color(0xFF1B2C4F), // Match home.dart
-                              size: 24, // Match home.dart
+                              Icons.search_rounded,
+                              color: Color(0xFF1B2C4F),
+                              size: 24,
                             ),
                           ),
-                          const SizedBox(width: 16), // Match home.dart
+                          const SizedBox(width: 16),
                           Expanded(
                             child: TextField(
                               controller: _searchController,
@@ -598,10 +556,9 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                 hintText:
                                     'Search venues by name or location...',
                                 hintStyle: TextStyle(
-                                  color: Colors.grey[400], // Match home.dart
-                                  fontSize: 14, // Match home.dart
-                                  fontWeight:
-                                      FontWeight.w400, // Match home.dart
+                                  color: Colors.grey[400],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
                                 ),
                                 border: InputBorder.none,
                                 isDense: true,
@@ -646,20 +603,668 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                   ),
                 ),
 
-                // Empty space to fill remaining area
-                Container(
-                  height: MediaQuery.of(context).size.height - 400,
-                  color: const Color(0xFFF5F6FA),
+                // Venues Section
+                if (_showVenues) ...[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Section Header
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _selectedSport.isEmpty
+                                  ? 'All Venues (${_filteredVenues.length})'
+                                  : '$_selectedSport Venues (${_filteredVenues.length})',
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF1B2C4F),
+                              ),
+                            ),
+                            if (_selectedSport.isNotEmpty)
+                              TextButton(
+                                onPressed: () => _onSportSelected(''),
+                                child: const Text(
+                                  'View All',
+                                  style: TextStyle(
+                                    color: Color(0xFF1B2C4F),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 0),
+
+                        // Venues List
+                        if (_isLoading)
+                          const Center(
+                            child: CircularProgressIndicator(
+                              color: Color(0xFF1B2C4F),
+                            ),
+                          )
+                        else if (_filteredVenues.isEmpty)
+                          Center(
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.sports,
+                                  size: 80,
+                                  color: Colors.grey[400],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  _selectedSport.isEmpty
+                                      ? 'No venues found'
+                                      : 'No $_selectedSport venues found',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Try searching for a different location or sport',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[500],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: _filteredVenues.length,
+                            itemBuilder: (context, index) {
+                              final venue = _filteredVenues[index];
+                              return EnhancedVenueCard(
+                                venue: venue,
+                                onFavoriteToggle: () => _toggleFavorite(index),
+                                onBookNow: () => _bookVenue(venue),
+                              );
+                            },
+                          ),
+                      ],
+                    ),
+                  ),
+                ] else ...[
+                  // Empty state when no sport is selected
+                  Container(
+                    height: MediaQuery.of(context).size.height - 400,
+                    color: const Color(0xFFF5F6FA),
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.sports, size: 80, color: Colors.grey[400]),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Select a sport to view venues',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Choose from the sports categories above',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[500],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Enhanced Venue Card Widget
+class EnhancedVenueCard extends StatelessWidget {
+  final Map<String, dynamic> venue;
+  final VoidCallback onFavoriteToggle;
+  final VoidCallback onBookNow;
+
+  const EnhancedVenueCard({
+    super.key,
+    required this.venue,
+    required this.onFavoriteToggle,
+    required this.onBookNow,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isFavorite = venue['is_favorite'] ?? false;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Image Section
+          Stack(
+            children: [
+              Container(
+                height: 200,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  color: Colors.grey[300],
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
+                  child: venue['image_path'] != null
+                      ? Image.asset(
+                          venue['image_path'],
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: const Color(0xFF1B2C4F).withOpacity(0.1),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.image,
+                                  size: 50,
+                                  color: Color(0xFF1B2C4F),
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                      : Container(
+                          color: const Color(0xFF1B2C4F).withOpacity(0.1),
+                          child: const Center(
+                            child: Icon(
+                              Icons.image,
+                              size: 50,
+                              color: Color(0xFF1B2C4F),
+                            ),
+                          ),
+                        ),
+                ),
+              ),
+              // Favorite Button
+              Positioned(
+                top: 12,
+                right: 12,
+                child: GestureDetector(
+                  onTap: onFavoriteToggle,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite ? Colors.red : Colors.grey[600],
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+              // Sport Tag
+              Positioned(
+                top: 12,
+                left: 12,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1B2C4F),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    venue['sport'] ?? '',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // Content Section
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title and Rating
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        venue['title'] ?? '',
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF2D3142),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.star, color: Colors.amber, size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          venue['rating']?.toString() ?? '0.0',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF2D3142),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 8),
+
+                // Location
+                Row(
+                  children: [
+                    Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        venue['location'] ?? '',
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      ),
+                    ),
+                    Text(
+                      venue['distance'] ?? '',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[500],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
+                // Opening Hours and Rate
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.access_time,
+                                size: 16,
+                                color: Colors.grey[600],
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'Open',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            venue['opening_hours'] ?? '',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF2D3142),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          venue['rate_per_hour'] ?? '',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF1B2C4F),
+                          ),
+                        ),
+                        Text(
+                          'per hour',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Book Now Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: onBookNow,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1B2C4F),
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: const Text(
+                      'Book Now',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
         ],
       ),
-      /*bottomNavigationBar: AppFooter(
-        currentIndex: _currentIndex,
-        onTabSelected: _onTabSelected,
-      ),*/
+    );
+  }
+}
+
+// Booking Bottom Sheet
+class BookingBottomSheet extends StatefulWidget {
+  final Map<String, dynamic> venue;
+
+  const BookingBottomSheet({super.key, required this.venue});
+
+  @override
+  State<BookingBottomSheet> createState() => _BookingBottomSheetState();
+}
+
+class _BookingBottomSheetState extends State<BookingBottomSheet> {
+  DateTime selectedDate = DateTime.now();
+  TimeOfDay selectedTime = TimeOfDay.now();
+  int duration = 1; // hours
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.7,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // Handle
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Book ${widget.venue['title']}',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1B2C4F),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  widget.venue['location'] ?? '',
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          ),
+
+          // Booking Form
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Date Selection
+                  const Text(
+                    'Select Date',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3142),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  InkWell(
+                    onTap: () async {
+                      final date = await showDatePicker(
+                        context: context,
+                        initialDate: selectedDate,
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now().add(const Duration(days: 30)),
+                      );
+                      if (date != null) {
+                        setState(() {
+                          selectedDate = date;
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.calendar_today, size: 20),
+                          const SizedBox(width: 12),
+                          Text(
+                            '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Time Selection
+                  const Text(
+                    'Select Time',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3142),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  InkWell(
+                    onTap: () async {
+                      final time = await showTimePicker(
+                        context: context,
+                        initialTime: selectedTime,
+                      );
+                      if (time != null) {
+                        setState(() {
+                          selectedTime = time;
+                        });
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300]!),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.access_time, size: 20),
+                          const SizedBox(width: 12),
+                          Text(
+                            selectedTime.format(context),
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Duration Selection
+                  const Text(
+                    'Duration (hours)',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3142),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [1, 2, 3, 4]
+                        .map(
+                          (hours) => Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              child: InkWell(
+                                onTap: () => setState(() => duration = hours),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: duration == hours
+                                        ? const Color(0xFF1B2C4F)
+                                        : Colors.grey[100],
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: duration == hours
+                                          ? const Color(0xFF1B2C4F)
+                                          : Colors.grey[300]!,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '$hours hr${hours > 1 ? 's' : ''}',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: duration == hours
+                                          ? Colors.white
+                                          : Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Confirm Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Booking confirmed for ${widget.venue['title']}!',
+                            ),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1B2C4F),
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Confirm Booking',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
