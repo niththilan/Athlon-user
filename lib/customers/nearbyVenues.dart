@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'home.dart';
 import 'search.dart';
-import 'footer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,30 +29,29 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFFF5F6FA),
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFF1B2C4F),
-          elevation: 0,
+          elevation: 2,
           centerTitle: false,
           foregroundColor: Colors.white,
         ),
       ),
-      home: const SportsVenueScreen(),
+      home: const SportsVenueScreen1(),
     );
   }
 }
 
-class SportsVenueScreen extends StatefulWidget {
-  const SportsVenueScreen({super.key});
+class SportsVenueScreen1 extends StatefulWidget {
+  const SportsVenueScreen1({super.key});
 
   @override
-  State<SportsVenueScreen> createState() => _SportsVenueScreenState();
+  State<SportsVenueScreen1> createState() => _SportsVenueScreen1State();
 }
 
-class _SportsVenueScreenState extends State<SportsVenueScreen>
+class _SportsVenueScreen1State extends State<SportsVenueScreen1>
     with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   bool _isScrolled = false;
   String _searchQuery = '';
-  int _currentIndex = 0;
   late AnimationController _animationController;
   String _activeFilter = 'All';
   String _sortingMode = 'Nearest';
@@ -87,6 +85,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Futsal", "Cricket", "Indoor Sports"],
+      openingHours: "6:00 AM - 11:00 PM",
+      ratePerHour: "Rs. 3,000",
     ),
     VenueModel(
       id: '2',
@@ -97,6 +97,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Futsal", "Cricket", "Indoor Sports"],
+      openingHours: "7:00 AM - 10:00 PM",
+      ratePerHour: "Rs. 2,500",
     ),
     VenueModel(
       id: '3',
@@ -107,6 +109,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Badminton", "Tennis", "Squash"],
+      openingHours: "6:00 AM - 10:00 PM",
+      ratePerHour: "Rs. 2,000",
     ),
     VenueModel(
       id: '4',
@@ -117,6 +121,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Swimming", "Water Polo", "Diving"],
+      openingHours: "5:30 AM - 9:30 PM",
+      ratePerHour: "Rs. 1,200",
     ),
     VenueModel(
       id: '5',
@@ -127,6 +133,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Basketball", "Volleyball"],
+      openingHours: "7:00 AM - 11:00 PM",
+      ratePerHour: "Rs. 1,800",
     ),
     VenueModel(
       id: '6',
@@ -137,6 +145,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Golf"],
+      openingHours: "6:00 AM - 8:00 PM",
+      ratePerHour: "Rs. 5,000",
     ),
     VenueModel(
       id: '7',
@@ -147,6 +157,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Tennis", "Badminton"],
+      openingHours: "6:00 AM - 8:00 PM",
+      ratePerHour: "Rs. 2,000",
     ),
     VenueModel(
       id: '8',
@@ -157,6 +169,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Surfing", "Swimming", "Beach Volleyball"],
+      openingHours: "7:00 AM - 6:00 PM",
+      ratePerHour: "Rs. 1,500",
     ),
     VenueModel(
       id: '9',
@@ -167,6 +181,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Yoga", "Pilates", "Fitness"],
+      openingHours: "6:30 AM - 10:30 PM",
+      ratePerHour: "Rs. 1,000",
     ),
     VenueModel(
       id: '10',
@@ -177,6 +193,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1541625602330-2277a4c46182?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Mountain Biking", "Hiking", "Trail Running"],
+      openingHours: "6:00 AM - 6:00 PM",
+      ratePerHour: "Rs. 800",
     ),
     VenueModel(
       id: '11',
@@ -187,6 +205,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Boxing", "MMA", "Kickboxing"],
+      openingHours: "7:00 AM - 10:00 PM",
+      ratePerHour: "Rs. 1,500",
     ),
     VenueModel(
       id: '12',
@@ -197,6 +217,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1531415074968-036ba1b575da?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Cricket", "Baseball"],
+      openingHours: "6:00 AM - 9:00 PM",
+      ratePerHour: "Rs. 2,500",
     ),
     VenueModel(
       id: '13',
@@ -207,6 +229,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       imageUrl:
           "https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Rock Climbing", "Bouldering", "Rappelling"],
+      openingHours: "7:00 AM - 5:00 PM",
+      ratePerHour: "Rs. 2,000",
     ),
   ];
 
@@ -271,23 +295,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
   }
 
   // Handle tab selection
-  void _handleTabSelection(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-
-    if (index == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } else if (index == 1) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const SearchScreen()),
-      );
-    }
-  }
 
   // Filtered venues based on search and active filter
   List<VenueModel> get _filteredVenues {
@@ -342,8 +349,13 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
 
   @override
   Widget build(BuildContext context) {
+    // Count favorites for badge display
+    final int favoriteCount = _favoriteStatus.values
+        .where((isFavorite) => isFavorite == true)
+        .length;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1B2C4F),
         elevation: 2,
@@ -351,7 +363,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
         title: const Text(
           "Nearby Venues",
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
             fontFamily: 'Poppins',
             color: Colors.white,
@@ -367,11 +379,58 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
             },
           ),
         ),
-        actions: [],
+        actions: [
+          // Add a favorites indicator with count in the app bar
+          if (favoriteCount > 0)
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.favorite, color: Colors.white),
+                    onPressed: () {
+                      // Navigate to favorites
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('$favoriteCount favorites saved'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    },
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        '$favoriteCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
       ),
       body: Column(
         children: [
-          // Search bar
+          // Search bar - Updated to match first file style
           Container(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
             decoration: BoxDecoration(
@@ -469,7 +528,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             child: Row(
               children: [
-                const SizedBox(width: 12), // Added spacing to move text right
+                const SizedBox(width: 12),
                 RichText(
                   text: TextSpan(
                     children: [
@@ -528,11 +587,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
                 : _buildVenuesList(),
           ),
         ],
-      ),
-      // Bottom navigation bar
-      bottomNavigationBar: AppFooter(
-        currentIndex: _currentIndex,
-        onTabSelected: _handleTabSelection,
       ),
     );
   }
@@ -695,6 +749,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(
                           Icons.directions_walk,
@@ -741,9 +796,9 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
               ],
             ),
 
-            // Venue details section
+            // Venue details section - Updated to match first file style
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -773,37 +828,43 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
 
                   const SizedBox(height: 12),
 
-                  // Sport tags and rating
+                  // Opening hours and rate - Similar to first file
                   Row(
                     children: [
-                      // Sports tags
-                      Expanded(
-                        child: Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: venue.sports.take(2).map((sport) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF5F6FA),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                sport,
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF1B2C4F),
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                      Icon(
+                        Icons.access_time,
+                        size: 16,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        venue.openingHours,
+                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                      ),
+                      const SizedBox(width: 16),
+                      Icon(
+                        Icons.monetization_on,
+                        size: 16,
+                        color: Colors.green,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        venue.ratePerHour,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.green,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
+                    ],
+                  ),
 
-                      // Rating
+                  const SizedBox(height: 16),
+
+                  // Sport tags, rating and action buttons
+                  Row(
+                    children: [
+                      // Rating - moved to match first file layout
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 10,
@@ -814,6 +875,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             const Icon(
                               Icons.star,
@@ -832,14 +894,9 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
                           ],
                         ),
                       ),
-                    ],
-                  ),
 
-                  const SizedBox(height: 16),
+                      const SizedBox(width: 12),
 
-                  // Action buttons
-                  Row(
-                    children: [
                       // Favorite button
                       InkWell(
                         onTap: () => _toggleFavorite(venue.id),
@@ -866,7 +923,12 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            // Booking functionality
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Booking ${venue.title}...'),
+                                backgroundColor: const Color(0xFF1B2C4F),
+                              ),
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1B2C4F),
@@ -906,19 +968,14 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Padding(
-              padding: const EdgeInsets.fromLTRB(
-                16.0,
-                15.0,
-                16.0,
-                10.0,
-              ), // Added top padding of 37 (16+21)
+              padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 8.0),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header
                   const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12.0),
+                    padding: EdgeInsets.symmetric(vertical: 6.0),
                     child: Text(
                       "Sort & Filter",
                       style: TextStyle(
@@ -932,7 +989,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
 
                   // Distance Range Slider
                   const Padding(
-                    padding: EdgeInsets.only(top: 12.0),
+                    padding: EdgeInsets.only(top: 6.0),
                     child: Text(
                       "Distance Range",
                       style: TextStyle(
@@ -943,14 +1000,13 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
                   ),
                   Row(
                     children: [
-                      // Changed to show selected distance instead of fixed "0 km"
                       Text("${_distanceRadius.round()} km"),
                       Expanded(
                         child: Slider(
                           value: _distanceRadius,
                           min: 0.0,
-                          max: 20.0, // Changed from 30.0 to 20.0
-                          divisions: 19, // Changed from 29 to 19 (20-1 steps)
+                          max: 20.0,
+                          divisions: 19,
                           label: "${_distanceRadius.round()} km",
                           activeColor: const Color(0xFF1B2C4F),
                           onChanged: (value) {
@@ -960,13 +1016,13 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
                           },
                         ),
                       ),
-                      Text("20 km"), // Changed from 30 km to 20 km
+                      const Text("20 km"),
                     ],
                   ),
 
                   // Sorting Options
                   const Padding(
-                    padding: EdgeInsets.only(top: 8.0),
+                    padding: EdgeInsets.only(top: 2.0),
                     child: Text(
                       "Sort By",
                       style: TextStyle(
@@ -975,32 +1031,32 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 2),
 
                   // Sorting Radio Buttons
                   _buildSortingOption(
                     "Nearest",
                     "Distance: Low to High",
                     setModalState,
-                    bottomPadding: 2.0,
+                    bottomPadding: 1.0,
                   ),
                   _buildSortingOption(
                     "Farthest",
                     "Distance: High to Low",
                     setModalState,
-                    topPadding: 2.0,
-                    bottomPadding: 2.0,
+                    topPadding: 1.0,
+                    bottomPadding: 1.0,
                   ),
                   _buildSortingOption(
                     "Highest Rated",
                     "Rating: High to Low",
                     setModalState,
-                    topPadding: 2.0,
+                    topPadding: 1.0,
                   ),
 
                   // Divider and Reset button
                   const Padding(
-                    padding: EdgeInsets.only(top: 16.0),
+                    padding: EdgeInsets.only(top: 8.0),
                     child: Divider(),
                   ),
 
@@ -1010,8 +1066,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
                     child: TextButton.icon(
                       onPressed: () {
                         setModalState(() {
-                          _distanceRadius = 10.0; // Reset to default
-                          _sortingMode = 'Nearest'; // Reset to default
+                          _distanceRadius = 10.0;
+                          _sortingMode = 'Nearest';
                         });
                       },
                       icon: const Icon(
@@ -1027,7 +1083,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
                         ),
                       ),
                       style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        padding: const EdgeInsets.symmetric(vertical: 2),
                         visualDensity: VisualDensity.compact,
                       ),
                     ),
@@ -1035,7 +1091,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
 
                   // Apply Button
                   Padding(
-                    padding: const EdgeInsets.only(top: 8.0, bottom: 16.0),
+                    padding: const EdgeInsets.only(top: 2.0, bottom: 12.0),
                     child: SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -1122,7 +1178,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
   }
 }
 
-// Venue Model
+// Venue Model - Enhanced to match first file data structure
 class VenueModel {
   final String id;
   final String title;
@@ -1131,6 +1187,8 @@ class VenueModel {
   final String imageUrl;
   final List<String> sports;
   final double distance;
+  final String openingHours;
+  final String ratePerHour;
 
   VenueModel({
     required this.id,
@@ -1140,5 +1198,7 @@ class VenueModel {
     required this.imageUrl,
     required this.sports,
     required this.distance,
+    required this.openingHours,
+    required this.ratePerHour,
   });
 }

@@ -64,14 +64,6 @@ class SportsVenueScreen extends StatefulWidget {
 }
 
 class _SportsVenueScreenState extends State<SportsVenueScreen> {
-  int _currentIndex = 0;
-
-  void _onTabSelected(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

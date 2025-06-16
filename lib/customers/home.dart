@@ -444,20 +444,27 @@ class FeatureCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // Check if this is the Find Players card to disable it
     bool isDisabled = title == "Find Players";
-    
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: isDisabled ? null : () {
-          // Navigation only for enabled cards
-          if (title == "Book") {
-            // Navigate to Available Sports screen
-            Navigator.push(
-              context,
-              NoAnimationRoute(builder: (context) => const SportsVenueScreen()),
-            );
-          }
-        },
+        onTap: isDisabled
+            ? null
+            : () {
+                // Navigation only for enabled cards
+                if (title == "Book") {
+                  // Navigate to Nearby Venues screen
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          const venues.SportsVenueScreen1(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
+                }
+              },
         borderRadius: BorderRadius.circular(16),
         child: Ink(
           decoration: BoxDecoration(
@@ -479,16 +486,18 @@ class FeatureCard extends StatelessWidget {
                   Container(
                     height: 120,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
                       image: DecorationImage(
                         image: AssetImage(imagePath),
                         fit: BoxFit.cover,
-                        colorFilter: isDisabled 
-                          ? ColorFilter.mode(
-                              Colors.grey.withOpacity(0.7), 
-                              BlendMode.srcOver
-                            )
-                          : null,
+                        colorFilter: isDisabled
+                            ? ColorFilter.mode(
+                                Colors.grey.withOpacity(0.7),
+                                BlendMode.srcOver,
+                              )
+                            : null,
                       ),
                     ),
                   ),
@@ -503,19 +512,19 @@ class FeatureCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: isDisabled 
-                              ? Colors.grey.shade600 
-                              : Color(0xFF2D3142),
+                            color: isDisabled
+                                ? Colors.grey.shade600
+                                : Color(0xFF2D3142),
                           ),
                         ),
                         SizedBox(height: 1),
                         Text(
                           isDisabled ? "Coming soon..." : description,
                           style: TextStyle(
-                            fontSize: 12, 
-                            color: isDisabled 
-                              ? Colors.grey.shade500 
-                              : Colors.grey[600]
+                            fontSize: 12,
+                            color: isDisabled
+                                ? Colors.grey.shade500
+                                : Colors.grey[600],
                           ),
                         ),
                       ],
@@ -529,7 +538,10 @@ class FeatureCard extends StatelessWidget {
                   top: 8,
                   right: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.orange.shade600,
                       borderRadius: BorderRadius.circular(12),
@@ -753,11 +765,14 @@ class VenuesSection extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // Navigate to Nearby Venues screen from nearbyVenues.dart
+                  // Navigate to Nearby Venues screen with no transition
                   Navigator.push(
                     context,
-                    NoAnimationRoute(
-                      builder: (context) => const venues.SportsVenueScreen(),
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          const venues.SportsVenueScreen1(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
                     ),
                   );
                 },
