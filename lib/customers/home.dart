@@ -1,0 +1,906 @@
+// ignore_for_file: deprecated_member_use
+
+import 'package:flutter/material.dart';
+
+import 'UserLogin.dart' show LoginPage; // Explicitly import LoginPage
+import 'address_input.dart';
+
+import 'footer.dart';
+import 'nearbyVenues.dart' as venues; // Import the nearbyVenues file
+import 'settings.dart';
+import 'search.dart' as search;
+
+// Add a custom route with no animation
+class NoAnimationRoute<T> extends PageRoute<T> {
+  NoAnimationRoute({
+    required this.builder,
+    super.settings,
+    this.maintainState = true,
+  }) : super(fullscreenDialog: false);
+
+  final WidgetBuilder builder;
+
+  @override
+  final bool maintainState;
+
+  @override
+  Duration get transitionDuration => Duration.zero;
+
+  @override
+  Color? get barrierColor => null;
+
+  @override
+  String? get barrierLabel => null;
+
+  @override
+  bool get opaque => true;
+
+  @override
+  Widget buildPage(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+  ) {
+    return builder(context);
+  }
+
+  @override
+  bool get barrierDismissible => false;
+}
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1B2C4F),
+          brightness: Brightness.light,
+          background: const Color.fromARGB(255, 34, 51, 117),
+        ),
+        scaffoldBackgroundColor: const Color(0xFFF5F6FA),
+        cardTheme: CardThemeData(
+          elevation: 4,
+          shadowColor: Colors.black26,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
+      home: HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _currentIndex = 0;
+
+  void _onTabSelected(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  Future<void> _signOut(BuildContext context) async {
+    try {
+      // Supabase sign-out removed. Implement local sign-out logic if needed.
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (route) => false,
+      );
+    } catch (e) {
+      // This catch block handles any other errors
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error during logout: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+
+      // Still navigate to login page even if there's an error
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (route) => false,
+      );
+    }
+  }
+
+  // Navigation methods to match facility owner's homepage
+  void _navigateToNotifications() {
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const NotificationScreen(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to search screen
+        Navigator.push(
+          context,
+          NoAnimationRoute(builder: (context) => const search.SearchScreen()),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF1B2C4F).withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(2),
+                child: const Icon(
+                  Icons.search_rounded,
+                  color: Color(0xFF1B2C4F),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Text(
+                'Search sports venues...',
+                style: TextStyle(
+                  color: Colors.grey[400],
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F6FA),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(70),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          toolbarHeight: 70.0,
+          surfaceTintColor: Colors.white,
+          centerTitle: false,
+          automaticallyImplyLeading: false,
+          title: Padding(
+            padding: const EdgeInsets.only(left: 20.0),
+            child: Image.asset(
+              'assets/Athlon1.png', // Match facility owner's path
+              height: 50,
+              fit: BoxFit.contain,
+            ),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(
+                Icons.notifications_outlined,
+                color: Color(0xFF1B2C4F),
+                size: 28,
+              ),
+              onPressed: () =>
+                  _navigateToNotifications(), // Match facility owner's behavior
+              tooltip: 'Notifications',
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.person_outline,
+                color: Color(0xFF1B2C4F),
+                size: 28,
+              ),
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return Container(
+                      padding: const EdgeInsets.all(30),
+                      height: 300,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Profile',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          const ListTile(
+                            leading: Icon(Icons.person),
+                            title: Text('My Account'),
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.settings),
+                            title: const Text('Settings'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                NoAnimationRoute(
+                                  builder: (context) => const SettingsScreen(),
+                                ),
+                              );
+                            },
+                          ),
+                          ListTile(
+                            leading: const Icon(Icons.exit_to_app),
+                            title: const Text('Logout'),
+                            onTap: () async {
+                              Navigator.pop(context);
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) => const Center(
+                                  child: CircularProgressIndicator(
+                                    color: Color(0xFF1B2C4F),
+                                  ),
+                                ),
+                              );
+                              Navigator.of(context).pop();
+                              await _signOut(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+              tooltip: 'Profile',
+            ),
+            const SizedBox(width: 25),
+          ],
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0), // Match vendor's padding
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 6),
+                // Welcome/location card
+                _buildWelcomeWithLocationCard(textTheme),
+                const SizedBox(height: 16),
+                // Search bar
+                _buildSearchBar(),
+                const SizedBox(height: 24),
+                FeatureSection(),
+                const SizedBox(height: 24),
+                SportsSection(),
+                const SizedBox(height: 24),
+                VenuesSection(),
+              ],
+            ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: AppFooter(
+        currentIndex: _currentIndex,
+        onTabSelected: _onTabSelected,
+      ),
+    );
+  }
+
+  Widget _buildWelcomeWithLocationCard(TextTheme textTheme) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 0),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1B2C4F),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Left: Welcome and location text
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Welcome back, Sam!",
+                  style: textTheme.titleMedium?.copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Current Location',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Text(
+                  'Colombo, Sri Lanka',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: GestureDetector(
+              onTap: () async {
+                // Navigate to address input screen
+                final result = await Navigator.push(
+                  context,
+                  NoAnimationRoute(
+                    builder: (context) => AddressInputScreen(
+                      initialAddress: 'Colombo, Sri Lanka',
+                    ),
+                  ),
+                );
+                // Handle the result if needed
+                if (result != null && result is String) {
+                  // You can add state management here to update the location
+                  print('New location selected: $result');
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(
+                    255,
+                    172,
+                    172,
+                    172,
+                  ).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.location_on,
+                  size: 20,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Enhanced Notification Screen - Matching facility owner's implementation
+class NotificationScreen extends StatefulWidget {
+  const NotificationScreen({super.key});
+
+  @override
+  NotificationScreenState createState() => NotificationScreenState();
+}
+
+class NotificationScreenState extends State<NotificationScreen> {
+  bool _isScrolled = false;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      setState(() {
+        _isScrolled = _scrollController.offset > 0;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F6FA),
+      body: CustomScrollView(
+        controller: _scrollController,
+        slivers: [
+          SliverAppBar(
+            elevation: _isScrolled ? 4 : 0,
+            toolbarHeight: 50,
+            floating: false,
+            pinned: true,
+            backgroundColor: const Color(0xFF1B2C4F),
+            centerTitle: false,
+            title: const Text(
+              "Notifications",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Poppins',
+                color: Colors.white,
+              ),
+            ),
+            leading: Container(
+              margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.chevron_left,
+                  color: Colors.white,
+                  size: 28,
+                ),
+                onPressed: () => Navigator.pop(context),
+                tooltip: 'Back',
+              ),
+            ),
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1B2C4F).withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.notifications_none,
+                      size: 60,
+                      color: const Color(0xFF1B2C4F).withOpacity(0.7),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'All caught up!',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'You have no new notifications',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ----------------- FeatureSection & FeatureCard -----------------
+class FeatureCard extends StatelessWidget {
+  final String title;
+  final String description;
+  final String imagePath;
+
+  const FeatureCard({
+    super.key,
+    required this.title,
+    required this.description,
+    required this.imagePath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          // Navigation based on card title
+          if (title == "Find Players") {
+            print('Navigating to Find Players screen');
+          } else if (title == "Book") {
+            print('Navigating to Available Sports screen');
+          }
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha((0.08 * 255).toInt()),
+                blurRadius: 12,
+                offset: Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 120,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  image: DecorationImage(
+                    image: AssetImage(imagePath),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 4),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF2D3142),
+                      ),
+                    ),
+                    SizedBox(height: 1),
+                    Text(
+                      description,
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Update FeatureSection to include onTap handlers
+class FeatureSection extends StatelessWidget {
+  const FeatureSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: FeatureCard(
+            title: "Find Players",
+            description: "Find players and join their activities",
+            imagePath: 'assets/findplay.jpg',
+          ),
+        ),
+        SizedBox(width: 14),
+        Expanded(
+          child: FeatureCard(
+            title: "Book",
+            description: "Book your slots in venues nearby",
+            imagePath: 'assets/courts.jpg',
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ----------------- SportsSection & SportsCard -----------------
+class SportsSection extends StatelessWidget {
+  const SportsSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha((0.08 * 255).toInt()),
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  "Available Sports",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3142),
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Navigate to Available Sports screen
+                },
+                child: Text(
+                  "See More",
+                  style: TextStyle(
+                    color: Color(0xFF2D3142),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 4),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                SportsCard(sport: "Football", imagePath: "assets/football.jpg"),
+                SportsCard(sport: "Basketball", imagePath: "assets/basket.jpg"),
+                SportsCard(sport: "Tennis", imagePath: "assets/tennis.jpg"),
+                SportsCard(sport: "Cricket", imagePath: "assets/crickett.jpg"),
+                SportsCard(
+                  sport: "Badminton",
+                  imagePath: "assets/badminton.jpg",
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SportsCard extends StatelessWidget {
+  final String sport;
+  final String imagePath;
+
+  const SportsCard({super.key, required this.sport, required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: GestureDetector(
+        onTap: () {
+          // Navigate to Available Sports screen with the selected sport
+        },
+        child: Column(
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                image: DecorationImage(
+                  image: AssetImage(imagePath),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              sport,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF2D3142),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ----------------- VenuesSection & VenueCard -----------------
+class VenuesSection extends StatelessWidget {
+  const VenuesSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha((0.05 * 255).toInt()),
+            blurRadius: 8,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: Text(
+                  "Venues",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF2D3142),
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  // Navigate to Nearby Venues screen from nearbyVenues.dart
+                  Navigator.push(
+                    context,
+                    NoAnimationRoute(
+                      builder: (context) => const venues.SportsVenueScreen(),
+                    ),
+                  );
+                },
+                child: Text(
+                  "See More",
+                  style: TextStyle(
+                    color: Color(0xFF2D3142),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 2),
+          Row(
+            children: [
+              Expanded(
+                child: VenueCard(
+                  title: "CR7 Futsal & Indoor Cricket Court",
+                  location: "23 Mile Post Ave, Colombo 00300",
+                  rating: 4.75,
+                  imagePath: 'assets/cr7.jpg',
+                ),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: VenueCard(
+                  title: "Ark Sports - Indoor Cricket & Futsal",
+                  location: "141/ A, Wattala 11300, Colombo 00600",
+                  rating: 4.23,
+                  imagePath: 'assets/ark.jpg',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class VenueCard extends StatelessWidget {
+  final String title;
+  final String location;
+  final double rating;
+  final String imagePath;
+
+  const VenueCard({
+    super.key,
+    required this.title,
+    required this.location,
+    required this.rating,
+    required this.imagePath,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 240,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha((0.05 * 255).toInt()),
+              blurRadius: 8,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: 110,
+              width: double.infinity,
+              child: ClipRRect(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                child: Image.asset(imagePath, fit: BoxFit.cover),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF2D3142),
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    location,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: List.generate(5, (index) {
+                      return Icon(
+                        Icons.star,
+                        color: index < rating ? Colors.amber : Colors.grey,
+                        size: 16,
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
