@@ -133,227 +133,287 @@ class _SettingsScreenState extends State<SettingsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1B2C4F),
-        elevation: _isScrolled ? 2 : 0,
-        toolbarHeight: 50,
-        title: const Text(
-          "Settings",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Poppins',
-            color: Colors.white,
+    return MaterialApp(
+      title: 'Settings',
+      debugShowCheckedModeBanner: false,
+      themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: primaryColor,
+          brightness: Brightness.light,
+        ),
+        scaffoldBackgroundColor: backgroundColor,
+        cardTheme: const CardThemeData(
+          elevation: 2,
+          shadowColor: Colors.black12,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
         ),
-        centerTitle: false,
-        leading: Container(
-          margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
-          child: IconButton(
-            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-        ),
-        actions: [],
       ),
-      body: ListView(
-        controller: _scrollController,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-        children: [
-          // Account Settings Section
-          _buildSettingsCategory(
-            title: 'Account',
-            tiles: [
-              _buildSettingsTile(
-                icon: Icons.payment,
-                iconColor: Colors.green,
-                title: 'Payment Methods',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const PaymentMethodsScreen(),
-                    ),
-                  );
-                },
-              ),
-              _buildSettingsTile(
-                icon: Icons.lock_outline,
-                iconColor: Colors.orange,
-                title: 'Change Password',
-                onTap: () {},
-              ),
-            ],
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF3A5A8A),
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        cardTheme: const CardThemeData(
+          elevation: 2,
+          shadowColor: Colors.black26,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
-
-          const SizedBox(height: 18),
-
-          // Notifications Section
-          _buildSettingsCategory(
-            title: 'Notifications',
-            tiles: [
-              _buildToggleTile(
-                icon: Icons.notifications_outlined,
-                iconColor: Colors.red,
-                title: 'Push Notifications',
-                subtitle: 'Receive alerts for bookings and events',
-                value: _notificationsEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    _notificationsEnabled = value;
-                  });
-                },
-              ),
-              _buildSettingsTile(
-                icon: Icons.email_outlined,
-                iconColor: Colors.purple,
-                title: 'Email Notifications',
-                onTap: () {},
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 18),
-
-          // Privacy & Location Section
-          _buildSettingsCategory(
-            title: 'Privacy & Location',
-            tiles: [
-              _buildToggleTile(
-                icon: Icons.location_on_outlined,
-                iconColor: Colors.indigo,
-                title: 'Location Services',
-                subtitle: 'Allow app to access your location',
-                value: _locationEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    _locationEnabled = value;
-                  });
-                },
-              ),
-              _buildSettingsTile(
-                icon: Icons.privacy_tip_outlined,
-                iconColor: Colors.teal,
-                title: 'Privacy Policy',
-                onTap: () {
-                  _showFeatureNotImplemented(context, 'Privacy Policy');
-                },
-              ),
-              _buildSettingsTile(
-                icon: Icons.description_outlined,
-                iconColor: Colors.blueGrey,
-                title: 'Terms of Service',
-                onTap: () {
-                  _showFeatureNotImplemented(context, 'Terms of Service');
-                },
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 18),
-
-          // Appearance Section
-          _buildSettingsCategory(
-            title: 'Appearance',
-            tiles: [
-              _buildToggleTile(
-                icon: Icons.dark_mode_outlined,
-                iconColor: Colors.deepPurple,
-                title: 'Dark Mode',
-                subtitle: 'Change app theme',
-                value: _darkModeEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    _darkModeEnabled = value;
-                  });
-                },
-              ),
-              _buildSettingsTile(
-                icon: Icons.language,
-                iconColor: Colors.cyan,
-                title: 'Language',
-                subtitle: _selectedLanguage,
-                onTap: () {
-                  _showLanguageDialog(context);
-                },
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 18),
-
-          // Support Section
-          _buildSettingsCategory(
-            title: 'Support',
-            tiles: [
-              _buildSettingsTile(
-                icon: Icons.help_outline,
-                iconColor: Colors.amber,
-                title: 'Help Center',
-                onTap: () {
-                  _showFeatureNotImplemented(context, 'Help Center');
-                },
-              ),
-              _buildSettingsTile(
-                icon: Icons.report_problem_outlined,
-                iconColor: Colors.red,
-                title: 'Report a Problem',
-                onTap: () {
-                  _showFeatureNotImplemented(context, 'Report a Problem');
-                },
-              ),
-              _buildSettingsTile(
-                icon: Icons.support_agent,
-                iconColor: Colors.green,
-                title: 'Contact Us',
-                onTap: () {
-                  _showFeatureNotImplemented(context, 'Contact Us');
-                },
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 18),
-
-          // About Section
-          _buildSettingsCategory(
-            title: 'About',
-            tiles: [
-              _buildSettingsTile(
-                icon: Icons.info_outline,
-                iconColor: Colors.blue,
-                title: 'App Version',
-                subtitle: 'v1.0.0',
-                onTap: () {},
-              ),
-            ],
-          ),
-
-          // Logout Button
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1B2C4F),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+      home: Scaffold(
+        backgroundColor: backgroundColor,
+        body: CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            // App Bar - matching original style
+            SliverAppBar(
+              elevation: _isScrolled ? 4 : 0,
+              toolbarHeight: 50,
+              floating: false,
+              pinned: true,
+              backgroundColor: primaryColor,
+              centerTitle: false,
+              title: const Text(
+                "Settings",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Poppins',
+                  color: Colors.white,
                 ),
-                elevation: 2,
               ),
-              onPressed: () {
-                _showLogoutDialog(context);
-              },
-              child: const Text(
-                'Logout',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              leading: Container(
+                margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.chevron_left,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  tooltip: 'Back',
+                ),
               ),
             ),
+
+            // Settings Content with better spacing
+            SliverToBoxAdapter(
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSectionTitle('Preferences'),
+                      const SizedBox(height: 12),
+                      _buildPreferencesCard(),
+                      const SizedBox(height: 32),
+                      _buildSectionTitle('Notifications'),
+                      const SizedBox(height: 12),
+                      _buildNotificationsCard(),
+                      const SizedBox(height: 32),
+                      _buildSectionTitle('Security'),
+                      const SizedBox(height: 12),
+                      _buildSecurityCard(),
+                      const SizedBox(height: 32),
+                      _buildSectionTitle('Account'),
+                      const SizedBox(height: 12),
+                      _buildAccountCard(),
+                      const SizedBox(height: 32),
+                      _buildSectionTitle('Support'),
+                      const SizedBox(height: 12),
+                      _buildSupportCard(),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 2),
+      child: Text(
+        title,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+          color: primaryColor,
+          letterSpacing: -0.3,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPreferencesCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: (isDarkMode ? Colors.black : Colors.black).withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildSettingsSwitch(
+            title: 'Dark Mode',
+            subtitle: 'Apply dark theme to the app',
+            value: isDarkMode,
+            onChanged: (value) {
+              setState(() {
+                isDarkMode = value;
+              });
+            },
+            icon: Icons.dark_mode_outlined,
+            isFirst: true,
+          ),
+          _buildDivider(),
+          _buildSettingsTile(
+            title: 'Language',
+            subtitle: selectedLanguage,
+            onTap: _showLanguageSelectionDialog,
+            icon: Icons.language_outlined,
+            trailing: Icon(
+              Icons.chevron_right,
+              color: textLightColor,
+              size: 20,
+            ),
+            isLast: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationsCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: (isDarkMode ? Colors.black : Colors.black).withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildSettingsSwitch(
+            title: 'Push Notifications',
+            subtitle: 'Receive push notifications',
+            value: isNotificationsEnabled,
+            onChanged: (value) {
+              setState(() {
+                isNotificationsEnabled = value;
+              });
+            },
+            icon: Icons.notifications_outlined,
+            isFirst: true,
+            isLast: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSecurityCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: (isDarkMode ? Colors.black : Colors.black).withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildSettingsTile(
+            title: 'Change Password',
+            subtitle:
+                'Last changed ${_getTimeAgoString(lastPasswordChangeTime)}', // Updated to show dynamic time
+            onTap: _showChangePasswordDialog,
+            icon: Icons.lock_outlined,
+            trailing: Icon(
+              Icons.chevron_right,
+              color: textLightColor,
+              size: 20,
+            ),
+            isFirst: true,
+          ),
+          _buildDivider(),
+          _buildSettingsTile(
+            title: 'Forgot Password',
+            subtitle: 'Reset your password via email',
+            onTap: _showForgotPasswordDialog,
+            icon: Icons.password_outlined,
+            trailing: Icon(
+              Icons.chevron_right,
+              color: textLightColor,
+              size: 20,
+            ),
+            isLast: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSupportCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: (isDarkMode ? Colors.black : Colors.black).withOpacity(0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildSettingsTile(
+            title: 'Help Center',
+            subtitle: 'Get help with the app',
+            onTap: () {
+              // Navigate to help center
+            },
+            icon: Icons.help_outline,
+            trailing: Icon(
+              Icons.chevron_right,
+              color: textLightColor,
+              size: 20,
+            ),
+            isFirst: true,
+            isLast: true,
           ),
         ],
       ),
