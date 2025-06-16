@@ -5,6 +5,7 @@ import 'userProfile.dart';
 
 // Explicitly import LoginPage
 import 'address_input.dart';
+import 'availableSports.dart'; // Add this import
 
 import 'footer.dart';
 import 'nearbyVenues.dart' as venues; // Import the nearbyVenues file
@@ -464,7 +465,11 @@ class FeatureCard extends StatelessWidget {
           if (title == "Find Players") {
             print('Navigating to Find Players screen');
           } else if (title == "Book") {
-            print('Navigating to Available Sports screen');
+            // Navigate to Available Sports screen
+            Navigator.push(
+              context,
+              NoAnimationRoute(builder: (context) => const SportsVenueScreen()),
+            );
           }
         },
         borderRadius: BorderRadius.circular(16),
@@ -591,6 +596,12 @@ class SportsSection extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   // Navigate to Available Sports screen
+                  Navigator.push(
+                    context,
+                    NoAnimationRoute(
+                      builder: (context) => const SportsVenueScreen(),
+                    ),
+                  );
                 },
                 child: Text(
                   "See More",
@@ -637,6 +648,12 @@ class SportsCard extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           // Navigate to Available Sports screen with the selected sport
+          Navigator.push(
+            context,
+            NoAnimationRoute(
+              builder: (context) => SportsVenueScreen(initialSport: sport),
+            ),
+          );
         },
         child: Column(
           children: [

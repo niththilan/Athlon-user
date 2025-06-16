@@ -200,12 +200,24 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
         _venues = List<Map<String, dynamic>>.from(_sampleVenues);
         debugPrint('🏟️ Venues loaded: ${_venues.length}');
 
-        // Initialize filtered venues with all venues
-        _filteredVenues = _venues;
-        _isLoading = false;
-        _showVenues = _venues.isNotEmpty;
+        // Filter venues based on initial sport if provided
+        if (widget.initialSport.isNotEmpty) {
+          _filteredVenues = _venues
+              .where((venue) => venue['sport'] == widget.initialSport)
+              .toList();
+          debugPrint(
+            '🎯 Filtered for ${widget.initialSport}: ${_filteredVenues.length} venues',
+          );
+        } else {
+          _filteredVenues = _venues;
+        }
 
-        if (_venues.isEmpty) {}
+        _isLoading = false;
+        _showVenues = _filteredVenues.isNotEmpty;
+
+        if (_filteredVenues.isEmpty && widget.initialSport.isNotEmpty) {
+          debugPrint('⚠️ No venues found for sport: ${widget.initialSport}');
+        }
       });
     } catch (error) {
       if (!mounted) return;
@@ -241,11 +253,14 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
   void _onSearchChanged() {
     setState(() {
       _searchQuery = _searchController.text.toLowerCase();
-      _filteredVenues = _selectedSport.isEmpty
+
+      // Start with all venues or filtered by sport
+      List<Map<String, dynamic>> baseVenues = _selectedSport.isEmpty
           ? _venues
           : _venues.where((venue) => venue['sport'] == _selectedSport).toList();
 
-      _filteredVenues = _filteredVenues.where((venue) {
+      // Apply search filter
+      _filteredVenues = baseVenues.where((venue) {
         final titleMatch =
             venue['title']?.toString().toLowerCase().contains(_searchQuery) ??
             false;
@@ -254,17 +269,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
               _searchQuery,
             ) ??
             false;
-        final sportMatch =
-            venue['sport']?.toString().toLowerCase().contains(_searchQuery) ??
-            false;
 
-        // If a sport is selected, only show venues for that sport
-        if (_selectedSport.isNotEmpty) {
-          return venue['sport'] == _selectedSport &&
-              (titleMatch || locationMatch);
-        }
-
-        return titleMatch || locationMatch || sportMatch;
+        return titleMatch || locationMatch;
       }).toList();
 
       // Show venues section if we have search results
@@ -438,7 +444,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
             title: const Text(
               "Available Sports",
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Poppins',
                 color: Colors.white,
@@ -1039,6 +1045,61 @@ class _SportsCategoriesState extends State<SportsCategories> {
     });
   }
 
+  // Helper function to prioritize selected sport and filter based on search
+  List<Map<String, dynamic>> _getOrderedSports() {
+    // Filter sports based on search query if available
+    List<Map<String, dynamic>> filteredSports = widget.searchQuery.isEmpty
+        ? sports
+        : () {
+            final query = widget.searchQuery.toLowerCase();
+            final matchingSports = sports
+                .where(
+                  (sport) =>
+                      sport['name'].toString().toLowerCase().contains(query),
+                )
+                .toList();
+
+            // Sort the filtered sports to show best matches first
+            matchingSports.sort((a, b) {
+              final aName = a['name'].toString().toLowerCase();
+              final bName = b['name'].toString().toLowerCase();
+
+              // Exact match comes first
+              if (aName == query && bName != query) return -1;
+              if (bName == query && aName != query) return 1;
+
+              // Sports that start with the query come next
+              final aStartsWith = aName.startsWith(query);
+              final bStartsWith = bName.startsWith(query);
+
+              if (aStartsWith && !bStartsWith) return -1;
+              if (bStartsWith && !aStartsWith) return 1;
+
+              // If both start with query or both don't, sort alphabetically
+              return aName.compareTo(bName);
+            });
+
+            return matchingSports;
+          }();
+
+    // If a sport is selected and no search query, prioritize the selected sport
+    if (widget.selectedSport.isNotEmpty && widget.searchQuery.isEmpty) {
+      // Find the selected sport
+      final selectedSportIndex = filteredSports.indexWhere(
+        (sport) => sport['name'] == widget.selectedSport,
+      );
+
+      if (selectedSportIndex != -1) {
+        // Remove the selected sport from its current position
+        final selectedSport = filteredSports.removeAt(selectedSportIndex);
+        // Insert it at the beginning
+        filteredSports.insert(0, selectedSport);
+      }
+    }
+
+    return filteredSports;
+  }
+
   IconData _getIconFromString(String iconName) {
     // Map icon names to Flutter Icons
     switch (iconName) {
@@ -1121,40 +1182,8 @@ class _SportsCategoriesState extends State<SportsCategories> {
       );
     }
 
-    // Filter sports based on search query if available
-    final filteredSports = widget.searchQuery.isEmpty
-        ? sports
-        : () {
-            final query = widget.searchQuery.toLowerCase();
-            final matchingSports = sports
-                .where(
-                  (sport) =>
-                      sport['name'].toString().toLowerCase().contains(query),
-                )
-                .toList();
-
-            // Sort the filtered sports to show best matches first
-            matchingSports.sort((a, b) {
-              final aName = a['name'].toString().toLowerCase();
-              final bName = b['name'].toString().toLowerCase();
-
-              // Exact match comes first
-              if (aName == query && bName != query) return -1;
-              if (bName == query && aName != query) return 1;
-
-              // Sports that start with the query come next
-              final aStartsWith = aName.startsWith(query);
-              final bStartsWith = bName.startsWith(query);
-
-              if (aStartsWith && !bStartsWith) return -1;
-              if (bStartsWith && !aStartsWith) return 1;
-
-              // If both start with query or both don't, sort alphabetically
-              return aName.compareTo(bName);
-            });
-
-            return matchingSports;
-          }();
+    // Get ordered sports with selected sport prioritized
+    final orderedSports = _getOrderedSports();
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1254,7 +1283,7 @@ class _SportsCategoriesState extends State<SportsCategories> {
             ],
           ),
           const SizedBox(height: 16),
-          filteredSports.isEmpty
+          orderedSports.isEmpty
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
@@ -1276,7 +1305,7 @@ class _SportsCategoriesState extends State<SportsCategories> {
                   controller: _scrollController,
                   child: Row(
                     children: [
-                      // Add "All Sports" option at beginning
+                      // Add "All Sports" option at beginning only if a sport is selected
                       if (widget.selectedSport.isNotEmpty)
                         GestureDetector(
                           onTap: () {
@@ -1336,8 +1365,8 @@ class _SportsCategoriesState extends State<SportsCategories> {
                             ),
                           ),
                         ),
-                      // Map through the filtered sports list
-                      ...filteredSports.map((sport) {
+                      // Map through the ordered sports list
+                      ...orderedSports.map((sport) {
                         final sportName = sport['name'] as String;
                         final bool isSelected =
                             sportName == widget.selectedSport;
