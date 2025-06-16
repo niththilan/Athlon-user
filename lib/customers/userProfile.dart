@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'settings.dart'; // Import the settings screen
 
 // Constants for consistent styling - matching vendor screen
 const Color primaryColor = Color(0xFF1B2C4F);
@@ -335,7 +336,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   // Settings action
   void _showSettings() {
-    _showSuccessSnackBar('Settings', message: "Opening settings...");
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+    );
   }
 
   // Help and Support action
