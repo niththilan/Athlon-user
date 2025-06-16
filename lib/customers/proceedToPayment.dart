@@ -750,6 +750,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
+  void _calculateAmountPerPerson() {
+    setState(() {
+      _amountPerPerson = _splitPayment ? 750.0 / _numberOfPeople : 750.0;
+    });
+  }
+
   Widget _buildPaySecurelyButton() {
     return ElevatedButton(
       onPressed: () {
@@ -775,242 +781,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
               color: Colors.white,
               fontSize: 16,
               fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _calculateAmountPerPerson() {
-    setState(() {
-      _amountPerPerson = _splitPayment ? 750.0 / _numberOfPeople : 750.0;
-    });
-  }
-
-  Widget _buildPricingSummaryCard(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Pricing Summary',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textDarkColor,
-              ),
-            ),
-            const SizedBox(height: 20),
-            _buildPriceRow('Venue Rental', 'LKR 700.00'),
-            _buildPriceRow('Service Fee', 'LKR 50.00'),
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: Divider(thickness: 1),
-            ),
-            _buildPriceRow('Total', 'LKR 750.00', isTotal: true),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: primaryColor.withOpacity(0.2)),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, size: 18, color: primaryColor),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      'Payment required to confirm your booking. Cancellations are free up to 24 hours before your slot.',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade700,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const PaymentScreen(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                minimumSize: const Size(double.infinity, 54),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 2,
-              ),
-              child: const Text(
-                'Proceed to Payment',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.lock_outline, size: 16, color: primaryColor),
-                  const SizedBox(width: 6),
-                  Text(
-                    'Secure payment powered by Stripe',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSelectedServicesCard() {
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Selected Services',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textDarkColor,
-              ),
-            ),
-            const SizedBox(height: 16),
-            _buildServiceRow('Venue Rental', 'LKR 700.00', true),
-            const Divider(height: 1, thickness: 0.5),
-            _buildServiceRow('Service Fee', 'LKR 50.00', true),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPaymentSummaryRow() {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.green.shade100,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(Icons.check, color: Colors.green, size: 20),
-        ),
-        const SizedBox(width: 16),
-        const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Amount Paid:',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            SizedBox(height: 2),
-            Text(
-              'LKR 750.00',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: textDarkColor,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPriceRow(String title, String price, {bool isTotal = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: isTotal ? 16 : 14,
-              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
-              color: isTotal ? primaryColor : textDarkColor,
-            ),
-          ),
-          Text(
-            price,
-            style: TextStyle(
-              fontSize: isTotal ? 18 : 14,
-              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
-              color: isTotal ? primaryColor : textDarkColor,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildServiceRow(String title, String price, bool isSelected) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 22,
-            height: 22,
-            decoration: BoxDecoration(
-              color: isSelected ? primaryColor : Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: isSelected
-                ? const Icon(Icons.check, color: Colors.white, size: 16)
-                : null,
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              title,
-              style: TextStyle(
-                fontSize: 14,
-                color: isSelected ? textDarkColor : Colors.grey.shade500,
-                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
-              ),
-            ),
-          ),
-          Text(
-            price,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: isSelected ? primaryColor : Colors.grey.shade500,
             ),
           ),
         ],
@@ -1285,7 +1055,7 @@ class InvoiceScreen extends StatelessWidget {
       title: const Text(
         'Payment Summary',
         style: TextStyle(
-          fontSize: 16,
+          fontSize: 18,
           fontWeight: FontWeight.w600,
           fontFamily: 'Poppins',
           color: Colors.white,
@@ -1321,11 +1091,7 @@ class InvoiceScreen extends StatelessWidget {
               _buildBookingDetailsCard(),
               const SizedBox(height: 16),
 
-              // Selected Services - moved before pricing for logical flow
-              _buildSelectedServicesCard(),
-              const SizedBox(height: 16),
-
-              // Pricing Summary - at the end as the conclusion
+              // Pricing Summary - removed Selected Services section
               _buildPricingSummaryCard(context),
             ],
           ),
@@ -1484,7 +1250,7 @@ class InvoiceScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSelectedServicesCard() {
+  Widget _buildPricingSummaryCard(BuildContext context) {
     return Card(
       elevation: 4,
       shadowColor: Colors.black.withOpacity(0.1),
@@ -1495,20 +1261,222 @@ class InvoiceScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Selected Services',
+              'Pricing Summary',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: textDarkColor,
               ),
             ),
+            const SizedBox(height: 20),
+            _buildPriceRow('Venue Rental', 'LKR 700.00'),
+            _buildPriceRow('Service Fee', 'LKR 50.00'),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Divider(thickness: 1),
+            ),
+            _buildPriceRow('Total', 'LKR 750.00', isTotal: true),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: primaryColor.withOpacity(0.2)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, size: 18, color: primaryColor),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Payment required to confirm your booking. Cancellations are free up to 24 hours before your slot.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PaymentScreen(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                minimumSize: const Size(double.infinity, 54),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 2,
+              ),
+              child: const Text(
+                'Proceed to Payment',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
             const SizedBox(height: 16),
-            _buildServiceRow('Venue Rental', 'LKR 700.00', true),
-            const Divider(height: 1, thickness: 0.5),
-            _buildServiceRow('Service Fee', 'LKR 50.00', true),
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.lock_outline, size: 16, color: primaryColor),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Secure payment powered by Stripe',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildServiceRow(String title, String price, bool isSelected) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Container(
+            width: 22,
+            height: 22,
+            decoration: BoxDecoration(
+              color: isSelected ? primaryColor : Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: isSelected
+                ? const Icon(Icons.check, color: Colors.white, size: 16)
+                : null,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                color: isSelected ? textDarkColor : Colors.grey.shade500,
+                fontWeight: isSelected ? FontWeight.w500 : FontWeight.normal,
+              ),
+            ),
+          ),
+          Text(
+            price,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: isSelected ? primaryColor : Colors.grey.shade500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriceRow(String title, String price, {bool isTotal = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: isTotal ? 16 : 14,
+              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
+              color: isTotal ? primaryColor : textDarkColor,
+            ),
+          ),
+          Text(
+            price,
+            style: TextStyle(
+              fontSize: isTotal ? 18 : 14,
+              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
+              color: isTotal ? primaryColor : textDarkColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+                // Venue image/icon
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: primaryColor.withOpacity(0.1),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.sports_soccer,
+                      size: 30,
+                      color: primaryColor,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'CR7 Futsal Arena',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: textDarkColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      _buildInfoRow(Icons.location_on, 'Downtown, 2.5 km'),
+                      const SizedBox(height: 4),
+                      _buildInfoRow(
+                        Icons.calendar_today_outlined,
+                        '11 Dec 2024, 10:00 - 12:00',
+                      ),
+                      const SizedBox(height: 4),
+                      _buildInfoRow(
+                        Icons.people_outline,
+                        'Capacity: 10-12 players',
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: Colors.grey.shade600),
+        const SizedBox(width: 6),
+        Text(text, style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
+      ],
     );
   }
 
@@ -1648,6 +1616,38 @@ class InvoiceScreen extends StatelessWidget {
               color: isSelected ? primaryColor : Colors.grey.shade500,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPriceRow(String title, String price, {bool isTotal = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: isTotal ? 16 : 14,
+              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
+              color: isTotal ? primaryColor : textDarkColor,
+            ),
+          ),
+          Text(
+            price,
+            style: TextStyle(
+              fontSize: isTotal ? 18 : 14,
+              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
+              color: isTotal ? primaryColor : textDarkColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
         ],
       ),
     );

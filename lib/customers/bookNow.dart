@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFF1B2C4F),
           brightness: Brightness.light,
-          background: const Color.fromARGB(255, 34, 51, 117),
+          surface: const Color.fromARGB(255, 34, 51, 117),
         ),
         scaffoldBackgroundColor: const Color(0xFFF5F6FA),
       ),
@@ -78,13 +78,13 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
             },
           ),
         ),
-        actions: [],
+        actions: const [],
       ),
-      body: CustomScrollView(
+      body: const CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.only(
+              padding: EdgeInsets.only(
                 top: 8.0,
                 left: 16.0,
                 right: 16.0,
@@ -93,14 +93,14 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
-                  const VenueSelectionSection(),
-                  const SizedBox(height: 20),
-                  const BookingDateTimeSection(),
-                  const SizedBox(height: 20),
-                  const NumberOfPlayersSection(),
-                  const SizedBox(height: 20),
-                  const PricingSummarySection(),
+                  SizedBox(height: 20),
+                  VenueSelectionSection(),
+                  SizedBox(height: 20),
+                  BookingDateTimeSection(),
+                  SizedBox(height: 20),
+                  NumberOfPlayersSection(),
+                  SizedBox(height: 20),
+                  PricingSummarySection(),
                 ],
               ),
             ),
@@ -324,7 +324,7 @@ class BookingDateTimeSection extends StatefulWidget {
   const BookingDateTimeSection({super.key});
 
   @override
-  _BookingDateTimeSectionState createState() => _BookingDateTimeSectionState();
+  State<BookingDateTimeSection> createState() => _BookingDateTimeSectionState();
 }
 
 class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
@@ -408,11 +408,9 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
   }
 
   void _resetTimeSlotsForDate() {
-    // Clear current selections
     selectedSlots.clear();
     selectedForRemoval.clear();
     
-    // Reset all slots to available
     for (var slot in timeSlots) {
       slot.status = SlotStatus.available;
     }
@@ -432,7 +430,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
       setState(() {
         selectedDate = newSelectedDate;
         currentDateStartIndex = newStartIndex;
-        _resetTimeSlotsForDate(); // Reset slots for new date
+        _resetTimeSlotsForDate();
       });
     }
   }
@@ -446,14 +444,11 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     setState(() {
       List<String> allTimes = timeSlots.map((s) => s.time).toList();
 
-      // If clicking a selected slot
       if (slot.status == SlotStatus.selected) {
-        // Find the range of selected slots
         int clickedIndex = allTimes.indexOf(slot.time);
         int firstSelectedIndex = -1;
         int lastSelectedIndex = -1;
 
-        // Find the continuous range of selected slots
         for (int i = 0; i < timeSlots.length; i++) {
           if (timeSlots[i].status == SlotStatus.selected) {
             if (firstSelectedIndex == -1) firstSelectedIndex = i;
@@ -463,7 +458,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
           }
         }
 
-        // If clicked slot is in middle of selection, deselect from clicked slot onwards
         if (clickedIndex > firstSelectedIndex &&
             clickedIndex < lastSelectedIndex) {
           for (int i = clickedIndex; i <= lastSelectedIndex; i++) {
@@ -473,7 +467,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
             }
           }
         } else {
-          // Otherwise deselect all
           selectedSlots.clear();
           for (var s in timeSlots) {
             if (s.status == SlotStatus.selected) {
@@ -484,7 +477,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
         return;
       }
 
-      // Regular selection logic for unselected slots
       if (selectedSlots.isEmpty) {
         slot.status = SlotStatus.selected;
         selectedSlots.add(slot.time);
@@ -540,9 +532,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
   void _showSplitTimeSlotDialog(List<List<int>> ranges) {
     String slotRangesText = ranges.map((range) {
       var startTime = timeSlots[range[0]].time;
-      var endTime = DateFormat('h:mm a').format(DateFormat('hh:mm a')
-          .parse(timeSlots[range[1]].time)
-          .add(const Duration(minutes: 30)));
+      var endTime = _formatEndTime(timeSlots[range[1]].time);
       return '$startTime - $endTime';
     }).join('\n');
 
@@ -587,12 +577,22 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     );
   }
 
+  // Fixed: Add helper method for formatting end time
+  String _formatEndTime(String timeStr) {
+    try {
+      final parsedTime = DateFormat('h:mm a').parse(timeStr);
+      final endTime = parsedTime.add(const Duration(minutes: 30));
+      return DateFormat('h:mm a').format(endTime);
+    } catch (e) {
+      return timeStr;
+    }
+  }
+
   Map<String, dynamic> _getSelectedDuration() {
     if (selectedSlots.isEmpty) {
       return {'formatted': '', 'minutes': 0, 'splits': []};
     }
 
-    // Get only the actually selected slots (green ones)
     var actuallySelectedTimes = timeSlots
         .where((slot) => slot.status == SlotStatus.selected)
         .map((slot) => slot.time)
@@ -603,7 +603,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
       return {'formatted': '', 'minutes': 0, 'splits': []};
     }
 
-    // Helper function to parse time strings
+    // Fixed: Improved time parsing
     DateTime parseTime(String timeStr) {
       try {
         final parsedTime = DateFormat('h:mm a').parse(timeStr);
@@ -621,7 +621,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
       }
     }
 
-    // Find continuous ranges in selected slots
     List<List<String>> timeRanges = [];
     List<String> currentRange = [];
 
@@ -646,7 +645,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
       timeRanges.add([...currentRange]);
     }
 
-    // Format each range
     List<String> formattedRanges = [];
     for (var range in timeRanges) {
       final startDateTime = parseTime(range.first);
@@ -658,7 +656,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
       formattedRanges.add('$startTimeStr - $endTimeStr');
     }
 
-    // Calculate total minutes
     final totalMinutes = actuallySelectedTimes.length * 30;
     final hours = totalMinutes ~/ 60;
     final minutes = totalMinutes % 60;
@@ -673,7 +670,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
       durationText = '$minutes min';
     }
 
-    // For a simple non-split slot
     if (timeRanges.length == 1) {
       final startDateTime = parseTime(actuallySelectedTimes.first);
       final endDateTime = parseTime(actuallySelectedTimes.last)
@@ -688,9 +684,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
         'splits': formattedRanges,
         'isSplit': false
       };
-    }
-    // For split slots - only show duration part without time ranges
-    else {
+    } else {
       return {
         'formatted': '($durationText)',
         'minutes': totalMinutes,
@@ -716,10 +710,9 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     return _buildCombinedDateAndSlotsSection();
   }
 
-  // Updated combined date and slots section (matching homepage calendar)
   Widget _buildCombinedDateAndSlotsSection() {
     return Container(
-      padding: const EdgeInsets.all(16), // Reduced from 24
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -734,11 +727,9 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header row with View Calendar button
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              // View Calendar button
               GestureDetector(
                 onTap: () {
                   setState(() {
@@ -768,7 +759,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
   Widget _buildCalendarContent() {
     return Column(
       children: [
-        // Calendar header
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -799,7 +789,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
           ],
         ),
         const SizedBox(height: 16),
-        // Week headers
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(
@@ -821,7 +810,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
           ),
         ),
         const SizedBox(height: 12),
-        // Calendar grid
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -838,7 +826,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
   Widget _buildDateAndSlotsContent() {
     return Column(
       children: [
-        // Date navigation
         Row(
           children: [
             GestureDetector(
@@ -847,6 +834,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
                   if (currentDateStartIndex > 0) {
                     currentDateStartIndex--;
                     selectedDate = dateList[currentDateStartIndex + 2];
+                    _resetTimeSlotsForDate(); // Fixed: Reset slots when date changes
                   }
                 });
               },
@@ -870,6 +858,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
                   if (currentDateStartIndex + 5 < dateList.length) {
                     currentDateStartIndex++;
                     selectedDate = dateList[currentDateStartIndex + 2];
+                    _resetTimeSlotsForDate(); // Fixed: Reset slots when date changes
                   }
                 });
               },
@@ -903,7 +892,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
           minWidth: 48,
           maxWidth: 64,
         ),
-        width: isSelected ? 60 : 48, // Reduced sizes to prevent overflow
+        width: isSelected ? 60 : 48,
         height: isSelected ? 60 : 48,
         decoration: BoxDecoration(
           color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[200],
@@ -915,7 +904,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
               ? [
                   BoxShadow(
                     color: const Color(0xFF1B2C4F).withOpacity(0.3),
-                    blurRadius: 8, // Reduced shadow
+                    blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
                 ]
@@ -925,7 +914,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
           child: Text(
             DateFormat('d').format(date),
             style: TextStyle(
-              fontSize: 15, // Slightly reduced font size
+              fontSize: 15,
               fontWeight: FontWeight.bold,
               color: isSelected ? Colors.white : const Color(0xFF2D3142),
             ),
@@ -944,19 +933,16 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
 
     List<Widget> dayWidgets = [];
 
-    // Add empty cells for days before the first day of the month
     for (int i = 0; i < firstDayWeekday; i++) {
       dayWidgets.add(
-        Expanded(
-          child: Container(
+        const Expanded(
+          child: SizedBox(
             height: 36,
-            margin: const EdgeInsets.all(2),
           ),
         ),
       );
     }
 
-    // Add day cells
     for (int day = 1; day <= daysInMonth; day++) {
       final date = DateTime(selectedDate.year, selectedDate.month, day);
       final isSelected = _isSameDay(date, selectedDate);
@@ -998,16 +984,14 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
       );
     }
 
-    // Build grid with 7 columns
     List<Widget> rows = [];
     for (int i = 0; i < dayWidgets.length; i += 7) {
       final weekDays = dayWidgets.skip(i).take(7).toList();
       while (weekDays.length < 7) {
         weekDays.add(
-          Expanded(
-            child: Container(
+          const Expanded(
+            child: SizedBox(
               height: 36,
-              margin: const EdgeInsets.all(2),
             ),
           ),
         );
@@ -1022,7 +1006,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     return Column(mainAxisSize: MainAxisSize.min, children: rows);
   }
 
-  /// Update the slots section to use responsive legend
   Widget _buildSlotsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1057,9 +1040,9 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
           ],
         ),
         const SizedBox(height: 20),
-        _buildLegend(), // Now uses the responsive version
+        _buildLegend(),
         const SizedBox(height: 20),
-        _buildTimeSlotGrid(), // Now uses the responsive version
+        _buildTimeSlotGrid(),
         if (selectedSlots.isNotEmpty)
           Align(
             alignment: Alignment.centerRight,
@@ -1082,18 +1065,12 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     );
   }
 
-  /// Builds responsive time slot grid that adapts to screen size
   Widget _buildTimeSlotGrid() {
-    // Get screen dimensions
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Calculate responsive values
-    double containerPadding =
-        screenWidth < 350 ? 12 : 16; // Padding from container
-    double availableWidth = screenWidth -
-        (containerPadding * 4); // Account for container margins and padding
+    double containerPadding = screenWidth < 350 ? 12 : 16;
+    double availableWidth = screenWidth - (containerPadding * 4);
 
-    // Calculate slot width and spacing
     double slotWidth;
     double smallSpacing;
     double largeSpacing;
@@ -1102,24 +1079,21 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     double slotHeight;
 
     if (screenWidth < 350) {
-      // Very small screens (iPhone SE)
-      slotWidth = (availableWidth - 40) / 4; // 40px total for spacing
+      slotWidth = (availableWidth - 40) / 4;
       smallSpacing = 4;
       largeSpacing = 16;
       fontSize = 10;
       smallFontSize = 8.5;
       slotHeight = 38;
     } else if (screenWidth < 400) {
-      // Small screens
-      slotWidth = (availableWidth - 44) / 4; // 44px total for spacing
+      slotWidth = (availableWidth - 44) / 4;
       smallSpacing = 5;
       largeSpacing = 18;
       fontSize = 11;
       smallFontSize = 9;
       slotHeight = 40;
     } else {
-      // Normal and large screens
-      slotWidth = (availableWidth - 48) / 4; // 48px total for spacing
+      slotWidth = (availableWidth - 48) / 4;
       smallSpacing = 6;
       largeSpacing = 24;
       fontSize = 12;
@@ -1128,7 +1102,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     }
 
     return SizedBox(
-      height: 300, // Fixed height for scrolling
+      height: 300,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         child: ListView.builder(
@@ -1141,12 +1115,10 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // First slot
                   _buildResponsiveTimeSlot(timeSlots[rowIndex * 4], slotWidth,
                       slotHeight, fontSize, smallFontSize),
                   SizedBox(width: smallSpacing),
 
-                  // Second slot (if exists)
                   if (rowIndex * 4 + 1 < timeSlots.length)
                     _buildResponsiveTimeSlot(timeSlots[rowIndex * 4 + 1],
                         slotWidth, slotHeight, fontSize, smallFontSize)
@@ -1155,7 +1127,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
 
                   SizedBox(width: largeSpacing),
 
-                  // Third slot (if exists)
                   if (rowIndex * 4 + 2 < timeSlots.length)
                     _buildResponsiveTimeSlot(timeSlots[rowIndex * 4 + 2],
                         slotWidth, slotHeight, fontSize, smallFontSize)
@@ -1164,7 +1135,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
 
                   SizedBox(width: smallSpacing),
 
-                  // Fourth slot (if exists)
                   if (rowIndex * 4 + 3 < timeSlots.length)
                     _buildResponsiveTimeSlot(timeSlots[rowIndex * 4 + 3],
                         slotWidth, slotHeight, fontSize, smallFontSize)
@@ -1179,7 +1149,6 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     );
   }
 
-  /// Builds responsive time slot with dynamic sizing
   Widget _buildResponsiveTimeSlot(TimeSlot slot, double width, double height,
       double fontSize, double smallFontSize) {
     Color backgroundColor;
@@ -1192,11 +1161,10 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
         break;
       case SlotStatus.occupied:
         backgroundColor = selectedForRemoval.contains(slot.time)
-            ? const Color.fromARGB(
-                255, 255, 205, 210) // Light red when selected for removal
+            ? const Color.fromARGB(255, 255, 205, 210)
             : const Color.fromARGB(255, 150, 9, 7);
         textColor = selectedForRemoval.contains(slot.time)
-            ? const Color.fromARGB(255, 150, 9, 7) // Dark red text
+            ? const Color.fromARGB(255, 150, 9, 7)
             : Colors.white;
         break;
       case SlotStatus.available:
@@ -1224,8 +1192,7 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
         height: height,
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(
-              width < 70 ? 8 : 10), // Smaller radius for smaller slots
+          borderRadius: BorderRadius.circular(width < 70 ? 8 : 10),
           border: selectedForRemoval.contains(slot.time)
               ? Border.all(color: const Color(0xFFB71C1C), width: 2)
               : null,
@@ -1264,11 +1231,9 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     );
   }
 
-  /// Builds responsive legend with dynamic sizing
   Widget _buildLegend() {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    // Responsive sizing
     double iconSize = screenWidth < 350
         ? 20
         : screenWidth < 400
@@ -1291,27 +1256,38 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildResponsiveLegendItem(
-              'Selected',
-              const Color.fromARGB(255, 8, 89, 11),
-              iconSize,
-              fontSize,
-              spacing),
+            label: 'Selected',
+            color: const Color.fromARGB(255, 8, 89, 11),
+            iconSize: iconSize,
+            fontSize: fontSize,
+            spacing: spacing,
+          ),
           _buildResponsiveLegendItem(
-              'Occupied',
-              const Color.fromARGB(255, 150, 9, 7),
-              iconSize,
-              fontSize,
-              spacing),
-          _buildResponsiveLegendItem('Available', const Color(0xFFE8E8E8),
-              iconSize, fontSize, spacing),
+            label: 'Occupied',
+            color: const Color.fromARGB(255, 150, 9, 7),
+            iconSize: iconSize,
+            fontSize: fontSize,
+            spacing: spacing,
+          ),
+          _buildResponsiveLegendItem(
+            label: 'Available',
+            color: const Color(0xFFE8E8E8),
+            iconSize: iconSize,
+            fontSize: fontSize,
+            spacing: spacing,
+          ),
         ],
       ),
     );
   }
 
-  /// Builds responsive legend item
-  Widget _buildResponsiveLegendItem(String label, Color color, double iconSize,
-      double fontSize, double spacing) {
+  Widget _buildResponsiveLegendItem({
+    required String label,
+    required Color color,
+    required double iconSize,
+    required double fontSize,
+    required double spacing,
+  }) {
     return Flexible(
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -1333,6 +1309,165 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
                   color: const Color(0xFF666666),
                 ),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Number of Players Section as separate component
+class NumberOfPlayersSection extends StatefulWidget {
+  const NumberOfPlayersSection({super.key});
+
+  @override
+  State<NumberOfPlayersSection> createState() => _NumberOfPlayersSectionState();
+}
+
+class _NumberOfPlayersSectionState extends State<NumberOfPlayersSection> {
+  int _numberOfPlayers = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Number of Players',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF1B2C4F),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: Colors.grey.shade200, width: 1),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.purple.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.people_outline,
+                    color: Colors.purple,
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                const Expanded(
+                  child: Text(
+                    'Players',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF1B2C4F),
+                    ),
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Material(
+                        color: Colors.transparent,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          bottomLeft: Radius.circular(12),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              if (_numberOfPlayers > 1) _numberOfPlayers--;
+                            });
+                          },
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            bottomLeft: Radius.circular(12),
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            child: const Icon(
+                              Icons.remove,
+                              size: 18,
+                              color: Color(0xFF1B2C4F),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          '$_numberOfPlayers',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1B2C4F),
+                          ),
+                        ),
+                      ),
+                      Material(
+                        color: Colors.transparent,
+                        borderRadius: const BorderRadius.only(
+                          topRight: Radius.circular(12),
+                          bottomRight: Radius.circular(12),
+                        ),
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              if (_numberOfPlayers < 10) _numberOfPlayers++;
+                            });
+                          },
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(12),
+                            bottomRight: Radius.circular(12),
+                          ),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            child: const Icon(
+                              Icons.add,
+                              size: 18,
+                              color: Color(0xFF1B2C4F),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -1440,161 +1575,6 @@ class PricingSummarySection extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// Number of Players Section as separate component
-class NumberOfPlayersSection extends StatefulWidget {
-  const NumberOfPlayersSection({super.key});
-
-  @override
-  _NumberOfPlayersSectionState createState() => _NumberOfPlayersSectionState();
-}
-
-class _NumberOfPlayersSectionState extends State<NumberOfPlayersSection> {
-  int _numberOfPlayers = 1;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Number of Players',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1B2C4F).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.people_outline,
-                    color: Color(0xFF1B2C4F),
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                const Expanded(
-                  child: Text(
-                    'Players',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF1B2C4F),
-                    ),
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Material(
-                        color: Colors.transparent,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          bottomLeft: Radius.circular(12),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              if (_numberOfPlayers > 1) _numberOfPlayers--;
-                            });
-                          },
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            bottomLeft: Radius.circular(12),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            child: const Icon(
-                              Icons.remove,
-                              size: 18,
-                              color: Color(0xFF1B2C4F),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          '$_numberOfPlayers',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1B2C4F),
-                          ),
-                        ),
-                      ),
-                      Material(
-                        color: Colors.transparent,
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(12),
-                          bottomRight: Radius.circular(12),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              if (_numberOfPlayers < 10) _numberOfPlayers++;
-                            });
-                          },
-                          borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(12),
-                            bottomRight: Radius.circular(12),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            child: const Icon(
-                              Icons.add,
-                              size: 18,
-                              color: Color(0xFF1B2C4F),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
             ),
           ),
         ],

@@ -514,30 +514,3 @@ class _VenueDetailsScreenState extends State<VenueDetailsScreen> {
     );
   }
 }
-
-// Example usage - you can create a simple app to test this
-class VenueDetailsApp extends StatelessWidget {
-  const VenueDetailsApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Venue Details Demo',
-      theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      home: VenueDetailsScreen(
-        venue: {
-          'title': 'ARK SPORTS',
-          'rating': 4.6,
-          'location': '141/A, Wattala 11300',
-          'distance': '2.5 km away',
-          'is_favorite': false,
-        },
-      ),
-    );
-  }
-}
-
-// To run this as a standalone app, use this main function:
-// void main() {
-//   runApp(const VenueDetailsApp());
-// }

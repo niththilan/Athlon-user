@@ -263,7 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           // Left: Welcome and location text
           Expanded(
@@ -298,8 +298,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          Align(
-            alignment: Alignment.bottomRight,
+          Center(
             child: GestureDetector(
               child: Container(
                 padding: const EdgeInsets.all(8),
