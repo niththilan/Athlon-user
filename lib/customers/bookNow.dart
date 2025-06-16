@@ -1537,6 +1537,13 @@ class PricingSummarySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Mock calculation - in real app, this would come from the booking state
+    const double hourlyRate = 700.0;
+    const double serviceFee = 50.0;
+    const int selectedHours = 2; // Mock selected duration
+    const double subtotal = hourlyRate * selectedHours;
+    const double total = subtotal + serviceFee;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -1560,8 +1567,11 @@ class PricingSummarySection extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const payment.PaymentScreen(),
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const payment.InvoiceScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
                   ),
                 );
               },
@@ -1615,15 +1625,15 @@ class PricingSummarySection extends StatelessWidget {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: const Icon(
-                      Icons.currency_rupee,
-                      color: Color(0xFF1B2C4F),
+                      Icons.security,
                       size: 14,
+                      color: Color(0xFF1B2C4F),
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
-                    'Total: LKR 0.00',
-                    style: TextStyle(
+                  Text(
+                    'Total: LKR ${total.toStringAsFixed(2)}',
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                       color: Color(0xFF666666),

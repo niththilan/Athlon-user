@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, unused_field
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -63,8 +63,7 @@ class PaymentScreen extends StatefulWidget {
   _PaymentScreenState createState() => _PaymentScreenState();
 }
 
-class _PaymentScreenState extends State<PaymentScreen>
-    with TickerProviderStateMixin {
+class _PaymentScreenState extends State<PaymentScreen> {
   String _selectedPaymentMethod = 'card'; // Default to 'card'
   int _numberOfPeople = 4;
   double _amountPerPerson = 200.0;
@@ -94,16 +93,10 @@ class _PaymentScreenState extends State<PaymentScreen>
   ];
 
   PaymentMethod? _selectedCard;
-  late AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _controller.forward();
 
     // Set default card if available
     if (_paymentMethods.isNotEmpty) {
@@ -115,15 +108,9 @@ class _PaymentScreenState extends State<PaymentScreen>
   }
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: const Color(0xFF1B2C4F),
         toolbarHeight: 50.0,
@@ -132,7 +119,7 @@ class _PaymentScreenState extends State<PaymentScreen>
         title: const Text(
           'Payments',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
             fontFamily: 'Poppins',
             color: Colors.white,
@@ -147,7 +134,6 @@ class _PaymentScreenState extends State<PaymentScreen>
         ),
       ),
       body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -189,206 +175,233 @@ class _PaymentScreenState extends State<PaymentScreen>
   }
 
   Widget _buildTotalAmountCard() {
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Total Amount',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: textDarkColor,
-                  ),
+    // Mock booking data - in real app, this would be passed from booking screen
+    const double hourlyRate = 700.0;
+    const double serviceFee = 50.0;
+    const int selectedHours = 2;
+    const double total = (hourlyRate * selectedHours) + serviceFee;
+
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Total Amount',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: textDarkColor,
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'Due Today',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: primaryColor,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'LKR 750.00',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: primaryColor,
               ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  'Due Today',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: primaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'LKR ${total.toStringAsFixed(2)}',
+            style: const TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: primaryColor,
             ),
-            const SizedBox(height: 8),
-            Text(
-              _selectedPaymentMethod == 'cash'
-                  ? 'Cash payment at venue'
-                  : 'Secure payment powered by Stripe',
-              style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _selectedPaymentMethod == 'cash'
+                ? 'Cash payment at venue'
+                : 'Secure payment powered by Stripe',
+            style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildPaymentMethodCard() {
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Payment Method',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: textDarkColor,
-              ),
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Payment Method',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: textDarkColor,
             ),
-            const SizedBox(height: 16),
+          ),
+          const SizedBox(height: 16),
 
-            // Payment Method Selector
-            Row(
-              children: [
-                // Cash Option
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedPaymentMethod = 'cash';
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
+          // Payment Method Selector
+          Row(
+            children: [
+              // Cash Option
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedPaymentMethod = 'cash';
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: _selectedPaymentMethod == 'cash'
+                          ? primaryColor.withOpacity(0.1)
+                          : Colors.white,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        bottomLeft: Radius.circular(8),
+                      ),
+                      border: Border.all(
                         color: _selectedPaymentMethod == 'cash'
-                            ? primaryColor.withOpacity(0.1)
-                            : Colors.white,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          bottomLeft: Radius.circular(8),
-                        ),
-                        border: Border.all(
+                            ? primaryColor
+                            : Colors.grey.shade300,
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.money,
+                          size: 18,
                           color: _selectedPaymentMethod == 'cash'
                               ? primaryColor
-                              : Colors.grey.shade300,
+                              : Colors.grey.shade600,
                         ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.money,
-                            size: 18,
+                        const SizedBox(width: 8),
+                        Text(
+                          'Cash',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                             color: _selectedPaymentMethod == 'cash'
                                 ? primaryColor
-                                : Colors.grey.shade600,
+                                : Colors.grey.shade700,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Cash',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: _selectedPaymentMethod == 'cash'
-                                  ? primaryColor
-                                  : Colors.grey.shade700,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                // Card Option
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedPaymentMethod = 'card';
-                      });
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
+              ),
+              // Card Option
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedPaymentMethod = 'card';
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: _selectedPaymentMethod == 'card'
+                          ? primaryColor.withOpacity(0.1)
+                          : Colors.white,
+                      borderRadius: const BorderRadius.only(
+                        topRight: Radius.circular(8),
+                        bottomRight: Radius.circular(8),
+                      ),
+                      border: Border.all(
                         color: _selectedPaymentMethod == 'card'
-                            ? primaryColor.withOpacity(0.1)
-                            : Colors.white,
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(8),
-                          bottomRight: Radius.circular(8),
-                        ),
-                        border: Border.all(
+                            ? primaryColor
+                            : Colors.grey.shade300,
+                      ),
+                    ),
+                    alignment: Alignment.center,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.credit_card,
+                          size: 18,
                           color: _selectedPaymentMethod == 'card'
                               ? primaryColor
-                              : Colors.grey.shade300,
+                              : Colors.grey.shade600,
                         ),
-                      ),
-                      alignment: Alignment.center,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.credit_card,
-                            size: 18,
+                        const SizedBox(width: 8),
+                        Text(
+                          'Card',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
                             color: _selectedPaymentMethod == 'card'
                                 ? primaryColor
-                                : Colors.grey.shade600,
+                                : Colors.grey.shade700,
                           ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Card',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: _selectedPaymentMethod == 'card'
-                                  ? primaryColor
-                                  : Colors.grey.shade700,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
   // CASH PAYMENT WIDGETS
   Widget _buildCashPaymentDetailsCard() {
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -527,8 +540,13 @@ class _PaymentScreenState extends State<PaymentScreen>
   }
 
   Widget _buildAmountPerPersonSection() {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+    // Mock booking data
+    const double hourlyRate = 700.0;
+    const double serviceFee = 50.0;
+    const int selectedHours = 2;
+    const double totalAmount = (hourlyRate * selectedHours) + serviceFee;
+
+    return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primaryColor.withOpacity(0.05),
@@ -549,7 +567,7 @@ class _PaymentScreenState extends State<PaymentScreen>
                 ),
               ),
               Text(
-                'LKR ${_splitPayment ? _amountPerPerson.toStringAsFixed(2) : "750.00"}',
+                'LKR ${_splitPayment ? (totalAmount / _numberOfPeople).toStringAsFixed(2) : totalAmount.toStringAsFixed(2)}',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -567,9 +585,9 @@ class _PaymentScreenState extends State<PaymentScreen>
                   'Total payment ($_numberOfPeople people)',
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
-                const Text(
-                  'LKR 750.00',
-                  style: TextStyle(
+                Text(
+                  'LKR ${totalAmount.toStringAsFixed(2)}',
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: textDarkColor,
@@ -608,10 +626,19 @@ class _PaymentScreenState extends State<PaymentScreen>
 
   // CARD PAYMENT WIDGETS
   Widget _buildSavedCardsSection() {
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -827,10 +854,19 @@ class _PaymentScreenState extends State<PaymentScreen>
   Widget _buildSelectedCardSection() {
     if (_selectedCard == null) return const SizedBox.shrink();
 
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -1023,8 +1059,16 @@ class _PaymentScreenState extends State<PaymentScreen>
   }
 
   void _calculateAmountPerPerson() {
+    // Mock calculation with actual booking data
+    const double hourlyRate = 700.0;
+    const double serviceFee = 50.0;
+    const int selectedHours = 2;
+    const double totalAmount = (hourlyRate * selectedHours) + serviceFee;
+
     setState(() {
-      _amountPerPerson = _splitPayment ? 750.0 / _numberOfPeople : 750.0;
+      _amountPerPerson = _splitPayment
+          ? totalAmount / _numberOfPeople
+          : totalAmount;
     });
   }
 
@@ -1038,8 +1082,11 @@ class _PaymentScreenState extends State<PaymentScreen>
           ? () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => const PaymentSuccessScreen(),
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const PaymentSuccessScreen(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
                 ),
               );
             }
@@ -1098,32 +1145,16 @@ class _PaymentScreenState extends State<PaymentScreen>
           ),
           child: Column(
             children: [
+              // Simple drag handle
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 15),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Add New Card',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1B2C4F),
-                      ),
-                    ),
-                  ],
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
               ),
               Expanded(
@@ -1139,6 +1170,17 @@ class _PaymentScreenState extends State<PaymentScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Title
+                        const Text(
+                          'Add New Card',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1B2C4F),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
                         // Card type selection
                         const Text(
                           'Card Type',
@@ -1450,7 +1492,7 @@ class PaymentSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: const Color(0xFF1B2C4F),
         toolbarHeight: 50.0,
@@ -1459,7 +1501,7 @@ class PaymentSuccessScreen extends StatelessWidget {
         title: const Text(
           'Payments',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
             fontFamily: 'Poppins',
             color: Colors.white,
@@ -1562,6 +1604,12 @@ class PaymentSuccessScreen extends StatelessWidget {
   }
 
   Widget _buildPaymentSummaryRow() {
+    // Mock booking data
+    const double hourlyRate = 700.0;
+    const double serviceFee = 50.0;
+    const int selectedHours = 2;
+    const double total = (hourlyRate * selectedHours) + serviceFee;
+
     return Row(
       children: [
         Container(
@@ -1573,17 +1621,17 @@ class PaymentSuccessScreen extends StatelessWidget {
           child: const Icon(Icons.check, color: Colors.green, size: 20),
         ),
         const SizedBox(width: 16),
-        const Column(
+        Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Amount Paid:',
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
-            SizedBox(height: 2),
+            const SizedBox(height: 2),
             Text(
-              'LKR 750.00',
-              style: TextStyle(
+              'LKR ${total.toStringAsFixed(2)}',
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
                 color: textDarkColor,
@@ -1601,17 +1649,17 @@ class PaymentSuccessScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.blue.shade100,
+            color: primaryColor.withOpacity(0.1),
             shape: BoxShape.circle,
           ),
-          child: const Icon(Icons.credit_card, color: Colors.blue, size: 20),
+          child: const Icon(Icons.credit_card, color: primaryColor, size: 20),
         ),
         const SizedBox(width: 16),
         const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'ComBank Digital Debit Card',
+              'Visa Card',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -1620,7 +1668,7 @@ class PaymentSuccessScreen extends StatelessWidget {
             ),
             SizedBox(height: 2),
             Text(
-              'XXXX XXXX XXXX 4590',
+              'XXXX XXXX XXXX 4242',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],
@@ -1657,8 +1705,12 @@ class PaymentSuccessScreen extends StatelessWidget {
         Expanded(
           child: ElevatedButton(
             onPressed: () {
-              // Navigate back to home screen
-              Navigator.of(context).popUntil((route) => route.isFirst);
+              // Navigate to home screen
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                (route) => false,
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryColor,
@@ -1688,6 +1740,7 @@ class InvoiceScreen extends StatelessWidget {
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: const Color(0xFF1B2C4F),
+      toolbarHeight: 50.0,
       elevation: 0,
       centerTitle: false,
       title: const Text(
@@ -1700,7 +1753,7 @@ class InvoiceScreen extends StatelessWidget {
         ),
       ),
       leading: Container(
-        margin: const EdgeInsets.fromLTRB(16, 6, 8, 8),
+        margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
         child: IconButton(
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
           onPressed: () => Navigator.of(context).pop(),
@@ -1712,7 +1765,7 @@ class InvoiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.white,
       appBar: _buildAppBar(context),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -1739,37 +1792,42 @@ class InvoiceScreen extends StatelessWidget {
   }
 
   Widget _buildInvoiceHeader() {
-    return Card(
-      elevation: 0,
-      color: backgroundColor,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Invoice #78921',
-              style: TextStyle(
-                color: textDarkColor,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Invoice #78921',
+            style: TextStyle(
+              color: textDarkColor,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
             ),
-            Text(
-              'Today, ${DateTime.now().toString().substring(0, 10)}',
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-            ),
-          ],
-        ),
+          ),
+          Text(
+            'Today, ${DateTime.now().toString().substring(0, 10)}',
+            style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildBookingDetailsCard() {
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -1873,10 +1931,26 @@ class InvoiceScreen extends StatelessWidget {
   }
 
   Widget _buildPricingSummaryCard(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    // Mock booking data
+    const double hourlyRate = 700.0;
+    const double serviceFee = 50.0;
+    const int selectedHours = 2;
+    const double subtotal = hourlyRate * selectedHours;
+    const double total = subtotal + serviceFee;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -1891,13 +1965,23 @@ class InvoiceScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            _buildPriceRow('Venue Rental', 'LKR 700.00'),
-            _buildPriceRow('Service Fee', 'LKR 50.00'),
+            _buildPriceRow(
+              'Venue Rental (${selectedHours}h)',
+              'LKR ${subtotal.toStringAsFixed(2)}',
+            ),
+            _buildPriceRow(
+              'Service Fee',
+              'LKR ${serviceFee.toStringAsFixed(2)}',
+            ),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Divider(thickness: 1),
             ),
-            _buildPriceRow('Total', 'LKR 750.00', isTotal: true),
+            _buildPriceRow(
+              'Total',
+              'LKR ${total.toStringAsFixed(2)}',
+              isTotal: true,
+            ),
             const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.all(12),
@@ -1927,8 +2011,11 @@ class InvoiceScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const PaymentScreen(),
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const PaymentScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
                   ),
                 );
               },
@@ -1954,7 +2041,7 @@ class InvoiceScreen extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.lock_outline, size: 16, color: primaryColor),
+                  Icon(Icons.lock_outline, size: 16, color: primaryColor),
                   const SizedBox(width: 6),
                   Text(
                     'Secure payment powered by Stripe',
