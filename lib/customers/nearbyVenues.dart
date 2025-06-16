@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use, file_names
 import 'package:flutter/material.dart';
+import 'bookNow.dart';
 
 void main() {
   runApp(const MyApp());
@@ -920,10 +921,31 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Booking ${venue.title}...'),
-                                backgroundColor: const Color(0xFF1B2C4F),
+                            // Convert VenueModel to expected venue format
+                            final venueData = {
+                              'id': venue.id,
+                              'title': venue.title,
+                              'location': venue.location,
+                              'sport': venue.sports.isNotEmpty
+                                  ? venue.sports.first
+                                  : 'Sports',
+                              'rating': venue.rating,
+                              'image_path': venue.imageUrl,
+                              'distance':
+                                  '${venue.distance.toStringAsFixed(1)} km',
+                              'is_favorite': _favoriteStatus[venue.id] ?? false,
+                              'opening_hours': venue.openingHours,
+                              'rate_per_hour': venue.ratePerHour,
+                            };
+
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        BookNowScreen(venue: venueData),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
                               ),
                             );
                           },
