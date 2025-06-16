@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'footer.dart';
 import 'favourites.dart';
-import 'VenueCard.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,11 +46,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
   bool _isScrolled = false;
   bool _showVenues = false;
   bool _isLoading = true;
-  bool _hasError = false;
-  String _errorMessage = '';
   String _selectedSport = '';
   String _searchQuery = '';
-  int _currentIndex = 0;
 
   // Theme colors
   final Color _themeNavyBlue = const Color(0xFF1B2C4F);
@@ -193,7 +188,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
 
     setState(() {
       _isLoading = true;
-      _hasError = false;
     });
 
     // Simulate loading delay for better UX
@@ -211,10 +205,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
         _isLoading = false;
         _showVenues = _venues.isNotEmpty;
 
-        if (_venues.isEmpty) {
-          _hasError = true;
-          _errorMessage = 'No venues available';
-        }
+        if (_venues.isEmpty) {}
       });
     } catch (error) {
       if (!mounted) return;
@@ -222,17 +213,11 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
       debugPrint('❌ Error loading venues: $error');
       setState(() {
         _isLoading = false;
-        _hasError = true;
-        _errorMessage = 'Failed to load venues: ${error.toString()}';
       });
     }
   }
 
   // Refresh venues list
-  Future<void> _refreshVenues() async {
-    await _loadVenues();
-    return;
-  }
 
   @override
   void dispose() {
