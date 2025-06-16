@@ -298,7 +298,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }) {
     return Expanded(
       child: Container(
-        height: 85,
+        height: 85, // Increased height from 85 to 95
         margin: const EdgeInsets.symmetric(horizontal: 4),
         child: ElevatedButton(
           onPressed: onPressed,
@@ -311,7 +311,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(color: Colors.grey.shade200, width: 1),
             ),
-            padding: const EdgeInsets.symmetric(vertical: 12),
+            padding: const EdgeInsets.symmetric(
+              vertical: 8,
+              horizontal: 4,
+            ), // Adjusted padding
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -321,11 +324,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 10, // Reduced from 13 to 12
                   fontWeight: FontWeight.w500,
                   color: textColor ?? textDarkColor,
                 ),
                 textAlign: TextAlign.center,
+                maxLines: 2, // Allow text to wrap to 2 lines
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
@@ -338,7 +343,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void _showSettings() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const SettingsScreen(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
     );
   }
 

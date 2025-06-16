@@ -442,14 +442,15 @@ class FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check if this is the Find Players card to disable it
+    bool isDisabled = title == "Find Players";
+    
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
-          // Navigation based on card title
-          if (title == "Find Players") {
-            print('Navigating to Find Players screen');
-          } else if (title == "Book") {
+        onTap: isDisabled ? null : () {
+          // Navigation only for enabled cards
+          if (title == "Book") {
             // Navigate to Available Sports screen
             Navigator.push(
               context,
@@ -460,7 +461,7 @@ class FeatureCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         child: Ink(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: isDisabled ? Colors.grey.shade100 : Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -470,41 +471,86 @@ class FeatureCard extends StatelessWidget {
               ),
             ],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
             children: [
-              Container(
-                height: 120,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                  image: DecorationImage(
-                    image: AssetImage(imagePath),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 4),
-                    Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF2D3142),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 120,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                      image: DecorationImage(
+                        image: AssetImage(imagePath),
+                        fit: BoxFit.cover,
+                        colorFilter: isDisabled 
+                          ? ColorFilter.mode(
+                              Colors.grey.withOpacity(0.7), 
+                              BlendMode.srcOver
+                            )
+                          : null,
                       ),
                     ),
-                    SizedBox(height: 1),
-                    Text(
-                      description,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 4),
+                        Text(
+                          title,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: isDisabled 
+                              ? Colors.grey.shade600 
+                              : Color(0xFF2D3142),
+                          ),
+                        ),
+                        SizedBox(height: 1),
+                        Text(
+                          isDisabled ? "Coming soon..." : description,
+                          style: TextStyle(
+                            fontSize: 12, 
+                            color: isDisabled 
+                              ? Colors.grey.shade500 
+                              : Colors.grey[600]
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
+              // Add "Coming Soon" overlay for disabled cards
+              if (isDisabled)
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.shade600,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Text(
+                      'Coming Soon',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
