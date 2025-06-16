@@ -3,12 +3,11 @@
 import 'package:flutter/material.dart';
 import 'userProfile.dart';
 
-import 'UserLogin.dart' show LoginPage; // Explicitly import LoginPage
+// Explicitly import LoginPage
 import 'address_input.dart';
 
 import 'footer.dart';
 import 'nearbyVenues.dart' as venues; // Import the nearbyVenues file
-import 'settings.dart';
 import 'search.dart' as search;
 
 // Add a custom route with no animation
@@ -95,30 +94,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _currentIndex = index;
     });
-  }
-
-  Future<void> _signOut(BuildContext context) async {
-    try {
-      // Supabase sign-out removed. Implement local sign-out logic if needed.
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-        (route) => false,
-      );
-    } catch (e) {
-      // This catch block handles any other errors
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error during logout: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
-
-      // Still navigate to login page even if there's an error
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-        (route) => false,
-      );
-    }
   }
 
   // Navigation methods to match facility owner's homepage
