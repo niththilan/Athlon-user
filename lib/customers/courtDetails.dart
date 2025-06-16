@@ -3,7 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-// Add import for BookNowScreen
+// Import your other screens
+// import 'bookNow.dart'; // Your BookNow screen (uncomment and update path as needed)
+// import 'messages.dart'; // Your Messages screen (uncomment and update path as needed)
+
+// Temporary BookNowScreen - replace with actual import when files are properly set up
 class BookNowScreen extends StatefulWidget {
   final Map<String, dynamic>? venue;
 
@@ -17,12 +21,48 @@ class _BookNowScreenState extends State<BookNowScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Book Now'),
         backgroundColor: const Color(0xFF1B2C4F),
-        foregroundColor: Colors.white,
+        elevation: 0,
+        toolbarHeight: 50.0,
+        title: const Text(
+          "Book Now",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: false,
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      body: const Center(child: Text('Booking Screen - Coming Soon')),
+      body: const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.calendar_today, size: 64, color: Color(0xFF1B2C4F)),
+            SizedBox(height: 16),
+            Text(
+              'Booking Screen',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1B2C4F),
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Navigation is working!\nThis is a placeholder screen.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -232,291 +272,204 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
       context: context,
       builder: (context) => Dialog(
         backgroundColor: Colors.transparent,
-        child: Container(
-          height: 400,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: Colors.black87,
-          ),
-          child: Stack(
-            children: [
-              PageView.builder(
-                itemCount: _courtDetails['images'].length,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentImageIndex = index;
-                  });
-                },
-                itemBuilder: (context, index) {
-                  return ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.network(
-                      _courtDetails['images'][index],
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[300],
-                          child: const Icon(Icons.broken_image, size: 50),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
-              Positioned(
-                top: 16,
-                right: 16,
-                child: IconButton(
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  style: IconButton.styleFrom(backgroundColor: Colors.black45),
-                ),
-              ),
-              Positioned(
-                bottom: 16,
-                left: 0,
-                right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    _courtDetails['images'].length,
-                    (index) => Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 3),
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: index == _currentImageIndex
-                            ? Colors.white
-                            : Colors.white54,
-                        shape: BoxShape.circle,
+        child: StatefulBuilder(
+          builder: (context, setDialogState) => Container(
+            height: 400,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Colors.black87,
+            ),
+            child: Stack(
+              children: [
+                GestureDetector(
+                  onTap: () {}, // Prevent dialog close on image tap
+                  child: Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.network(
+                        _courtDetails['images'][_currentImageIndex],
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[300],
+                            child: const Icon(Icons.broken_image, size: 50),
+                          );
+                        },
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showMessageDialog() {
-    final TextEditingController messageController = TextEditingController();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setModalState) => Container(
-          height: MediaQuery.of(context).size.height * 0.85,
-          decoration: const BoxDecoration(
-            color: Color(0xFFF5F6FA),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            children: [
-              // Header
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1B2C4F),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Colors.white.withOpacity(0.2),
-                          child: const Icon(Icons.person, color: Colors.white),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _courtDetails['owner_name'] ?? 'Venue Owner',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Text(
-                                '${_courtDetails['name']}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.white.withOpacity(0.8),
-                                ),
-                              ),
-                            ],
+                // Navigation arrows in gallery
+                if (_courtDetails['images'].length > 1) ...[
+                  // Left arrow
+                  Positioned(
+                    left: 16,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: () {
+                          if (_currentImageIndex > 0) {
+                            setState(() {
+                              _currentImageIndex--;
+                            });
+                            setDialogState(() {});
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.chevron_left,
+                            color: _currentImageIndex > 0
+                                ? Colors.white
+                                : Colors.white.withOpacity(0.5),
+                            size: 24,
                           ),
                         ),
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.close, color: Colors.white),
-                        ),
-                      ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
-
-              // Chat Area
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      // Sample messages
-                      Expanded(
-                        child: ListView(
-                          children: [
-                            _buildChatBubble(
-                              'Hello! I\'m interested in booking your court for this weekend. Are there any slots available?',
-                              true,
-                              '10:30 AM',
-                            ),
-                            _buildChatBubble(
-                              'Hi there! Yes, we have several slots available this weekend. What time would you prefer?',
-                              false,
-                              '10:32 AM',
-                            ),
-                            _buildChatBubble(
-                              'Saturday evening around 6 PM would be perfect. How much would it cost for 2 hours?',
-                              true,
-                              '10:35 AM',
-                            ),
-                            _buildChatBubble(
-                              'Saturday 6-8 PM is available. It would be Rs. 5,000 for 2 hours. Shall I reserve it for you?',
-                              false,
-                              '10:37 AM',
-                            ),
-                          ],
+                  ),
+                  // Right arrow
+                  Positioned(
+                    right: 16,
+                    top: 0,
+                    bottom: 0,
+                    child: Center(
+                      child: GestureDetector(
+                        onTap: () {
+                          if (_currentImageIndex <
+                              _courtDetails['images'].length - 1) {
+                            setState(() {
+                              _currentImageIndex++;
+                            });
+                            setDialogState(() {});
+                          }
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.5),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.chevron_right,
+                            color:
+                                _currentImageIndex <
+                                    _courtDetails['images'].length - 1
+                                ? Colors.white
+                                : Colors.white.withOpacity(0.5),
+                            size: 24,
+                          ),
                         ),
                       ),
-
-                      // Message Input
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(25),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: messageController,
-                                decoration: const InputDecoration(
-                                  hintText: 'Type your message...',
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                  ),
-                                ),
-                                maxLines: null,
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                if (messageController.text.trim().isNotEmpty) {
-                                  // Handle send message
-                                  messageController.clear();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Message sent!'),
-                                      duration: Duration(seconds: 2),
-                                    ),
-                                  );
-                                }
-                              },
-                              icon: const Icon(Icons.send),
-                              style: IconButton.styleFrom(
-                                backgroundColor: const Color(0xFF1B2C4F),
-                                foregroundColor: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
+                  ),
+                ],
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.close, color: Colors.white),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.black45,
+                    ),
                   ),
                 ),
-              ),
-            ],
+                Positioned(
+                  bottom: 16,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      _courtDetails['images'].length,
+                      (index) => GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _currentImageIndex = index;
+                          });
+                          setDialogState(() {});
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: index == _currentImageIndex
+                                ? Colors.white
+                                : Colors.white54,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildChatBubble(String message, bool isUser, String time) {
-    return Align(
-      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
-        child: Column(
-          crossAxisAlignment: isUser
-              ? CrossAxisAlignment.end
-              : CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: isUser ? const Color(0xFF1B2C4F) : Colors.white,
-                borderRadius: BorderRadius.circular(18).copyWith(
-                  bottomRight: isUser
-                      ? const Radius.circular(4)
-                      : const Radius.circular(18),
-                  bottomLeft: isUser
-                      ? const Radius.circular(18)
-                      : const Radius.circular(4),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: Text(
-                message,
-                style: TextStyle(
-                  color: isUser ? Colors.white : const Color(0xFF2D3142),
-                  fontSize: 14,
+  // Updated method to show a simple chat placeholder instead of navigating to chat screen
+  void _navigateToChat() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.message, color: Color(0xFF1B2C4F)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Message ${_courtDetails['name']}',
+                  style: const TextStyle(fontSize: 16),
                 ),
               ),
+            ],
+          ),
+          content: const Text(
+            'Chat functionality will open here.\n\nYou can message the venue directly to inquire about availability, pricing, or any special requirements.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Close'),
             ),
-            const SizedBox(height: 4),
-            Text(time, style: TextStyle(color: Colors.grey[600], fontSize: 11)),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Chat feature coming soon!'),
+                    backgroundColor: Color(0xFF1B2C4F),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1B2C4F),
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Start Chat'),
+            ),
           ],
-        ),
-      ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        );
+      },
     );
   }
 
@@ -680,8 +633,8 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   void _navigateToBooking() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => BookNowScreen(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => BookNowScreen(
           venue: {
             'title': _courtDetails['name'],
             'location': _courtDetails['location'],
@@ -691,6 +644,8 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
             'distance': _courtDetails['distance'],
           },
         ),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
       ),
     );
   }
@@ -719,63 +674,68 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     overflow: TextOverflow.ellipsis,
                   )
                 : null,
-            leading: Container(
-              margin: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3),
-                shape: BoxShape.circle,
+            // Updated leading without transparent background circle
+            leading: IconButton(
+              icon: const Icon(
+                Icons.chevron_left,
+                color: Colors.white,
+                size: 28,
               ),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.chevron_left,
-                  color: Colors.white,
-                  size: 28,
-                ),
-                onPressed: () => Navigator.pop(context),
-              ),
+              onPressed: () => Navigator.pop(context),
             ),
             actions: [
-              Container(
-                margin: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.3),
-                  shape: BoxShape.circle,
+              IconButton(
+                icon: Icon(
+                  _isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: _isFavorite ? Colors.red : Colors.white,
+                  size: 28,
                 ),
-                child: IconButton(
-                  icon: Icon(
-                    _isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: _isFavorite ? Colors.red : Colors.white,
-                  ),
-                  onPressed: _toggleFavorite,
-                ),
+                onPressed: _toggleFavorite,
               ),
             ],
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  PageView.builder(
-                    itemCount: _courtDetails['images'].length,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentImageIndex = index;
-                      });
-                    },
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: _showImageGallery,
-                        child: Image.network(
-                          _courtDetails['images'][index],
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.broken_image, size: 50),
-                            );
-                          },
-                        ),
-                      );
-                    },
+                  // Image display with arrow navigation only
+                  GestureDetector(
+                    onTap: _showImageGallery,
+                    child: Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      child: Image.network(
+                        _courtDetails['images'][_currentImageIndex],
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: Colors.grey[300],
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value:
+                                    loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                    : null,
+                                color: const Color(0xFF1B2C4F),
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[300],
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.broken_image, size: 50),
+                                Text('Failed to load image'),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                   Container(
                     decoration: BoxDecoration(
@@ -790,6 +750,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                       ),
                     ),
                   ),
+                  // Enhanced image indicators and navigation
                   Positioned(
                     bottom: 20,
                     left: 20,
@@ -800,15 +761,24 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         Row(
                           children: List.generate(
                             _courtDetails['images'].length,
-                            (index) => Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 3),
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: index == _currentImageIndex
-                                    ? Colors.white
-                                    : Colors.white54,
-                                shape: BoxShape.circle,
+                            (index) => GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _currentImageIndex = index;
+                                });
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 3,
+                                ),
+                                width: 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: index == _currentImageIndex
+                                      ? Colors.white
+                                      : Colors.white54,
+                                  shape: BoxShape.circle,
+                                ),
                               ),
                             ),
                           ),
@@ -833,6 +803,74 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                       ],
                     ),
                   ),
+                  // Add navigation arrows for better UX
+                  if (_courtDetails['images'].length > 1) ...[
+                    // Left arrow
+                    Positioned(
+                      left: 16,
+                      top: MediaQuery.of(context).size.height * 0.15,
+                      bottom: MediaQuery.of(context).size.height * 0.15,
+                      child: Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            if (_currentImageIndex > 0) {
+                              setState(() {
+                                _currentImageIndex--;
+                              });
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.chevron_left,
+                              color: _currentImageIndex > 0
+                                  ? Colors.white
+                                  : Colors.white.withOpacity(0.5),
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Right arrow
+                    Positioned(
+                      right: 16,
+                      top: MediaQuery.of(context).size.height * 0.15,
+                      bottom: MediaQuery.of(context).size.height * 0.15,
+                      child: Center(
+                        child: GestureDetector(
+                          onTap: () {
+                            if (_currentImageIndex <
+                                _courtDetails['images'].length - 1) {
+                              setState(() {
+                                _currentImageIndex++;
+                              });
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.chevron_right,
+                              color:
+                                  _currentImageIndex <
+                                      _courtDetails['images'].length - 1
+                                  ? Colors.white
+                                  : Colors.white.withOpacity(0.5),
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -983,12 +1021,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                           children: [
                             Expanded(
                               child: ElevatedButton.icon(
-                                onPressed: () {
-                                  print(
-                                    'Book Now button pressed',
-                                  ); // Debug print
-                                  _navigateToBooking();
-                                },
+                                onPressed: _navigateToBooking,
                                 icon: const Icon(Icons.calendar_today),
                                 label: const Text('Book Now'),
                                 style: ElevatedButton.styleFrom(
@@ -1005,7 +1038,8 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             ),
                             const SizedBox(width: 12),
                             ElevatedButton(
-                              onPressed: _showMessageDialog,
+                              onPressed:
+                                  _navigateToChat, // Updated to navigate to chat
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 foregroundColor: const Color(0xFF1B2C4F),
@@ -1321,9 +1355,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     ),
                   ),
 
-                  const SizedBox(
-                    height: 24,
-                  ), // Increased from 21 to 24 for better spacing
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
