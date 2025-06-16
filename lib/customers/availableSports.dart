@@ -1,5 +1,8 @@
+// ignore_for_file: file_names, deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'favourites.dart';
+import 'bookNow.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -826,15 +829,20 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                       ),
                                       ElevatedButton(
                                         onPressed: () {
-                                          // Handle book now action
-                                          ScaffoldMessenger.of(
+                                          Navigator.push(
                                             context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                'Booking ${venue['title']}...',
-                                              ),
-                                              backgroundColor: _themeNavyBlue,
+                                            PageRouteBuilder(
+                                              pageBuilder:
+                                                  (
+                                                    context,
+                                                    animation,
+                                                    secondaryAnimation,
+                                                  ) => BookNowScreen(
+                                                    venue: venue,
+                                                  ),
+                                              transitionDuration: Duration.zero,
+                                              reverseTransitionDuration:
+                                                  Duration.zero,
                                             ),
                                           );
                                         },
@@ -1440,7 +1448,7 @@ class _SportsCategoriesState extends State<SportsCategories> {
                             ),
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),

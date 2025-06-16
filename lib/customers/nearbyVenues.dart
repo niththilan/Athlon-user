@@ -1,8 +1,5 @@
-// ignore_for_file: deprecated_member_use
-
+// ignore_for_file: deprecated_member_use, file_names
 import 'package:flutter/material.dart';
-import 'home.dart';
-import 'search.dart';
 
 void main() {
   runApp(const MyApp());

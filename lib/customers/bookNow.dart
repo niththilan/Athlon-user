@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, library_private_types_in_public_api
+// ignore_for_file: deprecated_member_use, library_private_types_in_public_api, file_names
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -57,7 +57,9 @@ class MyApp extends StatelessWidget {
 }
 
 class BookNowScreen extends StatefulWidget {
-  const BookNowScreen({super.key});
+  final Map<String, dynamic>? venue;
+
+  const BookNowScreen({super.key, this.venue});
 
   @override
   State<BookNowScreen> createState() => _BookNowScreenState();
@@ -98,11 +100,11 @@ class _BookNowScreenState extends State<BookNowScreen> {
         ),
         actions: const [],
       ),
-      body: const CustomScrollView(
+      body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.only(
+              padding: const EdgeInsets.only(
                 top: 8.0,
                 left: 16.0,
                 right: 16.0,
@@ -111,14 +113,14 @@ class _BookNowScreenState extends State<BookNowScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20),
-                  VenueSelectionSection(),
-                  SizedBox(height: 20),
-                  BookingDateTimeSection(),
-                  SizedBox(height: 20),
-                  NumberOfPlayersSection(),
-                  SizedBox(height: 20),
-                  PricingSummarySection(),
+                  const SizedBox(height: 20),
+                  VenueSelectionSection(venue: widget.venue),
+                  const SizedBox(height: 20),
+                  const BookingDateTimeSection(),
+                  const SizedBox(height: 20),
+                  const NumberOfPlayersSection(),
+                  const SizedBox(height: 20),
+                  const PricingSummarySection(),
                 ],
               ),
             ),
@@ -130,18 +132,22 @@ class _BookNowScreenState extends State<BookNowScreen> {
 }
 
 class VenueSelectionSection extends StatelessWidget {
-  const VenueSelectionSection({super.key});
+  final Map<String, dynamic>? venue;
+
+  const VenueSelectionSection({super.key, this.venue});
 
   @override
   Widget build(BuildContext context) {
-    final venue = {
-      'name': 'CR7 Futsal Arena',
-      'location': 'Downtown, 2.5 km',
-      'isSelected': true,
-      'image': 'assets/venue1.jpg',
-      'rating': 4.8,
-      'price': 'LKR 700/hr',
-    };
+    final venueData =
+        venue ??
+        {
+          'title': 'CR7 Futsal Arena',
+          'location': 'Downtown, 2.5 km',
+          'sport': 'Football',
+          'rating': 4.8,
+          'rate_per_hour': 'Rs. 700',
+          'distance': '2.5 km',
+        };
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -217,9 +223,11 @@ class VenueSelectionSection extends StatelessWidget {
                       color: const Color(0xFF1B2C4F).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(
-                      Icons.sports_soccer,
-                      color: Color(0xFF1B2C4F),
+                    child: Icon(
+                      _getSportIcon(
+                        venueData['sport']?.toString() ?? 'Football',
+                      ),
+                      color: const Color(0xFF1B2C4F),
                       size: 20,
                     ),
                   ),
@@ -231,15 +239,16 @@ class VenueSelectionSection extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          Text(
-                            venue['name'] as String,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1B2C4F),
+                          Expanded(
+                            child: Text(
+                              venueData['title']?.toString() ?? 'Venue',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF1B2C4F),
+                              ),
                             ),
                           ),
-                          const Spacer(),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 8,
@@ -250,7 +259,8 @@ class VenueSelectionSection extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              venue['price'] as String,
+                              venueData['rate_per_hour']?.toString() ??
+                                  'Rs. 700/hr',
                               style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -269,11 +279,13 @@ class VenueSelectionSection extends StatelessWidget {
                             color: Colors.grey.shade600,
                           ),
                           const SizedBox(width: 4),
-                          Text(
-                            venue['location'] as String,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey.shade600,
+                          Expanded(
+                            child: Text(
+                              venueData['location']?.toString() ?? 'Location',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade600,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -284,7 +296,7 @@ class VenueSelectionSection extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '${venue['rating']}',
+                            '${venueData['rating'] ?? 4.8}',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -296,7 +308,11 @@ class VenueSelectionSection extends StatelessWidget {
                       const SizedBox(height: 10),
                       Row(
                         children: [
-                          _buildAmenityTag('5 vs 5'),
+                          _buildAmenityTag(
+                            _getSportFormat(
+                              venueData['sport']?.toString() ?? 'Football',
+                            ),
+                          ),
                           const SizedBox(width: 8),
                           _buildAmenityTag('Indoor'),
                           const SizedBox(width: 8),
@@ -312,6 +328,46 @@ class VenueSelectionSection extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  IconData _getSportIcon(String sport) {
+    switch (sport.toLowerCase()) {
+      case 'football':
+        return Icons.sports_soccer;
+      case 'basketball':
+        return Icons.sports_basketball;
+      case 'tennis':
+        return Icons.sports_tennis;
+      case 'badminton':
+        return Icons.sports_tennis;
+      case 'swimming':
+        return Icons.pool;
+      case 'cricket':
+        return Icons.sports_cricket;
+      case 'baseball':
+        return Icons.sports_baseball;
+      case 'table tennis':
+        return Icons.table_bar;
+      default:
+        return Icons.sports_soccer;
+    }
+  }
+
+  String _getSportFormat(String sport) {
+    switch (sport.toLowerCase()) {
+      case 'football':
+        return '5 vs 5';
+      case 'basketball':
+        return '5 vs 5';
+      case 'tennis':
+        return '1 vs 1';
+      case 'badminton':
+        return '2 vs 2';
+      case 'table tennis':
+        return '1 vs 1';
+      default:
+        return '5 vs 5';
+    }
   }
 
   Widget _buildAmenityTag(String text) {
