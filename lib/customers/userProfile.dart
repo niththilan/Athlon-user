@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'settings.dart'; // Import the settings screen
 
 // Constants for consistent styling - matching vendor screen
 const Color primaryColor = Color(0xFF1B2C4F);
@@ -335,7 +336,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   // Settings action
   void _showSettings() {
-    _showSuccessSnackBar('Settings', message: "Opening settings...");
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const SettingsScreen()),
+    );
   }
 
   // Help and Support action
@@ -998,6 +1002,29 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                     const SizedBox(height: 20),
 
+                    // Action buttons row (Settings, Help & Support, Logout)
+                    Row(
+                      children: [
+                        _buildActionButton(
+                          icon: Icons.settings,
+                          label: "Settings",
+                          onPressed: _showSettings,
+                        ),
+                        _buildActionButton(
+                          icon: Icons.help_outline,
+                          label: "Help & Support",
+                          onPressed: _showHelpAndSupport,
+                        ),
+                        _buildActionButton(
+                          icon: Icons.logout,
+                          label: "Logout",
+                          onPressed: _showLogoutConfirmation,
+                          iconColor: Colors.red,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
                     // Additional Profile Details
                     Container(
                       padding: const EdgeInsets.all(16),
@@ -1195,33 +1222,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ],
                   ],
                 ),
-              ),
-            ),
-          ),
-
-          // ACTION BUTTONS (MOVED DOWN)
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  _buildActionButton(
-                    icon: Icons.settings,
-                    label: "Settings",
-                    onPressed: _showSettings,
-                  ),
-                  _buildActionButton(
-                    icon: Icons.help_outline,
-                    label: "Help & Support",
-                    onPressed: _showHelpAndSupport,
-                  ),
-                  _buildActionButton(
-                    icon: Icons.logout,
-                    label: "Logout",
-                    onPressed: _showLogoutConfirmation,
-                    iconColor: Colors.red,
-                  ),
-                ],
               ),
             ),
           ),
