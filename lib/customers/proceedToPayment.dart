@@ -174,7 +174,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'LKR 800.00',
+              'LKR 750.00',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
@@ -493,7 +493,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
               ),
               Text(
-                'LKR ${_splitPayment ? _amountPerPerson.toStringAsFixed(2) : "800.00"}',
+                'LKR ${_splitPayment ? _amountPerPerson.toStringAsFixed(2) : "750.00"}',
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -512,7 +512,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
                 const Text(
-                  'LKR 800.00',
+                  'LKR 750.00',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
@@ -784,8 +784,198 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   void _calculateAmountPerPerson() {
     setState(() {
-      _amountPerPerson = _splitPayment ? 800.0 / _numberOfPeople : 800.0;
+      _amountPerPerson = _splitPayment ? 750.0 / _numberOfPeople : 750.0;
     });
+  }
+
+  Widget _buildPricingSummaryCard(BuildContext context) {
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.black.withOpacity(0.1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Pricing Summary',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: textDarkColor,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildPriceRow('Venue Rental', 'LKR 700.00'),
+            _buildPriceRow('Service Fee', 'LKR 50.00'),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Divider(thickness: 1),
+            ),
+            _buildPriceRow('Total', 'LKR 750.00', isTotal: true),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: primaryColor.withOpacity(0.2)),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.info_outline, size: 18, color: primaryColor),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'Payment required to confirm your booking. Cancellations are free up to 24 hours before your slot.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PaymentScreen(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                minimumSize: const Size(double.infinity, 54),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 2,
+              ),
+              child: const Text(
+                'Proceed to Payment',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.lock_outline, size: 16, color: primaryColor),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Secure payment powered by Stripe',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSelectedServicesCard() {
+    return Card(
+      elevation: 4,
+      shadowColor: Colors.black.withOpacity(0.1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Selected Services',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: textDarkColor,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildServiceRow('Venue Rental', 'LKR 700.00', true),
+            const Divider(height: 1, thickness: 0.5),
+            _buildServiceRow('Service Fee', 'LKR 50.00', true),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentSummaryRow() {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.green.shade100,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.check, color: Colors.green, size: 20),
+        ),
+        const SizedBox(width: 16),
+        const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Amount Paid:',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            SizedBox(height: 2),
+            Text(
+              'LKR 750.00',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: textDarkColor,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPriceRow(String title, String price, {bool isTotal = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: isTotal ? 16 : 14,
+              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
+              color: isTotal ? primaryColor : textDarkColor,
+            ),
+          ),
+          Text(
+            price,
+            style: TextStyle(
+              fontSize: isTotal ? 18 : 14,
+              fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
+              color: isTotal ? primaryColor : textDarkColor,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -944,7 +1134,7 @@ class PaymentSuccessScreen extends StatelessWidget {
             ),
             SizedBox(height: 2),
             Text(
-              'LKR 800.00',
+              'LKR 750.00',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -1273,15 +1463,9 @@ class InvoiceScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            _buildServiceRow('Venue Rental (2 hours)', '\$70.00', true),
+            _buildServiceRow('Venue Rental', 'LKR 700.00', true),
             const Divider(height: 1, thickness: 0.5),
-            _buildServiceRow('Equipment Rental', '\$10.00', true),
-            const Divider(height: 1, thickness: 0.5),
-            _buildServiceRow('Professional Coach', '\$45.00', false),
-            const Divider(height: 1, thickness: 0.5),
-            _buildServiceRow('Shower Access', '\$5.00', true),
-            const Divider(height: 1, thickness: 0.5),
-            _buildServiceRow('Video Recording', '\$25.00', false),
+            _buildServiceRow('Service Fee', 'LKR 50.00', true),
           ],
         ),
       ),
@@ -1307,15 +1491,13 @@ class InvoiceScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            _buildPriceRow('Venue Rental (2 hours)', '\$70.00'),
-            _buildPriceRow('Equipment Rental', '\$10.00'),
-            _buildPriceRow('Shower Access', '\$5.00'),
-            _buildPriceRow('Service Fee', '\$5.00'),
+            _buildPriceRow('Venue Rental', 'LKR 700.00'),
+            _buildPriceRow('Service Fee', 'LKR 50.00'),
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 12),
               child: Divider(thickness: 1),
             ),
-            _buildPriceRow('Total', '\$90.00', isTotal: true),
+            _buildPriceRow('Total', 'LKR 750.00', isTotal: true),
             const SizedBox(height: 10),
             Container(
               padding: const EdgeInsets.all(12),
