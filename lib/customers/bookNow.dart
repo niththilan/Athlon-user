@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, library_private_types_in_public_api, file_names
 
 import 'package:flutter/material.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:intl/intl.dart';
 import 'proceedToPayment.dart' as payment;
 
@@ -32,7 +33,12 @@ class Court {
 }
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    DevicePreview(
+      enabled: true, // Set to false to disable preview
+      builder: (context) => const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

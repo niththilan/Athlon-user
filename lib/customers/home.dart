@@ -1,7 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:athlon_user/customers/bookNow.dart';
 import 'package:flutter/material.dart';
 import 'userProfile.dart';
+import 'nearbyVenues.dart';
+import 'package:device_preview/device_preview.dart';
 
 // Explicitly import LoginPage
 
@@ -51,7 +54,12 @@ class NoAnimationRoute<T> extends PageRoute<T> {
 }
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    DevicePreview(
+      enabled: true, // Set to false to disable preview
+      builder: (context) => const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -117,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Navigate to search screen
         Navigator.push(
           context,
-          NoAnimationRoute(builder: (context) => const search.SearchScreen()),
+          NoAnimationRoute(builder: (context) => const NearByVenueScreen()),
         );
       },
       child: Container(
