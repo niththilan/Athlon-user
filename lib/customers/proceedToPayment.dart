@@ -1,7 +1,7 @@
-// ignore_for_file: deprecated_member_use, unused_field
+// ignore_for_file: deprecated_member_use, unused_field, file_names, library_private_types_in_public_api, prefer_final_fields
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+//import 'package:flutter/services.dart';
 import 'dart:math' as math;
 
 void main() {

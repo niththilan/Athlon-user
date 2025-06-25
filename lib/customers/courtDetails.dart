@@ -1,4 +1,5 @@
-// ignore_for_file: deprecated_member_use
+// ignore: file_names
+// ignore_for_file: deprecated_member_use, file_names, duplicate_ignore
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -265,7 +266,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
               children: [
                 GestureDetector(
                   onTap: () {}, // Prevent dialog close on image tap
-                  child: Container(
+                  child: SizedBox(
                     width: double.infinity,
                     height: double.infinity,
                     child: ClipRRect(
@@ -682,7 +683,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                   // Image display with arrow navigation only
                   GestureDetector(
                     onTap: _showImageGallery,
-                    child: Container(
+                    child: SizedBox(
                       width: double.infinity,
                       height: double.infinity,
                       child: Image.network(

@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use, file_names
 import 'package:athlon_user/customers/courtDetails.dart';
 import 'package:flutter/material.dart';
-import 'bookNow.dart';
+//import 'bookNow.dart';
 
 void main() {
   runApp(const MyApp());
@@ -1137,21 +1137,21 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                         child: ElevatedButton(
                           onPressed: () {
                             // Convert VenueModel to expected venue format
-                            final venueData = {
-                              'id': venue.id,
-                              'title': venue.title,
-                              'location': venue.location,
-                              'sport': venue.sports.isNotEmpty
-                                  ? venue.sports.first
-                                  : 'Sports',
-                              'rating': venue.rating,
-                              'image_path': venue.imageUrl,
-                              'distance':
-                                  '${venue.distance.toStringAsFixed(1)} km',
-                              'is_favorite': _favoriteStatus[venue.id] ?? false,
-                              'opening_hours': venue.openingHours,
-                              'rate_per_hour': venue.ratePerHour,
-                            };
+                            // final venueData = {
+                            //   'id': venue.id,
+                            //   'title': venue.title,
+                            //   'location': venue.location,
+                            //   'sport': venue.sports.isNotEmpty
+                            //       ? venue.sports.first
+                            //       : 'Sports',
+                            //   'rating': venue.rating,
+                            //   'image_path': venue.imageUrl,
+                            //   'distance':
+                            //       '${venue.distance.toStringAsFixed(1)} km',
+                            //   'is_favorite': _favoriteStatus[venue.id] ?? false,
+                            //   'opening_hours': venue.openingHours,
+                            //   'rate_per_hour': venue.ratePerHour,
+                            // };
 
                             Navigator.push(
                               context,
@@ -1417,48 +1417,48 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   }
   // Add this method to show current active distance:
 
-  Widget _buildDistanceIndicator() {
-    if (_distanceRadius < 20.0) {
-      return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1B2C4F).withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF1B2C4F).withOpacity(0.3)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.location_on, size: 14, color: const Color(0xFF1B2C4F)),
-            const SizedBox(width: 4),
-            Text(
-              'Within ${_distanceRadius.round()} km',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF1B2C4F),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(width: 6),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _distanceRadius = 20.0; // Reset to max
-                });
-              },
-              child: Icon(
-                Icons.close,
-                size: 14,
-                color: const Color(0xFF1B2C4F),
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-    return const SizedBox.shrink();
-  }
+  // Widget _buildDistanceIndicator() {
+  //   if (_distanceRadius < 20.0) {
+  //     return Container(
+  //       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+  //       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+  //       decoration: BoxDecoration(
+  //         color: const Color(0xFF1B2C4F).withOpacity(0.1),
+  //         borderRadius: BorderRadius.circular(16),
+  //         border: Border.all(color: const Color(0xFF1B2C4F).withOpacity(0.3)),
+  //       ),
+  //       child: Row(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Icon(Icons.location_on, size: 14, color: const Color(0xFF1B2C4F)),
+  //           const SizedBox(width: 4),
+  //           Text(
+  //             'Within ${_distanceRadius.round()} km',
+  //             style: const TextStyle(
+  //               fontSize: 12,
+  //               color: Color(0xFF1B2C4F),
+  //               fontWeight: FontWeight.w500,
+  //             ),
+  //           ),
+  //           const SizedBox(width: 6),
+  //           GestureDetector(
+  //             onTap: () {
+  //               setState(() {
+  //                 _distanceRadius = 20.0; // Reset to max
+  //               });
+  //             },
+  //             child: Icon(
+  //               Icons.close,
+  //               size: 14,
+  //               color: const Color(0xFF1B2C4F),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //   }
+  //   return const SizedBox.shrink();
+  // }
 }
 
 // Venue Model - Enhanced to match first file data structure

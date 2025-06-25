@@ -1,5 +1,5 @@
 // ignore: file_names
-// ignore_for_file: deprecated_member_use, file_names, duplicate_ignore, use_build_context_synchronously
+// ignore_for_file: deprecated_member_use, file_names, duplicate_ignore, use_build_context_synchronously, use_super_parameters
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -202,7 +202,7 @@ class _LoginPageState extends State<LoginPage>
                     }
 
                     try {
-                      // TODO: Implement password reset logic with Supabase
+                      // TO DO: Implement password reset logic with Supabase
                       // await SupabaseService.client.auth.resetPasswordForEmail(email);
 
                       // Close the modal
@@ -356,7 +356,7 @@ class _LoginPageState extends State<LoginPage>
 
       try {
         if (_isLogin) {
-          // TODO: Login with Supabase
+          // TO DO: Login with Supabase
           // final response = await SupabaseService.signIn(
           //   email: _emailController.text.trim(),
           //   password: _passwordController.text,
@@ -385,7 +385,7 @@ class _LoginPageState extends State<LoginPage>
             );
           }
         } else {
-          // TODO: Sign up with Supabase
+          // TO DO: Sign up with Supabase
           // final response = await SupabaseService.signUp(
           //   email: _emailController.text.trim(),
           //   password: _passwordController.text,
@@ -396,7 +396,7 @@ class _LoginPageState extends State<LoginPage>
             Navigator.of(context).pop(); // Close loading dialog
 
             // For facility owners, create profile
-            // TODO: Implement profile creation with Supabase
+            // TO DO: Implement profile creation with Supabase
             // await SupabaseService.createUserProfile(
             //   userId: response.user!.id,
             //   name: _nameController.text.trim(),

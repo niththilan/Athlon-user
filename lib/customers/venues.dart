@@ -1,4 +1,6 @@
-import 'package:athlon_user/customers/courtDetails.dart';
+//import 'package:athlon_user/customers/courtDetails.dart';
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'bookNow.dart';
 
@@ -202,6 +204,8 @@ class _VenueDetailsScreenState extends State<VenueDetailsScreen> {
             leading: Container(
               margin: const EdgeInsets.all(8),
               decoration: BoxDecoration(
+                // ignore: duplicate_ignore
+                // ignore: deprecated_member_use
                 color: Colors.black.withOpacity(0.3),
                 shape: BoxShape.circle,
               ),

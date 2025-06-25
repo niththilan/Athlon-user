@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, library_private_types_in_public_api, file_names
+// ignore_for_file: deprecated_member_use, library_private_types_in_public_api, file_names, depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
 import 'package:device_preview/device_preview.dart';

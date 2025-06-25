@@ -758,11 +758,12 @@ class VenuesSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(height: 0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 10.0),
+                padding: const EdgeInsets.only(left: 8.0),
                 child: Text(
                   "Venues",
                   style: TextStyle(
@@ -795,7 +796,7 @@ class VenuesSection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 0),
+          SizedBox(height: 4),
           Row(
             children: [
               Expanded(
