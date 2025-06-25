@@ -4,68 +4,50 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 // Import your other screens
-// import 'bookNow.dart'; // Your BookNow screen (uncomment and update path as needed)
+import 'bookNow.dart'; // Your BookNow screen (uncomment and update path as needed)
 // import 'messages.dart'; // Your Messages screen (uncomment and update path as needed)
 
 // Temporary BookNowScreen - replace with actual import when files are properly set up
-class BookNowScreen extends StatefulWidget {
-  final Map<String, dynamic>? venue;
+// class BookNowScreen extends StatefulWidget {
+//   final Map<String, dynamic>? venue;
 
-  const BookNowScreen({super.key, this.venue});
+//   const BookNowScreen({super.key, this.venue});
 
-  @override
-  State<BookNowScreen> createState() => _BookNowScreenState();
-}
+//   @override
+//   State<BookNowScreen> createState() => BookNowScreenState();
+// }
 
-class _BookNowScreenState extends State<BookNowScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1B2C4F),
-        elevation: 0,
-        toolbarHeight: 50.0,
-        title: const Text(
-          "Book Now",
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: false,
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.calendar_today, size: 64, color: Color(0xFF1B2C4F)),
-            SizedBox(height: 16),
-            Text(
-              'Booking Screen',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1B2C4F),
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Navigation is working!\nThis is a placeholder screen.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+// class _BookNowScreenState extends State<BookNowScreen> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       appBar: AppBar(
+//         backgroundColor: const Color(0xFF1B2C4F),
+//         elevation: 2,
+//         toolbarHeight: 50.0,
+//         title: const Text(
+//           "Book Now",
+//           style: TextStyle(
+//             fontSize: 18,
+//             fontWeight: FontWeight.w600,
+//             color: Colors.white,
+//           ),
+//         ),
+//         centerTitle: false,
+//         leading: IconButton(
+//           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+//           onPressed: () {
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(builder: (context) => BookNowScreen()),
+//             );
+//           },
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 void main() {
   runApp(const MyApp());

@@ -175,15 +175,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70),
+        preferredSize: const Size.fromHeight(50),
         child: AppBar(
           backgroundColor: Colors.white,
-          toolbarHeight: 70.0,
+          toolbarHeight: 50.0,
           surfaceTintColor: Colors.white,
           centerTitle: false,
           automaticallyImplyLeading: false,
           title: Padding(
-            padding: const EdgeInsets.only(left: 20.0),
+            padding: const EdgeInsets.only(left: 5.0),
             child: Image.asset(
               'assets/Athlon1.png', // Match facility owner's path
               height: 50,

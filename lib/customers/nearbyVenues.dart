@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use, file_names
+import 'package:athlon_user/customers/courtDetails.dart';
 import 'package:flutter/material.dart';
 import 'bookNow.dart';
 
@@ -88,7 +89,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 1.2,
       imageUrl:
           "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Futsal", "Cricket", "Indoor Sports"],
+      sports: ["Futsal", "Cricket", "Indoor"],
       openingHours: "6:00 AM - 11:00 PM",
       ratePerHour: "Rs. 3,000",
     ),
@@ -100,7 +101,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 3.5,
       imageUrl:
           "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Futsal", "Cricket", "Indoor Sports"],
+      sports: ["Futsal", "Cricket", "Indoor"],
       openingHours: "7:00 AM - 10:00 PM",
       ratePerHour: "Rs. 2,500",
     ),
@@ -112,7 +113,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 0.8,
       imageUrl:
           "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Badminton", "Tennis", "Squash"],
+      sports: ["Badminton", "Tennis", "Squash", "Outdoor"],
       openingHours: "6:00 AM - 10:00 PM",
       ratePerHour: "Rs. 2,000",
     ),
@@ -437,8 +438,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1B2C4F),
-        elevation: 2,
+        elevation: 1,
         toolbarHeight: 50,
+        //centerTitle: true, // center the title
         title: const Text(
           "Nearby Venues",
           style: TextStyle(
@@ -448,16 +450,11 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
             color: Colors.white,
           ),
         ),
-        centerTitle: false,
-        leading: Container(
-          margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
-          child: IconButton(
-            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+          onPressed: () => Navigator.of(context).pop(),
         ),
+
         actions: [
           // Add a favorites indicator with count in the app bar
           if (favoriteCount > 0)
@@ -680,7 +677,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
             // Sport Filters with Icons
             Container(
               height: 50,
-              padding: const EdgeInsets.only(left: 16),
+              padding: const EdgeInsets.only(left: 8),
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: _filterOptionsWithIcons.length,
@@ -724,7 +721,11 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                           _setFilter(option);
                         }
                       },
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8.0,
+                      ),
+                      labelPadding: const EdgeInsets.symmetric(horizontal: 8.0),
                     ),
                   );
                 },
@@ -1094,7 +1095,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                               size: 16,
                               color: Colors.amber,
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 8),
                             Text(
                               formattedRating,
                               style: const TextStyle(
@@ -1157,7 +1158,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                               PageRouteBuilder(
                                 pageBuilder:
                                     (context, animation, secondaryAnimation) =>
-                                        BookNowScreen(venue: venueData),
+                                        CourtDetailScreen(), //BookNowScreen(venue: venueData),
                                 transitionDuration: Duration.zero,
                                 reverseTransitionDuration: Duration.zero,
                               ),
@@ -1172,7 +1173,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             ),
                           ),
                           child: const Text(
-                            'Book Now',
+                            'View Court',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -1239,11 +1240,16 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                           value: _distanceRadius,
                           min: 0.0,
                           max: 20.0,
-                          divisions: 19,
+                          divisions:
+                              20, // Changed from 19 to 20 for better granularity
                           label: "${_distanceRadius.round()} km",
                           activeColor: const Color(0xFF1B2C4F),
                           onChanged: (value) {
                             setModalState(() {
+                              _distanceRadius = value;
+                            });
+                            // IMPORTANT: Also update the main state immediately for real-time filtering
+                            setState(() {
                               _distanceRadius = value;
                             });
                           },
@@ -1252,7 +1258,6 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       const Text("20 km"),
                     ],
                   ),
-
                   // Sorting Options
                   const Padding(
                     padding: EdgeInsets.only(top: 2.0),
@@ -1305,7 +1310,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       },
                       icon: const Icon(
                         Icons.refresh,
-                        size: 18,
+                        size: 20,
                         color: Color(0xFF1B2C4F),
                       ),
                       label: const Text(
@@ -1316,7 +1321,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                         ),
                       ),
                       style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         visualDensity: VisualDensity.compact,
                       ),
                     ),
@@ -1338,7 +1343,8 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                         ),
                         onPressed: () {
                           setState(() {
-                            // Update main state with modal values
+                            // The distance is already updated in real-time via slider onChange
+                            // Just ensure sorting mode is applied
                           });
                           Navigator.pop(context);
                         },
@@ -1408,6 +1414,50 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
         ),
       ),
     );
+  }
+  // Add this method to show current active distance:
+
+  Widget _buildDistanceIndicator() {
+    if (_distanceRadius < 20.0) {
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1B2C4F).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFF1B2C4F).withOpacity(0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.location_on, size: 14, color: const Color(0xFF1B2C4F)),
+            const SizedBox(width: 4),
+            Text(
+              'Within ${_distanceRadius.round()} km',
+              style: const TextStyle(
+                fontSize: 12,
+                color: Color(0xFF1B2C4F),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(width: 6),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _distanceRadius = 20.0; // Reset to max
+                });
+              },
+              child: Icon(
+                Icons.close,
+                size: 14,
+                color: const Color(0xFF1B2C4F),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return const SizedBox.shrink();
   }
 }
 

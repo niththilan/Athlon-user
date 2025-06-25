@@ -1,4 +1,6 @@
+import 'package:athlon_user/customers/courtDetails.dart';
 import 'package:flutter/material.dart';
+import 'bookNow.dart';
 
 class VenueDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> venue;
@@ -477,12 +479,10 @@ class _VenueDetailsScreenState extends State<VenueDetailsScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Booking ${widget.venue['title'] ?? 'ARK SPORTS'}...',
-                            ),
-                            backgroundColor: _themeNavyBlue,
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BookNowScreen(),
                           ),
                         );
                       },
