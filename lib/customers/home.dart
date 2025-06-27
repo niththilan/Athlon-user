@@ -814,7 +814,7 @@ class VenuesSection extends StatelessWidget {
                   title: "Elite Sports Complex",
                   location: "456 Galle Road, Colombo 03",
                   rating: 4.65,
-                  imagePath: 'assets/football.jpg',
+                  imagePath: 'assets/lolc.webp',
                 ),
                 VenueCard(
                   title: "Champions Arena",
