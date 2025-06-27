@@ -1,7 +1,10 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:athlon_user/customers/bookNow.dart';
 import 'package:flutter/material.dart';
 import 'userProfile.dart';
+import 'nearbyVenues.dart';
+
 
 // Explicitly import LoginPage
 
@@ -53,6 +56,7 @@ class NoAnimationRoute<T> extends PageRoute<T> {
 void main() {
   runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -117,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Navigate to search screen
         Navigator.push(
           context,
-          NoAnimationRoute(builder: (context) => const search.SearchScreen()),
+          NoAnimationRoute(builder: (context) => const NearByVenueScreen()),
         );
       },
       child: Container(
@@ -167,15 +171,15 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(70),
+        preferredSize: const Size.fromHeight(50),
         child: AppBar(
           backgroundColor: Colors.white,
-          toolbarHeight: 70.0,
+          toolbarHeight: 50.0,
           surfaceTintColor: Colors.white,
           centerTitle: false,
           automaticallyImplyLeading: false,
           title: Padding(
-            padding: const EdgeInsets.only(left: 20.0),
+            padding: const EdgeInsets.only(left: 5.0),
             child: Image.asset(
               'assets/Athlon1.png', // Match facility owner's path
               height: 50,
@@ -750,11 +754,12 @@ class VenuesSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(height: 0),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(
-                padding: const EdgeInsets.only(left: 10.0),
+                padding: const EdgeInsets.only(left: 8.0),
                 child: Text(
                   "Venues",
                   style: TextStyle(
@@ -787,7 +792,7 @@ class VenuesSection extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 0),
+          SizedBox(height: 4),
           Row(
             children: [
               Expanded(
