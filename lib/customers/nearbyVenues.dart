@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, file_names
+import 'package:athlon_user/customers/courtDetails.dart';
 import 'package:flutter/material.dart';
-import 'bookNow.dart';
+//import 'bookNow.dart';
 
 void main() {
   runApp(const MyApp());
@@ -48,6 +49,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocusNode = FocusNode();
   bool _isScrolled = false;
   String _searchQuery = '';
   late AnimationController _animationController;
@@ -55,22 +57,27 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   String _sortingMode = 'Nearest';
   double _distanceRadius = 10.0; // Default radius in km
 
+  // Search history variables
+  List<String> _searchHistory = [];
+  bool _showSearchHistory = false;
+  final int _maxHistoryItems = 5; // Limit history to 5 items
+
   // Map to track favorite status for each venue
   final Map<String, bool> _favoriteStatus = {};
 
-  // Sports filter list
-  final List<String> _filterOptions = [
-    'All',
-    'Indoor',
-    'Outdoor',
-    'Cricket',
-    'Futsal',
-    'Tennis',
-    'Swimming',
-    'Basketball',
-    'Golf',
-    'Yoga',
-  ];
+  // Sports filter list with icons
+  final Map<String, IconData> _filterOptionsWithIcons = {
+    'All': Icons.grid_view_rounded,
+    'Indoor': Icons.home_rounded,
+    'Outdoor': Icons.nature_rounded,
+    'Cricket': Icons.sports_cricket_rounded,
+    'Futsal': Icons.sports_soccer_rounded,
+    'Tennis': Icons.sports_tennis_rounded,
+    'Swimming': Icons.pool_rounded,
+    'Basketball': Icons.sports_basketball_rounded,
+    'Golf': Icons.sports_golf_rounded,
+    'Yoga': Icons.self_improvement_rounded,
+  };
 
   // List of all venues with distance
   final List<VenueModel> _allVenues = [
@@ -82,7 +89,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 1.2,
       imageUrl:
           "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Futsal", "Cricket", "Indoor Sports"],
+      sports: ["Futsal", "Cricket", "Indoor"],
       openingHours: "6:00 AM - 11:00 PM",
       ratePerHour: "Rs. 3,000",
     ),
@@ -94,7 +101,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 3.5,
       imageUrl:
           "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Futsal", "Cricket", "Indoor Sports"],
+      sports: ["Futsal", "Cricket", "Indoor"],
       openingHours: "7:00 AM - 10:00 PM",
       ratePerHour: "Rs. 2,500",
     ),
@@ -106,7 +113,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 0.8,
       imageUrl:
           "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Badminton", "Tennis", "Squash"],
+      sports: ["Badminton", "Tennis", "Squash", "Outdoor"],
       openingHours: "6:00 AM - 10:00 PM",
       ratePerHour: "Rs. 2,000",
     ),
@@ -237,6 +244,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     super.initState();
     _scrollController.addListener(_onScroll);
     _searchController.addListener(_onSearchChanged);
+    _searchFocusNode.addListener(_onSearchFocusChanged);
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -244,6 +252,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
 
     // Sort venues by distance (nearest first)
     _allVenues.sort((a, b) => a.distance.compareTo(b.distance));
+
+    // Load search history
+    _loadSearchHistory();
   }
 
   @override
@@ -252,8 +263,75 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     _scrollController.dispose();
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _searchFocusNode.removeListener(_onSearchFocusChanged);
+    _searchFocusNode.dispose();
     _animationController.dispose();
     super.dispose();
+  }
+
+  // Load search history (placeholder - implement SharedPreferences later)
+  void _loadSearchHistory() {
+    // For now, we'll use a simple list
+    // In a real app, load from SharedPreferences
+    setState(() {
+      _searchHistory = []; // Start with empty history
+    });
+  }
+
+  // Save search history (placeholder - implement SharedPreferences later)
+  void _saveSearchHistory() {
+    // In a real app, save to SharedPreferences
+    // For now, just keep in memory
+  }
+
+  // Handle search focus changes
+  void _onSearchFocusChanged() {
+    setState(() {
+      _showSearchHistory = _searchFocusNode.hasFocus && _searchQuery.isEmpty;
+    });
+  }
+
+  // Add search term to history
+  void _addToSearchHistory(String query) {
+    if (query.trim().isEmpty) return;
+
+    setState(() {
+      // Remove if already exists
+      _searchHistory.remove(query);
+      // Add to beginning
+      _searchHistory.insert(0, query);
+      // Keep only max items
+      if (_searchHistory.length > _maxHistoryItems) {
+        _searchHistory = _searchHistory.take(_maxHistoryItems).toList();
+      }
+    });
+    _saveSearchHistory();
+  }
+
+  // Select search history item
+  void _selectSearchHistoryItem(String query) {
+    _searchController.text = query;
+    _searchFocusNode.unfocus();
+    setState(() {
+      _showSearchHistory = false;
+    });
+  }
+
+  // Clear search history
+  void _clearSearchHistory() {
+    setState(() {
+      _searchHistory.clear();
+      _showSearchHistory = false;
+    });
+    _saveSearchHistory();
+  }
+
+  // Remove single history item
+  void _removeSearchHistoryItem(String query) {
+    setState(() {
+      _searchHistory.remove(query);
+    });
+    _saveSearchHistory();
   }
 
   // Toggle favorite status for a venue
@@ -282,7 +360,13 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   void _onSearchChanged() {
     setState(() {
       _searchQuery = _searchController.text.toLowerCase();
+      _showSearchHistory = _searchFocusNode.hasFocus && _searchQuery.isEmpty;
     });
+
+    // Add to history when user stops typing (you can implement debouncing)
+    if (_searchQuery.isNotEmpty && _searchQuery.length > 2) {
+      _addToSearchHistory(_searchController.text);
+    }
   }
 
   // Set active filter
@@ -291,8 +375,6 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       _activeFilter = filter;
     });
   }
-
-  // Handle tab selection
 
   // Filtered venues based on search and active filter
   List<VenueModel> get _filteredVenues {
@@ -356,8 +438,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1B2C4F),
-        elevation: 2,
+        elevation: 1,
         toolbarHeight: 50,
+        //centerTitle: true, // center the title
         title: const Text(
           "Nearby Venues",
           style: TextStyle(
@@ -367,16 +450,11 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
             color: Colors.white,
           ),
         ),
-        centerTitle: false,
-        leading: Container(
-          margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
-          child: IconButton(
-            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
+        leading: IconButton(
+          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+          onPressed: () => Navigator.of(context).pop(),
         ),
+
         actions: [
           // Add a favorites indicator with count in the app bar
           if (favoriteCount > 0)
@@ -426,165 +504,302 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
             ),
         ],
       ),
-      body: Column(
-        children: [
-          // Search bar - Updated to match first file style
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: _isScrolled
-                  ? [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        offset: const Offset(0, 1),
-                        blurRadius: 5,
-                      ),
-                    ]
-                  : [],
-            ),
-            child: Container(
+      body: GestureDetector(
+        onTap: () {
+          _searchFocusNode.unfocus();
+          setState(() {
+            _showSearchHistory = false;
+          });
+        },
+        child: Column(
+          children: [
+            // Search bar with history - Updated
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F6FA),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE0E3E8), width: 1),
+                color: Colors.white,
+                boxShadow: _isScrolled
+                    ? [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          offset: const Offset(0, 1),
+                          blurRadius: 5,
+                        ),
+                      ]
+                    : [],
               ),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Find sports venues...',
-                  hintStyle: TextStyle(color: Colors.grey[400], fontSize: 15),
-                  prefixIcon: const Icon(
-                    Icons.search_rounded,
-                    color: Color(0xFF1B2C4F),
-                  ),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(
-                            Icons.clear_rounded,
-                            color: Color(0xFF1B2C4F),
-                          ),
-                          onPressed: () {
-                            _searchController.clear();
-                          },
-                        )
-                      : null,
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 16,
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // Sport Filters
-          Container(
-            height: 50,
-            padding: const EdgeInsets.only(left: 16),
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _filterOptions.length,
-              itemBuilder: (context, index) {
-                final option = _filterOptions[index];
-                final isActive = _activeFilter == option;
-
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(option),
-                    labelStyle: TextStyle(
-                      color: isActive ? Colors.white : const Color(0xFF1B2C4F),
-                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                    ),
-                    backgroundColor: isActive
-                        ? const Color(0xFF1B2C4F)
-                        : Colors.white,
-                    side: BorderSide(
-                      color: isActive
-                          ? const Color(0xFF1B2C4F)
-                          : const Color(0xFFE0E3E8),
-                    ),
-                    selectedColor: const Color(0xFF1B2C4F),
-                    showCheckmark: false,
-                    selected: isActive,
-                    onSelected: (selected) {
-                      if (selected) {
-                        _setFilter(option);
-                      }
-                    },
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                  ),
-                );
-              },
-            ),
-          ),
-
-          // Results header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: Row(
-              children: [
-                const SizedBox(width: 12),
-                RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text: "Found ",
-                        style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF5F6FA),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFFE0E3E8),
+                        width: 1,
                       ),
-                      TextSpan(
-                        text: "${_filteredVenues.length} venues",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      focusNode: _searchFocusNode,
+                      decoration: InputDecoration(
+                        hintText: 'Find sports venues...',
+                        hintStyle: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 15,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.search_rounded,
                           color: Color(0xFF1B2C4F),
                         ),
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(
+                                  Icons.clear_rounded,
+                                  color: Color(0xFF1B2C4F),
+                                ),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _showSearchHistory =
+                                        _searchFocusNode.hasFocus;
+                                  });
+                                },
+                              )
+                            : null,
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                // Sort button
-                TextButton.icon(
-                  icon: const Icon(
-                    Icons.sort,
-                    size: 18,
-                    color: Color(0xFF1B2C4F),
-                  ),
-                  label: Text(
-                    _sortingMode,
-                    style: const TextStyle(
-                      color: Color(0xFF1B2C4F),
-                      fontWeight: FontWeight.w500,
+                      onSubmitted: (value) {
+                        if (value.trim().isNotEmpty) {
+                          _addToSearchHistory(value);
+                        }
+                        _searchFocusNode.unfocus();
+                      },
                     ),
                   ),
-                  style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFFF5F6FA),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  onPressed: () {
-                    _showSortingOptions(context);
-                  },
-                ),
-              ],
-            ),
-          ),
 
-          // Venues list
-          Expanded(
-            child: _filteredVenues.isEmpty
-                ? _buildEmptyState()
-                : _buildVenuesList(),
-          ),
-        ],
+                  // Search History Dropdown
+                  if (_showSearchHistory && _searchHistory.isNotEmpty)
+                    Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: const Color(0xFFE0E3E8),
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.history,
+                                  size: 16,
+                                  color: Color(0xFF1B2C4F),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Recent searches',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF1B2C4F),
+                                  ),
+                                ),
+                                const Spacer(),
+                                GestureDetector(
+                                  onTap: _clearSearchHistory,
+                                  child: Text(
+                                    'Clear all',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: _searchHistory.length,
+                            itemBuilder: (context, index) {
+                              final historyItem = _searchHistory[index];
+                              return ListTile(
+                                dense: true,
+                                leading: const Icon(
+                                  Icons.history,
+                                  size: 18,
+                                  color: Colors.grey,
+                                ),
+                                title: Text(
+                                  historyItem,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                trailing: GestureDetector(
+                                  onTap: () =>
+                                      _removeSearchHistoryItem(historyItem),
+                                  child: const Icon(
+                                    Icons.close,
+                                    size: 18,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                onTap: () =>
+                                    _selectSearchHistoryItem(historyItem),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            // Sport Filters with Icons
+            Container(
+              height: 50,
+              padding: const EdgeInsets.only(left: 8),
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _filterOptionsWithIcons.length,
+                itemBuilder: (context, index) {
+                  final option = _filterOptionsWithIcons.keys.elementAt(index);
+                  final icon = _filterOptionsWithIcons[option]!;
+                  final isActive = _activeFilter == option;
+
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      avatar: Icon(
+                        icon,
+                        size: 18,
+                        color: isActive
+                            ? Colors.white
+                            : const Color(0xFF1B2C4F),
+                      ),
+                      label: Text(option),
+                      labelStyle: TextStyle(
+                        color: isActive
+                            ? Colors.white
+                            : const Color(0xFF1B2C4F),
+                        fontWeight: isActive
+                            ? FontWeight.w600
+                            : FontWeight.w500,
+                      ),
+                      backgroundColor: isActive
+                          ? const Color(0xFF1B2C4F)
+                          : Colors.white,
+                      side: BorderSide(
+                        color: isActive
+                            ? const Color(0xFF1B2C4F)
+                            : const Color(0xFFE0E3E8),
+                      ),
+                      selectedColor: const Color(0xFF1B2C4F),
+                      showCheckmark: false,
+                      selected: isActive,
+                      onSelected: (selected) {
+                        if (selected) {
+                          _setFilter(option);
+                        }
+                      },
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8.0,
+                      ),
+                      labelPadding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            // Results header
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: Row(
+                children: [
+                  const SizedBox(width: 12),
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Found ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[700],
+                          ),
+                        ),
+                        TextSpan(
+                          text: "${_filteredVenues.length} venues",
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1B2C4F),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Spacer(),
+                  // Sort button
+                  TextButton.icon(
+                    icon: const Icon(
+                      Icons.sort,
+                      size: 18,
+                      color: Color(0xFF1B2C4F),
+                    ),
+                    label: Text(
+                      _sortingMode,
+                      style: const TextStyle(
+                        color: Color(0xFF1B2C4F),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    style: TextButton.styleFrom(
+                      backgroundColor: const Color(0xFFF5F6FA),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () {
+                      _showSortingOptions(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            // Venues list
+            Expanded(
+              child: _filteredVenues.isEmpty
+                  ? _buildEmptyState()
+                  : _buildVenuesList(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -880,7 +1095,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                               size: 16,
                               color: Colors.amber,
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 8),
                             Text(
                               formattedRating,
                               style: const TextStyle(
@@ -922,28 +1137,28 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                         child: ElevatedButton(
                           onPressed: () {
                             // Convert VenueModel to expected venue format
-                            final venueData = {
-                              'id': venue.id,
-                              'title': venue.title,
-                              'location': venue.location,
-                              'sport': venue.sports.isNotEmpty
-                                  ? venue.sports.first
-                                  : 'Sports',
-                              'rating': venue.rating,
-                              'image_path': venue.imageUrl,
-                              'distance':
-                                  '${venue.distance.toStringAsFixed(1)} km',
-                              'is_favorite': _favoriteStatus[venue.id] ?? false,
-                              'opening_hours': venue.openingHours,
-                              'rate_per_hour': venue.ratePerHour,
-                            };
+                            // final venueData = {
+                            //   'id': venue.id,
+                            //   'title': venue.title,
+                            //   'location': venue.location,
+                            //   'sport': venue.sports.isNotEmpty
+                            //       ? venue.sports.first
+                            //       : 'Sports',
+                            //   'rating': venue.rating,
+                            //   'image_path': venue.imageUrl,
+                            //   'distance':
+                            //       '${venue.distance.toStringAsFixed(1)} km',
+                            //   'is_favorite': _favoriteStatus[venue.id] ?? false,
+                            //   'opening_hours': venue.openingHours,
+                            //   'rate_per_hour': venue.ratePerHour,
+                            // };
 
                             Navigator.push(
                               context,
                               PageRouteBuilder(
                                 pageBuilder:
                                     (context, animation, secondaryAnimation) =>
-                                        BookNowScreen(venue: venueData),
+                                        CourtDetailScreen(), //BookNowScreen(venue: venueData),
                                 transitionDuration: Duration.zero,
                                 reverseTransitionDuration: Duration.zero,
                               ),
@@ -958,7 +1173,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             ),
                           ),
                           child: const Text(
-                            'Book Now',
+                            'View Court',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -1025,11 +1240,16 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                           value: _distanceRadius,
                           min: 0.0,
                           max: 20.0,
-                          divisions: 19,
+                          divisions:
+                              20, // Changed from 19 to 20 for better granularity
                           label: "${_distanceRadius.round()} km",
                           activeColor: const Color(0xFF1B2C4F),
                           onChanged: (value) {
                             setModalState(() {
+                              _distanceRadius = value;
+                            });
+                            // IMPORTANT: Also update the main state immediately for real-time filtering
+                            setState(() {
                               _distanceRadius = value;
                             });
                           },
@@ -1038,7 +1258,6 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       const Text("20 km"),
                     ],
                   ),
-
                   // Sorting Options
                   const Padding(
                     padding: EdgeInsets.only(top: 2.0),
@@ -1091,7 +1310,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       },
                       icon: const Icon(
                         Icons.refresh,
-                        size: 18,
+                        size: 20,
                         color: Color(0xFF1B2C4F),
                       ),
                       label: const Text(
@@ -1102,7 +1321,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                         ),
                       ),
                       style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
                         visualDensity: VisualDensity.compact,
                       ),
                     ),
@@ -1124,7 +1343,8 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                         ),
                         onPressed: () {
                           setState(() {
-                            // Update main state with modal values
+                            // The distance is already updated in real-time via slider onChange
+                            // Just ensure sorting mode is applied
                           });
                           Navigator.pop(context);
                         },
@@ -1195,6 +1415,50 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       ),
     );
   }
+  // Add this method to show current active distance:
+
+  // Widget _buildDistanceIndicator() {
+  //   if (_distanceRadius < 20.0) {
+  //     return Container(
+  //       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+  //       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+  //       decoration: BoxDecoration(
+  //         color: const Color(0xFF1B2C4F).withOpacity(0.1),
+  //         borderRadius: BorderRadius.circular(16),
+  //         border: Border.all(color: const Color(0xFF1B2C4F).withOpacity(0.3)),
+  //       ),
+  //       child: Row(
+  //         mainAxisSize: MainAxisSize.min,
+  //         children: [
+  //           Icon(Icons.location_on, size: 14, color: const Color(0xFF1B2C4F)),
+  //           const SizedBox(width: 4),
+  //           Text(
+  //             'Within ${_distanceRadius.round()} km',
+  //             style: const TextStyle(
+  //               fontSize: 12,
+  //               color: Color(0xFF1B2C4F),
+  //               fontWeight: FontWeight.w500,
+  //             ),
+  //           ),
+  //           const SizedBox(width: 6),
+  //           GestureDetector(
+  //             onTap: () {
+  //               setState(() {
+  //                 _distanceRadius = 20.0; // Reset to max
+  //               });
+  //             },
+  //             child: Icon(
+  //               Icons.close,
+  //               size: 14,
+  //               color: const Color(0xFF1B2C4F),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //   }
+  //   return const SizedBox.shrink();
+  // }
 }
 
 // Venue Model - Enhanced to match first file data structure
