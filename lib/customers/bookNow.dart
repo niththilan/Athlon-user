@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, library_private_types_in_public_api, file_names
+// ignore_for_file: deprecated_member_use, library_private_types_in_public_api, file_names, depend_on_referenced_packages
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -32,8 +32,9 @@ class Court {
 }
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
