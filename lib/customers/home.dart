@@ -733,6 +733,7 @@ class SportsCard extends StatelessWidget {
 }
 
 // ----------------- VenuesSection & VenueCard -----------------
+// ----------------- VenuesSection & VenueCard -----------------
 class VenuesSection extends StatelessWidget {
   const VenuesSection({super.key});
 
@@ -793,26 +794,48 @@ class VenuesSection extends StatelessWidget {
             ],
           ),
           SizedBox(height: 4),
-          Row(
-            children: [
-              Expanded(
-                child: VenueCard(
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                VenueCard(
                   title: "CR7 Futsal & Indoor Cricket Court",
                   location: "23 Mile Post Ave, Colombo 00300",
                   rating: 4.75,
                   imagePath: 'assets/cr7.jpg',
                 ),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: VenueCard(
+                VenueCard(
                   title: "Ark Sports - Indoor Cricket & Futsal",
                   location: "141/ A, Wattala 11300, Colombo 00600",
                   rating: 4.23,
                   imagePath: 'assets/ark.jpg',
                 ),
-              ),
-            ],
+                VenueCard(
+                  title: "Elite Sports Complex",
+                  location: "456 Galle Road, Colombo 03",
+                  rating: 4.65,
+                  imagePath: 'assets/football.jpg',
+                ),
+                VenueCard(
+                  title: "Champions Arena",
+                  location: "789 Kandy Road, Colombo 07",
+                  rating: 4.45,
+                  imagePath: 'assets/basket.jpg',
+                ),
+                VenueCard(
+                  title: "Victory Sports Hub",
+                  location: "321 Negombo Road, Colombo 15",
+                  rating: 4.85,
+                  imagePath: 'assets/tennis.jpg',
+                ),
+                VenueCard(
+                  title: "Premier Courts",
+                  location: "654 High Level Road, Colombo 06",
+                  rating: 4.35,
+                  imagePath: 'assets/crickett.jpg',
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -836,78 +859,84 @@ class VenueCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 240,
-      child: GestureDetector(
-        onTap: () {
-          // Navigate to CourtDetailScreen when tapped
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  const CourtDetailScreen(),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: SizedBox(
+        width: 160, // Fixed width for horizontal scrolling
+        height: 240,
+        child: GestureDetector(
+          onTap: () {
+            // Navigate to CourtDetailScreen when tapped
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const CourtDetailScreen(),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha((0.05 * 255).toInt()),
+                  blurRadius: 8,
+                  offset: Offset(0, 2),
+                ),
+              ],
             ),
-          );
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha((0.05 * 255).toInt()),
-                blurRadius: 8,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 110,
-                width: double.infinity,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                  child: Image.asset(imagePath, fit: BoxFit.cover),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 110,
+                  width: double.infinity,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                    child: Image.asset(imagePath, fit: BoxFit.cover),
+                  ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF2D3142),
+                Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF2D3142),
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      location,
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      children: List.generate(5, (index) {
-                        return Icon(
-                          Icons.star,
-                          color: index < rating ? Colors.amber : Colors.grey,
-                          size: 16,
-                        );
-                      }),
-                    ),
-                  ],
+                      SizedBox(height: 4),
+                      Text(
+                        location,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        children: List.generate(5, (index) {
+                          return Icon(
+                            Icons.star,
+                            color: index < rating ? Colors.amber : Colors.grey,
+                            size: 16,
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
