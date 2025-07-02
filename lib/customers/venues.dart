@@ -368,7 +368,8 @@ class _VenueDetailsScreenState extends State<VenueDetailsScreen> {
                       _buildInfoRow(
                         icon: Icons.location_on,
                         title:
-                            widget.venue['location'] ?? '141/A, Wattala 11300',
+                            widget.venue['full_address'] ??
+                            '141/A, Wattala 11300',
                         subtitle: widget.venue['distance'] ?? '2.5 km away',
                         onTap: _openDirections,
                       ),

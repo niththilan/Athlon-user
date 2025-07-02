@@ -600,7 +600,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             const SizedBox(height: 24),
 
                             const Text(
-                              "Location & Contact",
+                              "location & Contact",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,

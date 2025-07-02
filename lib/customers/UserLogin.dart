@@ -1,5 +1,5 @@
 // ignore: file_names
-// ignore_for_file: deprecated_member_use, file_names, duplicate_ignore, use_build_context_synchronously, use_super_parameters
+// ignore_for_file: deprecated_member_use, file_names, duplicate_ignore, use_build_context_synchronously, use_super_parameters, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -69,7 +69,7 @@ class _LoginPageState extends State<LoginPage>
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _facilityNameController = TextEditingController(); // For facility name
-  final _locationController = TextEditingController(); // For location
+  final _full_addressController = TextEditingController(); // For full_address
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage>
     _nameController.dispose();
     _phoneController.dispose();
     _facilityNameController.dispose();
-    _locationController.dispose();
+    _full_addressController.dispose();
     _animationController.dispose();
     super.dispose();
   }
@@ -114,7 +114,7 @@ class _LoginPageState extends State<LoginPage>
         _nameController.clear();
         _phoneController.clear();
         _facilityNameController.clear();
-        _locationController.clear();
+        _full_addressController.clear();
       }
     });
     // Play animation when switching modes
@@ -403,8 +403,8 @@ class _LoginPageState extends State<LoginPage>
             //   phone: _phoneController.text.trim(),
             //   facilityName: _facilityNameController.text.trim(),
             //   userType: 'vendor',
-            //   location: _locationController.text.trim().isNotEmpty
-            //       ? _locationController.text.trim()
+            //   full_address: _full_addressController.text.trim().isNotEmpty
+            //       ? _full_addressController.text.trim()
             //       : null,
             // );
 
@@ -428,7 +428,7 @@ class _LoginPageState extends State<LoginPage>
               _nameController.clear();
               _phoneController.clear();
               _facilityNameController.clear();
-              _locationController.clear();
+              _full_addressController.clear();
               _agreeToTerms = false;
             });
           }
@@ -523,9 +523,9 @@ class _LoginPageState extends State<LoginPage>
                         ),
                         const SizedBox(height: 16),
 
-                        // Location Field (Sign up only)
+                        // full_address Field (Sign up only)
                         _buildInputField(
-                          controller: _locationController,
+                          controller: _full_addressController,
                           hintText: 'Location (Optional)',
                           icon: Icons.location_on_outlined,
                           validator: null, // Optional field

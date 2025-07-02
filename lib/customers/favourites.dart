@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
 import 'footer.dart';
@@ -139,7 +139,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 final venue = _favoriteVenues[index];
                 return VenueCardFavorite(
                   title: venue['title'] ?? 'Unknown Venue',
-                  location: venue['location'] ?? 'Unknown Location',
+                  full_address: venue['full_address'] ?? 'Unknown full_address',
                   rating: venue['rating'] is double
                       ? venue['rating']
                       : double.tryParse(venue['rating'].toString()) ?? 0.0,
@@ -206,7 +206,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
 class VenueCardFavorite extends StatelessWidget {
   final String title;
-  final String location;
+  final String full_address;
   final double rating;
   final String imagePath;
   final String venueId;
@@ -217,7 +217,7 @@ class VenueCardFavorite extends StatelessWidget {
   const VenueCardFavorite({
     super.key,
     required this.title,
-    required this.location,
+    required this.full_address,
     required this.rating,
     required this.imagePath,
     required this.venueId,
@@ -326,14 +326,14 @@ class VenueCardFavorite extends StatelessWidget {
 
                 const SizedBox(height: 8),
 
-                // Location
+                // full_address
                 Row(
                   children: [
                     Icon(Icons.location_on, color: Colors.grey[600], size: 16),
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        location,
+                        full_address,
                         style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

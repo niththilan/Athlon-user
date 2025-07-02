@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, use_build_context_synchronously, unnecessary_to_list_in_spreads
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously, unnecessary_to_list_in_spreads, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
 
@@ -47,7 +47,7 @@ class _SettingsScreenState extends State<SettingsScreen>
   bool isDarkMode = false;
   bool isNotificationsEnabled = true;
   bool isEmailNotificationsEnabled = true;
-  bool isLocationEnabled = true;
+  bool isfull_addressEnabled = true;
   bool isTwoFactorEnabled = false;
   String selectedLanguage = 'English';
   late AnimationController _animationController;

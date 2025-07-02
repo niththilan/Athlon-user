@@ -1,10 +1,11 @@
-// ignore_for_file: deprecated_member_use
-
-import 'package:athlon_user/customers/bookNow.dart';
+// ignore_for_file: deprecated_member_use, non_constant_identifier_names
+// ignore: depend_on_referenced_packages
+//import 'package:athlon_user/customers/bookNow.dart';
 import 'package:flutter/material.dart';
 import 'userProfile.dart';
 import 'nearbyVenues.dart';
-import 'package:device_preview/device_preview.dart';
+
+//import 'package:device_preview/device_preview.dart';
 
 // Explicitly import LoginPage
 
@@ -13,7 +14,7 @@ import 'courtDetails.dart'; // Add this import
 
 import 'footer.dart';
 import 'nearbyVenues.dart' as venues; // Import the nearbyVenues file
-import 'search.dart' as search;
+//import 'search.dart' as search;
 
 // Add a custom route with no animation
 class NoAnimationRoute<T> extends PageRoute<T> {
@@ -53,13 +54,17 @@ class NoAnimationRoute<T> extends PageRoute<T> {
   bool get barrierDismissible => false;
 }
 
+// void main() {
+//   runApp(
+//     DevicePreview(
+//       enabled: true, // Set to false to disable preview
+//       builder: (context) => const MyApp(),
+//     ),
+//   );
+// }
+
 void main() {
-  runApp(
-    DevicePreview(
-      enabled: true, // Set to false to disable preview
-      builder: (context) => const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -802,7 +807,7 @@ class VenuesSection extends StatelessWidget {
               Expanded(
                 child: VenueCard(
                   title: "CR7 Futsal & Indoor Cricket Court",
-                  location: "23 Mile Post Ave, Colombo 00300",
+                  full_address: "23 Mile Post Ave, Colombo 00300",
                   rating: 4.75,
                   imagePath: 'assets/cr7.jpg',
                 ),
@@ -811,7 +816,7 @@ class VenuesSection extends StatelessWidget {
               Expanded(
                 child: VenueCard(
                   title: "Ark Sports - Indoor Cricket & Futsal",
-                  location: "141/ A, Wattala 11300, Colombo 00600",
+                  full_address: "141/ A, Wattala 11300, Colombo 00600",
                   rating: 4.23,
                   imagePath: 'assets/ark.jpg',
                 ),
@@ -826,14 +831,14 @@ class VenuesSection extends StatelessWidget {
 
 class VenueCard extends StatelessWidget {
   final String title;
-  final String location;
+  final String full_address;
   final double rating;
   final String imagePath;
 
   const VenueCard({
     super.key,
     required this.title,
-    required this.location,
+    required this.full_address,
     required this.rating,
     required this.imagePath,
   });
@@ -895,7 +900,7 @@ class VenueCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      location,
+                      full_address,
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                     SizedBox(height: 10),

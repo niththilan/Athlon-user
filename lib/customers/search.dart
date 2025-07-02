@@ -582,7 +582,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Location row
+                          // full_address row
                           Row(
                             children: [
                               Icon(

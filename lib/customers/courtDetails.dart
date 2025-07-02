@@ -108,11 +108,11 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
           'id': 'court_001',
           'name': 'CR7 FUTSAL & INDOOR CRICKET ARENA',
           'type': 'Futsal Court',
-          'location': '23 Mile Post Ave, Colombo 00300',
+          'full_address': '23 Mile Post Ave, Colombo 00300',
           'rating': 4.75,
-          'total_reviews': 124,
+          'review_count': 4,
           'distance': '2.3 km',
-          'price_per_hour': 2500.0,
+          'price_per_hour': 2000.0,
           'opening_hours': '6:00 AM - 11:00 PM',
           'phone': '+94 77 123 4567',
           'email': 'info@cr7arena.lk',
@@ -620,7 +620,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
         pageBuilder: (context, animation, secondaryAnimation) => BookNowScreen(
           venue: {
             'title': _courtDetails['name'],
-            'location': _courtDetails['location'],
+            'full_address': _courtDetails['full_address'],
             'sport': _courtDetails['type'],
             'rating': _courtDetails['rating'],
             'rate_per_hour': 'Rs. ${_courtDetails['price_per_hour']}',
@@ -954,7 +954,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                                     ),
                                   ),
                                   Text(
-                                    ' (${_courtDetails['total_reviews']})',
+                                    ' (${_courtDetails['review_count']})',
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: Colors.grey[600],
@@ -1208,7 +1208,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         _buildInfoRow(
                           Icons.location_on,
                           'Address',
-                          _courtDetails['location'],
+                          _courtDetails['full_address'],
                         ),
                         const SizedBox(height: 12),
                         _buildInfoRow(
@@ -1255,7 +1255,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Reviews (${_courtDetails['total_reviews']})',
+                              'Reviews (${_courtDetails['review_count']})',
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,

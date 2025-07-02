@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, file_names
+// ignore_for_file: deprecated_member_use, file_names, non_constant_identifier_names
 import 'package:athlon_user/customers/courtDetails.dart';
 import 'package:flutter/material.dart';
 //import 'bookNow.dart';
@@ -84,19 +84,19 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '1',
       title: "CR7 FUTSAL & INDOOR CRICKET",
-      location: "23 Mile Post Ave, Colombo 00300",
+      full_address: "23 Mile Post Ave, Colombo 00300",
       rating: 4.75,
       distance: 1.2,
       imageUrl:
           "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
       sports: ["Futsal", "Cricket", "Indoor"],
       openingHours: "6:00 AM - 11:00 PM",
-      ratePerHour: "Rs. 3,000",
+      ratePerHour: "Rs. 2,000",
     ),
     VenueModel(
       id: '2',
       title: "ARK SPORTS - INDOOR CRICKET & FUTSAL",
-      location: "141/A, Wattala 11300",
+      full_address: "141/A, Wattala 11300",
       rating: 4.23,
       distance: 3.5,
       imageUrl:
@@ -108,7 +108,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '3',
       title: "CHAMPION'S ARENA",
-      location: "45 Sports Complex Road, Rajagiriya 10100",
+      full_address: "45 Sports Complex Road, Rajagiriya 10100",
       rating: 4.89,
       distance: 0.8,
       imageUrl:
@@ -120,7 +120,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '4',
       title: "AQUA SPORTS CENTER",
-      location: "78 Poolside Avenue, Mount Lavinia 10370",
+      full_address: "78 Poolside Avenue, Mount Lavinia 10370",
       rating: 4.67,
       distance: 5.2,
       imageUrl:
@@ -132,7 +132,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '5',
       title: "ELITE BASKETBALL ACADEMY",
-      location: "92 Court Lane, Dehiwala 10350",
+      full_address: "92 Court Lane, Dehiwala 10350",
       rating: 4.45,
       distance: 2.7,
       imageUrl:
@@ -144,7 +144,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '6',
       title: "VICTORY VALLEY GOLF CLUB",
-      location: "156 Greens Road, Kandy 20000",
+      full_address: "156 Greens Road, Kandy 20000",
       rating: 4.92,
       distance: 8.6,
       imageUrl:
@@ -156,7 +156,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '7',
       title: "COLOMBO TENNIS CLUB",
-      location: "45 Racquet Road, Colombo 00500",
+      full_address: "45 Racquet Road, Colombo 00500",
       rating: 4.82,
       distance: 1.5,
       imageUrl:
@@ -168,7 +168,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '8',
       title: "OCEANSIDE SURFING SCHOOL",
-      location: "Beach Front, Hikkaduwa 80240",
+      full_address: "Beach Front, Hikkaduwa 80240",
       rating: 4.78,
       distance: 12.3,
       imageUrl:
@@ -180,7 +180,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '9',
       title: "CENTRAL YOGA & FITNESS",
-      location: "22 Wellness Street, Nawala 10107",
+      full_address: "22 Wellness Street, Nawala 10107",
       rating: 4.65,
       distance: 1.9,
       imageUrl:
@@ -192,7 +192,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '10',
       title: "MOUNTAIN BIKING TRAILS",
-      location: "Hanthana Mountain Range, Kandy 20000",
+      full_address: "Hanthana Mountain Range, Kandy 20000",
       rating: 4.91,
       distance: 10.5,
       imageUrl:
@@ -204,7 +204,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '11',
       title: "COLOMBO BOXING CLUB",
-      location: "78 Fighter's Lane, Colombo 00700",
+      full_address: "78 Fighter's Lane, Colombo 00700",
       rating: 4.56,
       distance: 4.3,
       imageUrl:
@@ -216,7 +216,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '12',
       title: "GRAND SLAM CRICKET ACADEMY",
-      location: "123 Boundary Road, Galle 80000",
+      full_address: "123 Boundary Road, Galle 80000",
       rating: 4.88,
       distance: 7.8,
       imageUrl:
@@ -228,7 +228,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '13',
       title: "KANDY HILLS ROCK CLIMBING",
-      location: "Rock Face Avenue, Kandy 20100",
+      full_address: "Rock Face Avenue, Kandy 20100",
       rating: 4.70,
       distance: 9.2,
       imageUrl:
@@ -384,13 +384,13 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((venue) {
         final titleMatches = venue.title.toLowerCase().contains(_searchQuery);
-        final locationMatches = venue.location.toLowerCase().contains(
+        final full_addressMatches = venue.full_address.toLowerCase().contains(
           _searchQuery,
         );
         final sportsMatches = venue.sports.any(
           (sport) => sport.toLowerCase().contains(_searchQuery),
         );
-        return titleMatches || locationMatches || sportsMatches;
+        return titleMatches || full_addressMatches || sportsMatches;
       }).toList();
     }
 
@@ -1027,7 +1027,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          venue.location,
+                          venue.full_address,
                           style: TextStyle(
                             fontSize: 13,
                             color: Colors.grey[600],
@@ -1140,7 +1140,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             // final venueData = {
                             //   'id': venue.id,
                             //   'title': venue.title,
-                            //   'location': venue.location,
+                            //   'full_address': venue.full_address,
                             //   'sport': venue.sports.isNotEmpty
                             //       ? venue.sports.first
                             //       : 'Sports',
@@ -1430,7 +1430,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   //       child: Row(
   //         mainAxisSize: MainAxisSize.min,
   //         children: [
-  //           Icon(Icons.location_on, size: 14, color: const Color(0xFF1B2C4F)),
+  //           Icon(Icons.full_address_on, size: 14, color: const Color(0xFF1B2C4F)),
   //           const SizedBox(width: 4),
   //           Text(
   //             'Within ${_distanceRadius.round()} km',
@@ -1465,7 +1465,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
 class VenueModel {
   final String id;
   final String title;
-  final String location;
+  final String full_address;
   final double rating;
   final String imageUrl;
   final List<String> sports;
@@ -1476,7 +1476,7 @@ class VenueModel {
   VenueModel({
     required this.id,
     required this.title,
-    required this.location,
+    required this.full_address,
     required this.rating,
     required this.imageUrl,
     required this.sports,

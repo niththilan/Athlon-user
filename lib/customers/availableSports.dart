@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, deprecated_member_use
+// ignore_for_file: file_names, deprecated_member_use, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
 import 'favourites.dart';
@@ -65,7 +65,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     {
       'id': '1',
       'title': 'SportsCentral Stadium',
-      'location': 'Downtown, Colombo 00200',
+      'full_address': 'Downtown, Colombo 00200',
       'sport': 'Football',
       'rating': 4.8,
       'image_path':
@@ -78,7 +78,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     {
       'id': '2',
       'title': 'Galaxy Sports Complex',
-      'location': 'North Avenue, Colombo 00300',
+      'full_address': 'North Avenue, Colombo 00300',
       'sport': 'Basketball',
       'rating': 4.5,
       'image_path':
@@ -91,7 +91,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     {
       'id': '3',
       'title': 'Olympic Swimming Center',
-      'location': 'Lake View, Colombo 00400',
+      'full_address': 'Lake View, Colombo 00400',
       'sport': 'Swimming',
       'rating': 4.7,
       'image_path':
@@ -104,7 +104,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     {
       'id': '4',
       'title': 'Tennis Court Complex',
-      'location': 'Green Hills, Colombo 00500',
+      'full_address': 'Green Hills, Colombo 00500',
       'sport': 'Tennis',
       'rating': 4.4,
       'image_path':
@@ -117,7 +117,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     {
       'id': '5',
       'title': 'City Badminton Center',
-      'location': 'Central Park, Colombo 00600',
+      'full_address': 'Central Park, Colombo 00600',
       'sport': 'Badminton',
       'rating': 4.6,
       'image_path':
@@ -130,7 +130,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     {
       'id': '6',
       'title': 'CR7 FUTSAL & INDOOR CRICKET',
-      'location': '23 Mile Post Ave, Colombo 00300',
+      'full_address': '23 Mile Post Ave, Colombo 00300',
       'sport': 'Cricket',
       'rating': 4.75,
       'image_path':
@@ -143,7 +143,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     {
       'id': '7',
       'title': 'Table Tennis Hub',
-      'location': 'City Center, Colombo 00100',
+      'full_address': 'City Center, Colombo 00100',
       'sport': 'Table Tennis',
       'rating': 4.2,
       'image_path':
@@ -156,7 +156,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     {
       'id': '8',
       'title': 'Baseball Diamond',
-      'location': 'West End, Colombo 00700',
+      'full_address': 'West End, Colombo 00700',
       'sport': 'Baseball',
       'rating': 4.1,
       'image_path':
@@ -267,13 +267,13 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
         final titleMatch =
             venue['title']?.toString().toLowerCase().contains(_searchQuery) ??
             false;
-        final locationMatch =
-            venue['location']?.toString().toLowerCase().contains(
+        final full_addressMatch =
+            venue['full_address']?.toString().toLowerCase().contains(
               _searchQuery,
             ) ??
             false;
 
-        return titleMatch || locationMatch;
+        return titleMatch || full_addressMatch;
       }).toList();
 
       // Show venues section if we have search results
