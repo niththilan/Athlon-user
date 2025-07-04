@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'userProfile.dart';
 import 'nearbyVenues.dart';
 
-//import 'package:device_preview/device_preview.dart';
+import 'package:device_preview/device_preview.dart';
 
 // Explicitly import LoginPage
 
@@ -54,18 +54,18 @@ class NoAnimationRoute<T> extends PageRoute<T> {
   bool get barrierDismissible => false;
 }
 
-// void main() {
-//   runApp(
-//     DevicePreview(
-//       enabled: true, // Set to false to disable preview
-//       builder: (context) => const MyApp(),
-//     ),
-//   );
-// }
-
 void main() {
-  runApp(const MyApp());
+  runApp(
+    DevicePreview(
+      enabled: true, // Set to false to disable preview
+      builder: (context) => const MyApp(),
+    ),
+  );
 }
+
+// void main() {
+//   runApp(const MyApp());
+// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 //import 'package:flutter/services.dart';
 import 'dart:math' as math;
+import 'home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -37,14 +38,14 @@ class MyApp extends StatelessWidget {
 }
 
 // Placeholder for missing imports
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+// class HomeScreen extends StatelessWidget {
+//   const HomeScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(body: Center(child: Text('Home Screen')));
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(body: Center(child: Text('Home Screen')));
+//   }
+// }
 
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});

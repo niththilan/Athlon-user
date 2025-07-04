@@ -1707,7 +1707,7 @@
 // ignore_for_file: deprecated_member_use, library_private_types_in_public_api, file_names, depend_on_referenced_packages, unused_local_variable
 
 import 'package:flutter/material.dart';
-//import 'package:device_preview/device_preview.dart';
+import 'package:device_preview/device_preview.dart';
 import 'package:intl/intl.dart';
 import 'proceedToPayment.dart' as payment;
 
@@ -1746,7 +1746,7 @@ class BookingState {
 
   static Map<String, dynamic> getSelectedDuration() {
     if (selectedSlots.isEmpty) {
-      return {'formatted': '', 'minutes': 0, 'splits': []};
+      return {'formatted': '', 'minutes': 0, 'splits': [], 'totalHours': 0.0};
     }
 
     final totalMinutes = selectedSlots.length * 30;
@@ -1781,17 +1781,17 @@ class BookingState {
   }
 }
 
-// void main() {
-//   runApp(
-//     DevicePreview(
-//       enabled: true, // Set to false to disable preview
-//       builder: (context) => const MyApp(),
-//     ),
-//   );
-// }
 void main() {
-  runApp(const MyApp());
+  runApp(
+    DevicePreview(
+      enabled: true, // Set to false to disable preview
+      builder: (context) => const MyApp(),
+    ),
+  );
 }
+// void main() {
+//   runApp(const MyApp());
+// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -2776,14 +2776,14 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Select Date',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF1B2C4F),
-          ),
-        ),
-        const SizedBox(height: 8),
+        // Text(
+        //   'Select Date',
+        //   style: Theme.of(context).textTheme.titleMedium?.copyWith(
+        //     fontWeight: FontWeight.w600,
+        //     color: const Color(0xFF1B2C4F),
+        //   ),
+        // ),
+        const SizedBox(height: 6),
         Row(
           children: [
             // Left arrow button
@@ -2909,57 +2909,67 @@ class _BookingDateTimeSectionState extends State<BookingDateTimeSection> {
             border: Border.all(color: Colors.grey.shade200),
           ),
           child: DropdownButtonHideUnderline(
-            child: DropdownButton<int>(
-              value: selectedCourtIndex,
-              isExpanded: true,
-              icon: const Icon(
-                Icons.keyboard_arrow_down,
-                color: Color(0xFF1B2C4F),
+            child: Theme(
+              data: Theme.of(context).copyWith(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                focusColor: Colors.transparent,
               ),
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF1B2C4F),
+              child: DropdownButton<int>(
+                value: selectedCourtIndex,
+                isExpanded: true,
+                icon: const Icon(
+                  Icons.keyboard_arrow_down,
+                  color: Color(0xFF1B2C4F),
+                ),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF1B2C4F),
+                ),
+                items: courts.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  Court court = entry.value;
+                  return DropdownMenuItem<int>(
+                    value: index,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.sports_soccer,
+                          size: 16,
+                          color: const Color.fromARGB(255, 132, 132, 132),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${court.name} - ${court.type}',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: const Color.fromARGB(255, 132, 132, 132),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'Rs. ${court.hourlyRate.toStringAsFixed(0)}/hr',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (int? newValue) {
+                  if (newValue != null) {
+                    setState(() {
+                      selectedCourtIndex = newValue;
+                      BookingState.hourlyRate = courts[newValue].hourlyRate;
+                    });
+                    widget.onSlotSelectionChanged?.call();
+                  }
+                },
               ),
-              items: courts.asMap().entries.map((entry) {
-                int index = entry.key;
-                Court court = entry.value;
-                return DropdownMenuItem<int>(
-                  value: index,
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.sports_soccer,
-                        size: 16,
-                        color: Colors.grey.shade600,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          '${court.name} - ${court.type}',
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ),
-                      Text(
-                        'Rs. ${court.hourlyRate.toStringAsFixed(0)}/hr',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-              onChanged: (int? newValue) {
-                if (newValue != null) {
-                  setState(() {
-                    selectedCourtIndex = newValue;
-                    BookingState.hourlyRate = courts[newValue].hourlyRate;
-                  });
-                  widget.onSlotSelectionChanged?.call();
-                }
-              },
             ),
           ),
         ),
@@ -3480,10 +3490,10 @@ class _PricingSummarySectionState extends State<PricingSummarySection> {
       'venue': 'CR7 Futsal Arena',
       'date': DateFormat('dd MMM yyyy').format(DateTime.now()),
       'timeSlots': BookingState.selectedSlots.toList(),
-      'duration': BookingState.getSelectedDuration(),
-      'subtotal': BookingState.calculateSubtotal(),
-      'serviceFee': BookingState.serviceFee,
-      'total': BookingState.calculateTotal(),
+      'duration': BookingState.getSelectedDuration() ?? 0.0,
+      'subtotal': BookingState.calculateSubtotal() ?? 0.0,
+      'serviceFee': BookingState.serviceFee ?? 0.0,
+      'total': BookingState.calculateTotal() ?? 0.0,
       'numberOfPlayers': 10,
     };
 
