@@ -433,9 +433,10 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
+        elevation: 4,
+        toolbarHeight: 60,
         backgroundColor: const Color(0xFF1B2C4F),
-        elevation: 1,
-        toolbarHeight: 56,
+        centerTitle: false,
         title: const Text(
           "Nearby Venues",
           style: TextStyle(
@@ -445,9 +446,17 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
             color: Colors.white,
           ),
         ),
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-          onPressed: () => Navigator.of(context).pop(),
+        leading: Container(
+          margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
+          child: IconButton(
+            icon: const Icon(
+              Icons.chevron_left,
+              color: Colors.white,
+              size: 28,
+            ),
+            onPressed: () => Navigator.pop(context),
+            tooltip: 'Back',
+          ),
         ),
 
         actions: [
