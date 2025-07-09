@@ -2,53 +2,6 @@
 // ignore_for_file: deprecated_member_use, file_names, duplicate_ignore
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-// Import your other screens
-import 'bookNow.dart'; // Your BookNow screen (uncomment and update path as needed)
-// import 'messages.dart'; // Your Messages screen (uncomment and update path as needed)
-
-// Temporary BookNowScreen - replace with actual import when files are properly set up
-// class BookNowScreen extends StatefulWidget {
-//   final Map<String, dynamic>? venue;
-
-//   const BookNowScreen({super.key, this.venue});
-
-//   @override
-//   State<BookNowScreen> createState() => BookNowScreenState();
-// }
-
-// class _BookNowScreenState extends State<BookNowScreen> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.white,
-//       appBar: AppBar(
-//         backgroundColor: const Color(0xFF1B2C4F),
-//         elevation: 2,
-//         toolbarHeight: 50.0,
-//         title: const Text(
-//           "Book Now",
-//           style: TextStyle(
-//             fontSize: 18,
-//             fontWeight: FontWeight.w600,
-//             color: Colors.white,
-//           ),
-//         ),
-//         centerTitle: false,
-//         leading: IconButton(
-//           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-//           onPressed: () {
-//             Navigator.push(
-//               context,
-//               MaterialPageRoute(builder: (context) => BookNowScreen()),
-//             );
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }
 
 void main() {
   runApp(const MyApp());
@@ -84,12 +37,8 @@ class CourtDetailScreen extends StatefulWidget {
 }
 
 class _CourtDetailScreenState extends State<CourtDetailScreen> {
-  final ScrollController _scrollController = ScrollController();
-  bool _isScrolled = false;
   bool _isFavorite = false;
   int _currentImageIndex = 0;
-  bool _showAllAmenities = false;
-  bool _showAllReviews = false;
 
   // Mock court data
   late Map<String, dynamic> _courtDetails;
@@ -97,13 +46,11 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
     _initializeCourtData();
   }
 
   void _initializeCourtData() {
-    _courtDetails =
-        widget.courtData ??
+    _courtDetails = widget.courtData ??
         {
           'id': 'court_001',
           'name': 'CR7 FUTSAL & INDOOR CRICKET ARENA',
@@ -130,42 +77,14 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
           'amenities': [
             {'name': 'Parking', 'icon': Icons.local_parking, 'available': true},
             {'name': 'Changing Rooms', 'icon': Icons.wc, 'available': true},
-            {
-              'name': 'Shower Facilities',
-              'icon': Icons.shower,
-              'available': true,
-            },
-            {
-              'name': 'Equipment Rental',
-              'icon': Icons.sports_soccer,
-              'available': true,
-            },
-            {
-              'name': 'Refreshments',
-              'icon': Icons.local_cafe,
-              'available': true,
-            },
-            {
-              'name': 'First Aid',
-              'icon': Icons.medical_services,
-              'available': true,
-            },
-            {
-              'name': 'CCTV Security',
-              'icon': Icons.security,
-              'available': true,
-            },
-            {
-              'name': 'Air Conditioning',
-              'icon': Icons.ac_unit,
-              'available': true,
-            },
+            {'name': 'Shower Facilities', 'icon': Icons.shower, 'available': true},
+            {'name': 'Equipment Rental', 'icon': Icons.sports_soccer, 'available': true},
+            {'name': 'Refreshments', 'icon': Icons.local_cafe, 'available': true},
+            {'name': 'First Aid', 'icon': Icons.medical_services, 'available': true},
+            {'name': 'CCTV Security', 'icon': Icons.security, 'available': true},
+            {'name': 'Air Conditioning', 'icon': Icons.ac_unit, 'available': true},
             {'name': 'WiFi', 'icon': Icons.wifi, 'available': false},
-            {
-              'name': 'Scoreboard',
-              'icon': Icons.leaderboard,
-              'available': true,
-            },
+            {'name': 'Scoreboard', 'icon': Icons.leaderboard, 'available': true},
           ],
           'sports_available': ['Futsal', 'Indoor Cricket', 'Basketball'],
           'surface_type': 'Artificial Turf',
@@ -193,44 +112,8 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
               'comment':
                   'Great place to play futsal. Clean facilities and friendly staff. The only downside is parking can be limited during peak hours.',
             },
-            {
-              'id': '3',
-              'user_name': 'Priya Jayawardena',
-              'user_avatar': null,
-              'rating': 5.0,
-              'date': '2024-01-08',
-              'comment':
-                  'Love this place! Been coming here for months. The court is always well-maintained and the booking system is convenient.',
-            },
-            {
-              'id': '4',
-              'user_name': 'Chaminda Silva',
-              'user_avatar': null,
-              'rating': 4.0,
-              'date': '2024-01-05',
-              'comment':
-                  'Good court overall. Equipment could be updated but the playing surface is excellent.',
-            },
           ],
         };
-  }
-
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.offset > 200 && !_isScrolled) {
-      setState(() {
-        _isScrolled = true;
-      });
-    } else if (_scrollController.offset <= 200 && _isScrolled) {
-      setState(() {
-        _isScrolled = false;
-      });
-    }
   }
 
   void _toggleFavorite() {
@@ -250,160 +133,6 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     );
   }
 
-  void _showImageGallery() {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: StatefulBuilder(
-          builder: (context, setDialogState) => Container(
-            height: 400,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: Colors.black87,
-            ),
-            child: Stack(
-              children: [
-                GestureDetector(
-                  onTap: () {}, // Prevent dialog close on image tap
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: double.infinity,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.network(
-                        _courtDetails['images'][_currentImageIndex],
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.broken_image, size: 50),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-                // Navigation arrows in gallery
-                if (_courtDetails['images'].length > 1) ...[
-                  // Left arrow
-                  Positioned(
-                    left: 16,
-                    top: 0,
-                    bottom: 0,
-                    child: Center(
-                      child: GestureDetector(
-                        onTap: () {
-                          if (_currentImageIndex > 0) {
-                            setState(() {
-                              _currentImageIndex--;
-                            });
-                            setDialogState(() {});
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.5),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.chevron_left,
-                            color: _currentImageIndex > 0
-                                ? Colors.white
-                                : Colors.white.withOpacity(0.5),
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  // Right arrow
-                  Positioned(
-                    right: 16,
-                    top: 0,
-                    bottom: 0,
-                    child: Center(
-                      child: GestureDetector(
-                        onTap: () {
-                          if (_currentImageIndex <
-                              _courtDetails['images'].length - 1) {
-                            setState(() {
-                              _currentImageIndex++;
-                            });
-                            setDialogState(() {});
-                          }
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.5),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.chevron_right,
-                            color:
-                                _currentImageIndex <
-                                    _courtDetails['images'].length - 1
-                                ? Colors.white
-                                : Colors.white.withOpacity(0.5),
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-                Positioned(
-                  top: 16,
-                  right: 16,
-                  child: IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.close, color: Colors.white),
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.black45,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 16,
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(
-                      _courtDetails['images'].length,
-                      (index) => GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _currentImageIndex = index;
-                          });
-                          setDialogState(() {});
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: index == _currentImageIndex
-                                ? Colors.white
-                                : Colors.white54,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Updated method to show a simple chat placeholder instead of navigating to chat screen
   void _navigateToChat() {
     showDialog(
       context: context,
@@ -456,88 +185,75 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: const Color(0xFF1B2C4F)),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF2D3142),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAmenityChip(Map<String, dynamic> amenity) {
+  Widget _buildActionButton(String text, IconData icon, Color backgroundColor, Color textColor, VoidCallback onPressed) {
     return Container(
-      margin: const EdgeInsets.only(right: 8, bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: amenity['available']
-            ? const Color(0xFF1B2C4F).withOpacity(0.1)
-            : Colors.grey.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: amenity['available']
-              ? const Color(0xFF1B2C4F).withOpacity(0.3)
-              : Colors.grey.withOpacity(0.3),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            amenity['icon'],
-            size: 16,
-            color: amenity['available']
-                ? const Color(0xFF1B2C4F)
-                : Colors.grey[600],
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          const SizedBox(width: 6),
-          Text(
-            amenity['name'],
-            style: TextStyle(
-              fontSize: 12,
-              color: amenity['available']
-                  ? const Color(0xFF1B2C4F)
-                  : Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          if (!amenity['available']) ...[
-            const SizedBox(width: 4),
-            Icon(Icons.close, size: 14, color: Colors.grey[600]),
-          ],
         ],
       ),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: textColor,
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 0,
+          minimumSize: const Size(0, 48),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 20),
+            const SizedBox(height: 4),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                text,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 1,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildReviewItem(Map<String, dynamic> review) {
+  Widget _buildOverlayIcon(IconData icon, VoidCallback onTap, {Color? iconColor}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.5),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          color: iconColor ?? Colors.white,
+          size: 20,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSportCard(String sport) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -549,86 +265,84 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: const Color(0xFF1B2C4F).withOpacity(0.1),
-                child: Text(
-                  review['user_name'][0].toUpperCase(),
-                  style: const TextStyle(
-                    color: Color(0xFF1B2C4F),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      review['user_name'],
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF2D3142),
-                      ),
-                    ),
-                    Text(
-                      DateFormat(
-                        'MMM d, yyyy',
-                      ).format(DateTime.parse(review['date'])),
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
-              ),
-              Row(
-                children: List.generate(5, (index) {
-                  return Icon(
-                    Icons.star,
-                    size: 16,
-                    color: index < review['rating']
-                        ? Colors.amber
-                        : Colors.grey[300],
-                  );
-                }),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            review['comment'],
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[700],
-              height: 1.5,
-            ),
-          ),
-        ],
+      child: Text(
+        sport,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF2D3142),
+        ),
       ),
     );
   }
 
-  void _navigateToBooking() {
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) => BookNowScreen(
-          venue: {
-            'title': _courtDetails['name'],
-            'location': _courtDetails['location'],
-            'sport': _courtDetails['type'],
-            'rating': _courtDetails['rating'],
-            'rate_per_hour': 'Rs. ${_courtDetails['price_per_hour']}',
-            'distance': _courtDetails['distance'],
-          },
+  Widget _buildInfoCard(IconData icon, String title, String content) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1B2C4F).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(icon, color: const Color(0xFF1B2C4F), size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    content,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
+      ),
+    );
+  }
+
+  Widget _buildBottomNavItem(IconData icon, String label, bool isSelected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey,
+            size: 24,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey,
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -638,67 +352,37 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       body: CustomScrollView(
-        controller: _scrollController,
         slivers: [
-          // App Bar with images
-          SliverAppBar(
-            expandedHeight: 300,
-            pinned: true,
-            backgroundColor: const Color(0xFF1B2C4F),
-            title: _isScrolled
-                ? Text(
-                    _courtDetails['name'],
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  )
-                : null,
-            // Updated leading without transparent background circle
-            leading: IconButton(
-              icon: const Icon(
-                Icons.chevron_left,
-                color: Colors.white,
-                size: 28,
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-            actions: [
-              IconButton(
-                icon: Icon(
-                  _isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: _isFavorite ? Colors.red : Colors.white,
-                  size: 28,
-                ),
-                onPressed: _toggleFavorite,
-              ),
-            ],
-            flexibleSpace: FlexibleSpaceBar(
-              background: Stack(
-                fit: StackFit.expand,
+          // Top Image Carousel as Sliver
+          SliverToBoxAdapter(
+            child: Container(
+              height: 300,
+              width: double.infinity,
+              child: Stack(
                 children: [
-                  // Image display with arrow navigation only
-                  GestureDetector(
-                    onTap: _showImageGallery,
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: double.infinity,
-                      child: Image.network(
-                        _courtDetails['images'][_currentImageIndex],
+                  // Image Carousel
+                  PageView.builder(
+                    itemCount: _courtDetails['images'].length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentImageIndex = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      return Image.network(
+                        _courtDetails['images'][index],
                         fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
                             color: Colors.grey[300],
                             child: Center(
                               child: CircularProgressIndicator(
-                                value:
-                                    loadingProgress.expectedTotalBytes != null
+                                value: loadingProgress.expectedTotalBytes != null
                                     ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
+                                        loadingProgress.expectedTotalBytes!
                                     : null,
                                 color: const Color(0xFF1B2C4F),
                               ),
@@ -717,634 +401,317 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             ),
                           );
                         },
-                      ),
-                    ),
+                      );
+                    },
                   ),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.7),
-                        ],
-                        stops: const [0.6, 1.0],
-                      ),
-                    ),
-                  ),
-                  // Enhanced image indicators and navigation
+                  // Overlay icons on top right
                   Positioned(
-                    bottom: 20,
-                    left: 20,
-                    right: 20,
+                    top: 50,
+                    right: 16,
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: List.generate(
-                            _courtDetails['images'].length,
-                            (index) => GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _currentImageIndex = index;
-                                });
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 3,
-                                ),
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: index == _currentImageIndex
-                                      ? Colors.white
-                                      : Colors.white54,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                          ),
+                        _buildOverlayIcon(Icons.grid_view, () {}),
+                        const SizedBox(width: 8),
+                        _buildOverlayIcon(
+                          _isFavorite ? Icons.favorite : Icons.favorite_border,
+                          _toggleFavorite,
+                          iconColor: _isFavorite ? Colors.red : Colors.white,
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.6),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            '${_currentImageIndex + 1}/${_courtDetails['images'].length}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
+                        const SizedBox(width: 8),
+                        _buildOverlayIcon(Icons.notifications_outlined, () {}),
                       ],
                     ),
                   ),
-                  // Add navigation arrows for better UX
-                  if (_courtDetails['images'].length > 1) ...[
-                    // Left arrow
-                    Positioned(
-                      left: 16,
-                      top: MediaQuery.of(context).size.height * 0.15,
-                      bottom: MediaQuery.of(context).size.height * 0.15,
-                      child: Center(
-                        child: GestureDetector(
-                          onTap: () {
-                            if (_currentImageIndex > 0) {
-                              setState(() {
-                                _currentImageIndex--;
-                              });
-                            }
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.5),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.chevron_left,
-                              color: _currentImageIndex > 0
-                                  ? Colors.white
-                                  : Colors.white.withOpacity(0.5),
-                              size: 24,
-                            ),
+                  // Back button
+                  Positioned(
+                    top: 50,
+                    left: 16,
+                    child: _buildOverlayIcon(Icons.arrow_back, () => Navigator.pop(context)),
+                  ),
+                  // White circular indicator dots at bottom center
+                  Positioned(
+                    bottom: 20,
+                    left: 0,
+                    right: 0,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(
+                        _courtDetails['images'].length,
+                        (index) => Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: index == _currentImageIndex
+                                ? Colors.white
+                                : Colors.white.withOpacity(0.5),
+                            shape: BoxShape.circle,
                           ),
                         ),
                       ),
                     ),
-                    // Right arrow
-                    Positioned(
-                      right: 16,
-                      top: MediaQuery.of(context).size.height * 0.15,
-                      bottom: MediaQuery.of(context).size.height * 0.15,
-                      child: Center(
-                        child: GestureDetector(
-                          onTap: () {
-                            if (_currentImageIndex <
-                                _courtDetails['images'].length - 1) {
-                              setState(() {
-                                _currentImageIndex++;
-                              });
-                            }
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.5),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.chevron_right,
-                              color:
-                                  _currentImageIndex <
-                                      _courtDetails['images'].length - 1
-                                  ? Colors.white
-                                  : Colors.white.withOpacity(0.5),
-                              size: 24,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ],
               ),
             ),
           ),
 
-          // Court Details
+          // Sticky Header with Matching Background
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: _StickyHeaderDelegate(
+              child: Text(
+                _courtDetails['name'],
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF2D3142),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+
+          // Scrollable Content
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Basic Info Card
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
+                  // Rating Row (now scrollable)
+                  Row(
+                    children: [
+                      Text(
+                        '${_courtDetails['rating']}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2D3142),
                         ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    _courtDetails['name'],
-                                    style: const TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF2D3142),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: const Color(
-                                            0xFF1B2C4F,
-                                          ).withOpacity(0.1),
-                                          borderRadius: BorderRadius.circular(
-                                            12,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          _courtDetails['type'],
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            color: Color(0xFF1B2C4F),
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                                vertical: 8,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.star,
-                                    color: Colors.amber,
-                                    size: 16,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    _courtDetails['rating'].toString(),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF2D3142),
-                                    ),
-                                  ),
-                                  Text(
-                                    ' (${_courtDetails['total_reviews']})',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // Quick Info Grid
-                        Column(
-                          children: [
-                            _buildInfoRow(
-                              Icons.location_on,
-                              'Location',
-                              _courtDetails['distance'],
-                            ),
-                            const SizedBox(height: 16),
-                            _buildInfoRow(
-                              Icons.monetization_on,
-                              'Price',
-                              'Rs. ${_courtDetails['price_per_hour']}/hr',
-                            ),
-                            const SizedBox(height: 16),
-                            _buildInfoRow(
-                              Icons.access_time,
-                              'Hours',
-                              _courtDetails['opening_hours'],
-                            ),
-                            const SizedBox(height: 16),
-                            _buildInfoRow(
-                              Icons.people,
-                              'Capacity',
-                              _courtDetails['capacity'],
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // Action Buttons
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton.icon(
-                                onPressed: _navigateToBooking,
-                                icon: const Icon(Icons.calendar_today),
-                                label: const Text('Book Now'),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF1B2C4F),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            ElevatedButton(
-                              onPressed:
-                                  _navigateToChat, // Updated to navigate to chat
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                foregroundColor: const Color(0xFF1B2C4F),
-                                side: const BorderSide(
-                                  color: Color(0xFF1B2C4F),
-                                ),
-                                padding: const EdgeInsets.all(16),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              child: const Icon(Icons.message),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 4),
+                      Row(
+                        children: List.generate(5, (index) {
+                          return Icon(
+                            Icons.star,
+                            size: 18,
+                            color: index < _courtDetails['rating']
+                                ? Colors.amber
+                                : Colors.grey[300],
+                          );
+                        }),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 20),
-
-                  // Description Card
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
+                  // Three Action Buttons Row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildActionButton(
+                          'Directions',
+                          Icons.directions,
+                          const Color(0xFF1B2C4F),
+                          Colors.white,
+                          () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Opening directions...')),
+                            );
+                          },
                         ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'About This Court',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2D3142),
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          _courtDetails['description'],
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[700],
-                            height: 1.6,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Court Specifications
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF5F6FA),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: _buildInfoRow(
-                                      Icons.straighten,
-                                      'Dimensions',
-                                      _courtDetails['court_dimensions'],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: _buildInfoRow(
-                                      Icons.grass,
-                                      'Surface',
-                                      _courtDetails['surface_type'],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Amenities Card
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Amenities & Facilities',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF2D3142),
-                              ),
-                            ),
-                            if (_courtDetails['amenities'].length > 6)
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _showAllAmenities = !_showAllAmenities;
-                                  });
-                                },
-                                child: Text(
-                                  _showAllAmenities ? 'Show Less' : 'Show All',
-                                  style: const TextStyle(
-                                    color: Color(0xFF1B2C4F),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          children:
-                              (_showAllAmenities
-                                      ? _courtDetails['amenities']
-                                      : _courtDetails['amenities']
-                                            .take(6)
-                                            .toList())
-                                  .map<Widget>(
-                                    (amenity) => _buildAmenityChip(amenity),
-                                  )
-                                  .toList(),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Contact Info Card
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Contact Information',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2D3142),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildInfoRow(
-                          Icons.location_on,
-                          'Address',
-                          _courtDetails['location'],
-                        ),
-                        const SizedBox(height: 12),
-                        _buildInfoRow(
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildActionButton(
+                          'Call',
                           Icons.phone,
-                          'Phone',
-                          _courtDetails['phone'],
+                          Colors.grey[200]!,
+                          const Color(0xFF2D3142),
+                          () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Calling ${_courtDetails['phone']}...')),
+                            );
+                          },
                         ),
-                        const SizedBox(height: 12),
-                        _buildInfoRow(
-                          Icons.email,
-                          'Email',
-                          _courtDetails['email'],
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildActionButton(
+                          'Share',
+                          Icons.share,
+                          Colors.grey[200]!,
+                          const Color(0xFF2D3142),
+                          () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Sharing...')),
+                            );
+                          },
                         ),
-                        const SizedBox(height: 12),
-                        _buildInfoRow(
-                          Icons.web,
-                          'Website',
-                          _courtDetails['website'],
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 20),
 
-                  // Reviews Card
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Reviews (${_courtDetails['total_reviews']})',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF2D3142),
-                              ),
-                            ),
-                            if (_courtDetails['reviews'].length > 2)
-                              TextButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _showAllReviews = !_showAllReviews;
-                                  });
-                                },
-                                child: Text(
-                                  _showAllReviews ? 'Show Less' : 'View All',
-                                  style: const TextStyle(
-                                    color: Color(0xFF1B2C4F),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                        Column(
-                          children:
-                              (_showAllReviews
-                                      ? _courtDetails['reviews']
-                                      : _courtDetails['reviews']
-                                            .take(2)
-                                            .toList())
-                                  .map<Widget>(
-                                    (review) => _buildReviewItem(review),
-                                  )
-                                  .toList(),
-                        ),
-                      ],
-                    ),
+                  // Address Card
+                  _buildInfoCard(
+                    Icons.location_on,
+                    'Address',
+                    _courtDetails['location'],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
-                  // Policies Card
-                  Container(
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.08),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                  // Open Hours Card
+                  _buildInfoCard(
+                    Icons.access_time,
+                    'Open Hours',
+                    'Today 6:00 AM - 11:00 PM',
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Review Card
+                  _buildInfoCard(
+                    Icons.star,
+                    'Reviews',
+                    'Overall ${_courtDetails['rating']} rating • ${_courtDetails['total_reviews']} reviews',
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Available Sports Section
+                  const Text(
+                    'Available Sports',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2D3142),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Booking Policies',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2D3142),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        _buildInfoRow(
-                          Icons.event_available,
-                          'Advance Booking',
-                          'Up to ${_courtDetails['booking_advance_days']} days',
-                        ),
-                        const SizedBox(height: 12),
-                        _buildInfoRow(
-                          Icons.cancel,
-                          'Cancellation',
-                          _courtDetails['cancellation_policy'],
-                        ),
-                      ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 50,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _courtDetails['sports_available'].length,
+                      itemBuilder: (context, index) {
+                        return _buildSportCard(_courtDetails['sports_available'][index]);
+                      },
                     ),
                   ),
 
                   const SizedBox(height: 24),
+
+                  // Description Section
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'About',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF2D3142),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _courtDetails['description'],
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            height: 1.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 100), // Space for bottom nav
                 ],
               ),
             ),
           ),
         ],
       ),
+      // Bottom Navigation Bar
+      bottomNavigationBar: Container(
+        height: 80,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _buildBottomNavItem(Icons.home, 'Home', true, () {}),
+            ),
+            Expanded(
+              child: _buildBottomNavItem(Icons.chat_bubble_outline, 'Chat', false, _navigateToChat),
+            ),
+          ],
+        ),
+      ),
     );
+  }
+}
+
+class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
+  final Widget child;
+
+  _StickyHeaderDelegate({required this.child});
+
+  @override
+  double get minExtent => 120; // Increased height to accommodate safe area + text
+  
+  @override
+  double get maxExtent => 120; // Same height to keep it simple
+
+  @override
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    final safePadding = MediaQuery.of(context).padding.top;
+    
+    return Container(
+      height: 120,
+      color: const Color(0xFFF5F6FA),
+      padding: EdgeInsets.only(
+        top: safePadding + 8, // Safe area + minimal padding
+        left: 16,
+        right: 16,
+        bottom: 8,
+      ),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: child,
+      ),
+    );
+  }
+
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
+    return false;
   }
 }
