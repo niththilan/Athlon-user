@@ -863,7 +863,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                               ],
                                             ),
 
-                                            const SizedBox(height: 6),
+                                            const SizedBox(height: 8),
 
                                             // Opening hours and rate
                                             Row(

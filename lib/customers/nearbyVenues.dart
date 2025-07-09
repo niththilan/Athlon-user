@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use, file_names
 import 'package:athlon_user/customers/courtDetails.dart';
+import 'package:athlon_user/customers/footer.dart';
 import 'package:flutter/material.dart';
 //import 'bookNow.dart';
 
@@ -57,13 +58,15 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   String _sortingMode = 'Nearest';
   double _distanceRadius = 10.0; // Default radius in km
 
-  // Search history variables
+  // Search history variables (simplified for home page style)
   List<String> _searchHistory = [];
-  bool _showSearchHistory = false;
   final int _maxHistoryItems = 5; // Limit history to 5 items
 
   // Map to track favorite status for each venue
   final Map<String, bool> _favoriteStatus = {};
+
+  // Current tab index for footer navigation
+  int _currentTabIndex = 0;
 
   // Sports filter list with icons - Comprehensive list based on venue data
   final Map<String, IconData> _filterOptionsWithIcons = {
@@ -305,8 +308,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
 
   // Handle search focus changes
   void _onSearchFocusChanged() {
+    // Simplified for home page style search bar
     setState(() {
-      _showSearchHistory = _searchFocusNode.hasFocus && _searchQuery.isEmpty;
+      // Focus handling simplified - no search history dropdown
     });
   }
 
@@ -323,32 +327,6 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       if (_searchHistory.length > _maxHistoryItems) {
         _searchHistory = _searchHistory.take(_maxHistoryItems).toList();
       }
-    });
-    _saveSearchHistory();
-  }
-
-  // Select search history item
-  void _selectSearchHistoryItem(String query) {
-    _searchController.text = query;
-    _searchFocusNode.unfocus();
-    setState(() {
-      _showSearchHistory = false;
-    });
-  }
-
-  // Clear search history
-  void _clearSearchHistory() {
-    setState(() {
-      _searchHistory.clear();
-      _showSearchHistory = false;
-    });
-    _saveSearchHistory();
-  }
-
-  // Remove single history item
-  void _removeSearchHistoryItem(String query) {
-    setState(() {
-      _searchHistory.remove(query);
     });
     _saveSearchHistory();
   }
@@ -379,7 +357,6 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   void _onSearchChanged() {
     setState(() {
       _searchQuery = _searchController.text.toLowerCase();
-      _showSearchHistory = _searchFocusNode.hasFocus && _searchQuery.isEmpty;
     });
 
     // Add to history when user stops typing (you can implement debouncing)
@@ -448,16 +425,6 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Get screen dimensions for responsive design
-    final screenSize = MediaQuery.of(context).size;
-    final screenWidth = screenSize.width;
-    final isSmallScreen = screenWidth < 360;
-    
-    // Calculate responsive values
-    final appBarHeight = isSmallScreen ? 45.0 : 50.0;
-    final titleFontSize = isSmallScreen ? 16.0 : 18.0;
-    final iconSize = isSmallScreen ? 24.0 : 28.0;
-    
     // Count favorites for badge display
     final int favoriteCount = _favoriteStatus.values
         .where((isFavorite) => isFavorite == true)
@@ -468,18 +435,18 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       appBar: AppBar(
         backgroundColor: const Color(0xFF1B2C4F),
         elevation: 1,
-        toolbarHeight: appBarHeight,
-        title: Text(
+        toolbarHeight: 56,
+        title: const Text(
           "Nearby Venues",
           style: TextStyle(
-            fontSize: titleFontSize,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
             fontFamily: 'Poppins',
             color: Colors.white,
           ),
         ),
         leading: IconButton(
-          icon: Icon(Icons.chevron_left, color: Colors.white, size: iconSize),
+          icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
           onPressed: () => Navigator.of(context).pop(),
         ),
 
@@ -535,22 +502,14 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       body: GestureDetector(
         onTap: () {
           _searchFocusNode.unfocus();
-          setState(() {
-            _showSearchHistory = false;
-          });
         },
         child: Column(
           children: [
-            // Search bar with history - Updated for responsive design
+            // Search bar
             Container(
-              padding: EdgeInsets.fromLTRB(
-                isSmallScreen ? 12 : 16, 
-                isSmallScreen ? 12 : 16, 
-                isSmallScreen ? 12 : 16, 
-                8
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color(0xFFF5F6FA),
                 boxShadow: _isScrolled
                     ? [
                         BoxShadow(
@@ -561,223 +520,15 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       ]
                     : [],
               ),
-              child: Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F6FA),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFE0E3E8),
-                        width: 1,
-                      ),
-                    ),
-                    child: TextField(
-                      controller: _searchController,
-                      focusNode: _searchFocusNode,
-                      decoration: InputDecoration(
-                        hintText: 'Find sports venues...',
-                        hintStyle: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: isSmallScreen ? 14 : 15,
-                        ),
-                        prefixIcon: Icon(
-                          Icons.search_rounded,
-                          color: const Color(0xFF1B2C4F),
-                          size: isSmallScreen ? 20 : 24,
-                        ),
-                        suffixIcon: _searchQuery.isNotEmpty
-                            ? IconButton(
-                                icon: Icon(
-                                  Icons.clear_rounded,
-                                  color: const Color(0xFF1B2C4F),
-                                  size: isSmallScreen ? 20 : 24,
-                                ),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  setState(() {
-                                    _showSearchHistory =
-                                        _searchFocusNode.hasFocus;
-                                  });
-                                },
-                              )
-                            : null,
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: isSmallScreen ? 10 : 12,
-                          horizontal: isSmallScreen ? 12 : 16,
-                        ),
-                      ),
-                      onSubmitted: (value) {
-                        if (value.trim().isNotEmpty) {
-                          _addToSearchHistory(value);
-                        }
-                        _searchFocusNode.unfocus();
-                      },
-                    ),
-                  ),
-
-                  // Search History Dropdown
-                  if (_showSearchHistory && _searchHistory.isNotEmpty)
-                    Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: const Color(0xFFE0E3E8),
-                          width: 1,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.history,
-                                  size: 16,
-                                  color: Color(0xFF1B2C4F),
-                                ),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'Recent searches',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF1B2C4F),
-                                  ),
-                                ),
-                                const Spacer(),
-                                GestureDetector(
-                                  onTap: _clearSearchHistory,
-                                  child: Text(
-                                    'Clear all',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: _searchHistory.length,
-                            itemBuilder: (context, index) {
-                              final historyItem = _searchHistory[index];
-                              return ListTile(
-                                dense: true,
-                                leading: const Icon(
-                                  Icons.history,
-                                  size: 18,
-                                  color: Colors.grey,
-                                ),
-                                title: Text(
-                                  historyItem,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                                trailing: GestureDetector(
-                                  onTap: () =>
-                                      _removeSearchHistoryItem(historyItem),
-                                  child: const Icon(
-                                    Icons.close,
-                                    size: 18,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                onTap: () =>
-                                    _selectSearchHistoryItem(historyItem),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
+              child: _buildSearchBar(),
             ),
 
-            // Sport Filters with Icons - REMOVED FROM UI
-            // Container(
-            //   height: 50,
-            //   padding: const EdgeInsets.only(left: 8),
-            //   child: ListView.builder(
-            //     scrollDirection: Axis.horizontal,
-            //     itemCount: _filterOptionsWithIcons.length,
-            //     itemBuilder: (context, index) {
-            //       final option = _filterOptionsWithIcons.keys.elementAt(index);
-            //       final icon = _filterOptionsWithIcons[option]!;
-            //       final isActive = _activeFilter == option;
-
-            //       return Padding(
-            //         padding: const EdgeInsets.only(right: 8),
-            //         child: FilterChip(
-            //           avatar: Icon(
-            //             icon,
-            //             size: 18,
-            //             color: isActive
-            //                 ? Colors.white
-            //                 : const Color(0xFF1B2C4F),
-            //           ),
-            //           label: Text(option),
-            //           labelStyle: TextStyle(
-            //             color: isActive
-            //                 ? Colors.white
-            //                 : const Color(0xFF1B2C4F),
-            //             fontWeight: isActive
-            //                 ? FontWeight.w600
-            //                 : FontWeight.w500,
-            //           ),
-            //           backgroundColor: isActive
-            //               ? const Color(0xFF1B2C4F)
-            //               : Colors.white,
-            //           side: BorderSide(
-            //             color: isActive
-            //                 ? const Color(0xFF1B2C4F)
-            //                 : const Color(0xFFE0E3E8),
-            //           ),
-            //           selectedColor: const Color(0xFF1B2C4F),
-            //           showCheckmark: false,
-            //           selected: isActive,
-            //           onSelected: (selected) {
-            //             if (selected) {
-            //               _setFilter(option);
-            //             }
-            //           },
-            //           padding: const EdgeInsets.symmetric(
-            //             horizontal: 16,
-            //             vertical: 8.0,
-            //           ),
-            //           labelPadding: const EdgeInsets.symmetric(horizontal: 8.0),
-            //         ),
-            //       );
-            //     },
-            //   ),
-            // ),
-
-            // Results header - Responsive
+            // Results header
             Padding(
-              padding: EdgeInsets.fromLTRB(
-                isSmallScreen ? 12 : 16, 
-                8, 
-                isSmallScreen ? 12 : 16, 
-                8
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               child: Row(
                 children: [
-                  SizedBox(width: isSmallScreen ? 8 : 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: RichText(
                       text: TextSpan(
@@ -785,46 +536,46 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                           TextSpan(
                             text: "Found ",
                             style: TextStyle(
-                              fontSize: isSmallScreen ? 14 : 16,
+                              fontSize: 16,
                               color: Colors.grey[700],
                             ),
                           ),
                           TextSpan(
                             text: "${_filteredVenues.length} venues",
-                            style: TextStyle(
-                              fontSize: isSmallScreen ? 14 : 16,
+                            style: const TextStyle(
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: const Color(0xFF1B2C4F),
+                              color: Color(0xFF1B2C4F),
                             ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  // Sort & Filter button - Responsive
+                  // Sort & Filter button
                   TextButton.icon(
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.tune_rounded,
-                      size: isSmallScreen ? 16 : 18,
-                      color: const Color(0xFF1B2C4F),
+                      size: 18,
+                      color: Color(0xFF1B2C4F),
                     ),
                     label: Text(
                       _activeFilter != 'All' 
-                          ? (isSmallScreen ? _activeFilter : '$_sortingMode | $_activeFilter')
+                          ? '$_sortingMode | $_activeFilter'
                           : _sortingMode,
-                      style: TextStyle(
-                        color: const Color(0xFF1B2C4F),
+                      style: const TextStyle(
+                        color: Color(0xFF1B2C4F),
                         fontWeight: FontWeight.w500,
-                        fontSize: isSmallScreen ? 12 : 14,
+                        fontSize: 14,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     style: TextButton.styleFrom(
                       backgroundColor: const Color(0xFFF5F6FA),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isSmallScreen ? 8 : 12,
-                        vertical: isSmallScreen ? 6 : 8,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
                       ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -844,6 +595,84 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                   ? _buildEmptyState()
                   : _buildVenuesList(),
             ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: AppFooter(
+        currentIndex: _currentTabIndex,
+        onTabSelected: (index) {
+          setState(() {
+            _currentTabIndex = index;
+          });
+        },
+      ),
+    );
+  }
+
+  // Search bar method - matches home page style
+  Widget _buildSearchBar() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF1B2C4F).withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(2),
+              child: const Icon(
+                Icons.search_rounded,
+                color: Color(0xFF1B2C4F),
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                focusNode: _searchFocusNode,
+                decoration: InputDecoration(
+                  hintText: 'Search sports venues...',
+                  hintStyle: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                onSubmitted: (value) {
+                  if (value.trim().isNotEmpty) {
+                    _addToSearchHistory(value);
+                  }
+                  _searchFocusNode.unfocus();
+                },
+              ),
+            ),
+            if (_searchQuery.isNotEmpty)
+              IconButton(
+                icon: const Icon(
+                  Icons.clear_rounded,
+                  color: Color(0xFF1B2C4F),
+                  size: 20,
+                ),
+                onPressed: () {
+                  _searchController.clear();
+                  setState(() {
+                    _searchQuery = '';
+                  });
+                },
+              ),
           ],
         ),
       ),
@@ -893,18 +722,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   }
 
   Widget _buildVenuesList() {
-    // Get screen dimensions for responsive design
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 360;
-    
     return ListView.builder(
       controller: _scrollController,
-      padding: EdgeInsets.fromLTRB(
-        isSmallScreen ? 12 : 16, 
-        4, 
-        isSmallScreen ? 12 : 16, 
-        isSmallScreen ? 12 : 16
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
       itemCount: _filteredVenues.length,
       itemBuilder: (context, index) {
         final venue = _filteredVenues[index];
@@ -915,285 +735,261 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     );
   }
 
+  // SIMPLIFIED VENUE CARD
   Widget _buildVenueCard(VenueModel venue, bool isFavorite) {
-    // Get screen dimensions for responsive design
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isSmallScreen = screenWidth < 360;
-    
-    // Calculate responsive values
-    final cardPadding = isSmallScreen ? 12.0 : 16.0;
-    final imageHeight = isSmallScreen ? 160.0 : 200.0;
-    final titleFontSize = isSmallScreen ? 14.0 : 16.0;
-    final subtitleFontSize = isSmallScreen ? 12.0 : 14.0;
-    final iconSize = isSmallScreen ? 14.0 : 16.0;
-    final buttonPadding = isSmallScreen ? 12.0 : 20.0;
-    
     return Container(
-      margin: EdgeInsets.only(bottom: isSmallScreen ? 12.0 : 16.0),
+      margin: const EdgeInsets.only(bottom: 16.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
             offset: const Offset(0, 2),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          // Image with favorite button
-          Stack(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(16),
-                  topRight: Radius.circular(16),
-                ),
-                child: Container(
-                  height: imageHeight,
-                  width: double.infinity,
-                  color: Colors.grey[200],
-                  child: Image.network(
-                    venue.imageUrl,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey[300],
-                        child: Center(
-                          child: Icon(
-                            Icons.image_not_supported,
-                            size: isSmallScreen ? 32 : 40,
-                            color: Colors.grey,
+              // Image with favorite button
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
+                    ),
+                    child: Container(
+                      height: 160,
+                      width: double.infinity,
+                      color: Colors.grey[200],
+                      child: Image.network(
+                        venue.imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[100],
+                            child: const Center(
+                              child: Icon(
+                                Icons.image_not_supported,
+                                size: 40,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  // Favorite button
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: GestureDetector(
+                      onTap: () => _toggleFavorite(venue.id),
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : Colors.grey[600],
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Distance badge
+                  Positioned(
+                    bottom: 12,
+                    left: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        "${venue.distance.toStringAsFixed(1)} km",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Venue details
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Venue name
+                    Text(
+                      venue.title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2D3142),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    
+                    const SizedBox(height: 4),
+                    
+                    // Location
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_on_outlined,
+                          size: 14,
+                          color: Colors.grey[500],
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            venue.location,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey[600],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 12,
-                right: 12,
-                child: GestureDetector(
-                  onTap: () => _toggleFavorite(venue.id),
-                  child: Container(
-                    padding: EdgeInsets.all(isSmallScreen ? 6 : 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
-                      shape: BoxShape.circle,
+                      ],
                     ),
-                    child: Icon(
-                      isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: isFavorite ? Colors.red : Colors.grey,
-                      size: isSmallScreen ? 18 : 20,
+                    
+                    const SizedBox(height: 12),
+                    
+                    // Rating and Price
+                    Row(
+                      children: [
+                        // Rating
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(
+                                Icons.star,
+                                color: Colors.orange,
+                                size: 12,
+                              ),
+                              const SizedBox(width: 2),
+                              Text(
+                                venue.rating.toString(),
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.orange,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        
+                        const SizedBox(width: 8),
+                        
+                        // Price
+                        Text(
+                          venue.ratePerHour,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1B2C4F),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                    
+                    const SizedBox(height: 8),
+                    
+                    // Sports tags (simplified)
+                    Wrap(
+                      spacing: 4,
+                      runSpacing: 4,
+                      children: venue.sports.take(3).map((sport) {
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1B2C4F).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            sport,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF1B2C4F),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-
-          // Venue details
-          Padding(
-            padding: EdgeInsets.all(cardPadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Venue name and distance
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        venue.title,
-                        style: TextStyle(
-                          fontSize: titleFontSize,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF2D3142),
-                        ),
-                        maxLines: isSmallScreen ? 2 : 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    SizedBox(width: isSmallScreen ? 4 : 8),
-                    Text(
-                      "${venue.distance.toStringAsFixed(1)} km",
-                      style: TextStyle(
-                        fontSize: subtitleFontSize,
-                        color: Colors.grey[600],
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: isSmallScreen ? 6 : 8),
-
-                // Location
-                Row(
-                  children: [
-                    Icon(
-                      Icons.location_on,
-                      size: iconSize,
-                      color: Colors.grey[600],
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        venue.location,
-                        style: TextStyle(
-                          fontSize: subtitleFontSize,
-                          color: Colors.grey[600],
-                        ),
-                        maxLines: isSmallScreen ? 2 : 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-
-                SizedBox(height: isSmallScreen ? 6 : 8),
-
-                // Opening hours and rate - Stack on small screens
-                if (isSmallScreen) ...[
-                  // Stack vertically on small screens
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.access_time,
-                        size: iconSize,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          venue.openingHours,
-                          style: TextStyle(
-                            fontSize: subtitleFontSize,
-                            color: Colors.grey[600],
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
+          
+          // Book Now button positioned in bottom-right corner
+          Positioned(
+            bottom: 10,
+            right: 14,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        CourtDetailScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.monetization_on,
-                        size: iconSize,
-                        color: Colors.green,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        venue.ratePerHour,
-                        style: TextStyle(
-                          fontSize: subtitleFontSize,
-                          color: Colors.green,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ] else ...[
-                  // Side by side on larger screens
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.access_time,
-                        size: iconSize,
-                        color: Colors.grey[600],
-                      ),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          venue.openingHours,
-                          style: TextStyle(
-                            fontSize: subtitleFontSize,
-                            color: Colors.grey[600],
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Icon(
-                        Icons.monetization_on,
-                        size: iconSize,
-                        color: Colors.green,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        venue.ratePerHour,
-                        style: TextStyle(
-                          fontSize: subtitleFontSize,
-                          color: Colors.green,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-
-                const SizedBox(height: 2),
-
-                // Rating and Book Now button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          _buildStarRating(venue.rating, isSmallScreen),
-                          SizedBox(width: isSmallScreen ? 4 : 8),
-                          Text(
-                            venue.rating.toString(),
-                            style: TextStyle(
-                              fontSize: subtitleFontSize,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) =>
-                                CourtDetailScreen(),
-                            transitionDuration: Duration.zero,
-                            reverseTransitionDuration: Duration.zero,
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1B2C4F),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                          horizontal: buttonPadding,
-                          vertical: isSmallScreen ? 6 : 8,
-                        ),
-                      ),
-                      child: Text(
-                        'Book Now',
-                        style: TextStyle(
-                          fontSize: isSmallScreen ? 12 : 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1B2C4F),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ],
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
+                elevation: 2,
+              ),
+              child: const Text(
+                'Book Now',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ],
@@ -1202,17 +998,11 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   }
 
   void _showSortingOptions(BuildContext context) {
-    // Get screen dimensions for responsive design
-    final screenSize = MediaQuery.of(context).size;
-    final screenWidth = screenSize.width;
-    final screenHeight = screenSize.height;
-    final isSmallScreen = screenWidth < 360;
-    
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Allow custom height
+      isScrollControlled: true,
       constraints: BoxConstraints(
-        maxHeight: screenHeight * 0.8, // Max 80% of screen height
+        maxHeight: MediaQuery.of(context).size.height * 0.8,
       ),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.only(
@@ -1225,37 +1015,32 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
           builder: (context, setModalState) {
             return SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  isSmallScreen ? 12.0 : 16.0, 
-                  4.0, 
-                  isSmallScreen ? 12.0 : 16.0, 
-                  8.0
-                ),
+                padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 8.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Header
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 6.0),
                       child: Text(
                         "Sort & Filter",
                         style: TextStyle(
-                          fontSize: isSmallScreen ? 16 : 18,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1B2C4F),
+                          color: Color(0xFF1B2C4F),
                         ),
                       ),
                     ),
                     const Divider(),
 
                     // Distance Range Slider
-                    Padding(
-                      padding: const EdgeInsets.only(top: 6.0),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 6.0),
                       child: Text(
                         "Distance Range",
                         style: TextStyle(
-                          fontSize: isSmallScreen ? 14 : 16,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -1264,7 +1049,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       children: [
                         Text(
                           "${_distanceRadius.round()} km",
-                          style: TextStyle(fontSize: isSmallScreen ? 12 : 14),
+                          style: const TextStyle(fontSize: 14),
                         ),
                         Expanded(
                           child: Slider(
@@ -1284,19 +1069,19 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             },
                           ),
                         ),
-                        Text(
+                        const Text(
                           "20 km",
-                          style: TextStyle(fontSize: isSmallScreen ? 12 : 14),
+                          style: TextStyle(fontSize: 14),
                         ),
                       ],
                     ),
                     // Sorting Options
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2.0),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 2.0),
                       child: Text(
                         "Sort By",
                         style: TextStyle(
-                          fontSize: isSmallScreen ? 14 : 16,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -1309,7 +1094,6 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       "Distance: Low to High",
                       setModalState,
                       bottomPadding: 1.0,
-                      isSmallScreen: isSmallScreen,
                     ),
                     _buildSortingOption(
                       "Farthest",
@@ -1317,40 +1101,38 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       setModalState,
                       topPadding: 1.0,
                       bottomPadding: 1.0,
-                      isSmallScreen: isSmallScreen,
                     ),
                     _buildSortingOption(
                       "Highest Rated",
                       "Rating: High to Low",
                       setModalState,
                       topPadding: 1.0,
-                      isSmallScreen: isSmallScreen,
                     ),
 
                     // Sports Filter Section
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16.0),
                       child: Text(
                         "Filter by Sport",
                         style: TextStyle(
-                          fontSize: isSmallScreen ? 14 : 16,
+                          fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                     const SizedBox(height: 8),
                     
-                    // Sports Filter Chips in a Wrap - Responsive
+                    // Sports Filter Chips in a Wrap
                     Wrap(
-                      spacing: isSmallScreen ? 6.0 : 8.0,
-                      runSpacing: isSmallScreen ? 2.0 : 4.0,
+                      spacing: 8.0,
+                      runSpacing: 4.0,
                       children: _filterOptionsWithIcons.keys.map((sport) {
                         final isSelected = _activeFilter == sport;
                         return FilterChip(
                           label: Text(
                             sport,
                             style: TextStyle(
-                              fontSize: isSmallScreen ? 10 : 12,
+                              fontSize: 12,
                               color: isSelected ? Colors.white : const Color(0xFF1B2C4F),
                               fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                             ),
@@ -1374,9 +1156,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                               _activeFilter = selected ? sport : 'All';
                             });
                           },
-                          padding: EdgeInsets.symmetric(
-                            horizontal: isSmallScreen ? 6 : 8, 
-                            vertical: isSmallScreen ? 2 : 4
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8, 
+                            vertical: 4
                           ),
                         );
                       }).toList(),
@@ -1404,17 +1186,17 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             _activeFilter = 'All';
                           });
                         },
-                        icon: Icon(
+                        icon: const Icon(
                           Icons.refresh,
-                          size: isSmallScreen ? 18 : 20,
-                          color: const Color(0xFF1B2C4F),
+                          size: 20,
+                          color: Color(0xFF1B2C4F),
                         ),
-                        label: Text(
+                        label: const Text(
                           "Reset Filters",
                           style: TextStyle(
-                            color: const Color(0xFF1B2C4F),
+                            color: Color(0xFF1B2C4F),
                             fontWeight: FontWeight.w500,
-                            fontSize: isSmallScreen ? 12 : 14,
+                            fontSize: 14,
                           ),
                         ),
                         style: TextButton.styleFrom(
@@ -1433,9 +1215,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1B2C4F),
                             foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                              vertical: isSmallScreen ? 12 : 14
-                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -1447,10 +1227,10 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             });
                             Navigator.pop(context);
                           },
-                          child: Text(
+                          child: const Text(
                             "Apply",
                             style: TextStyle(
-                              fontSize: isSmallScreen ? 14 : 16,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -1476,7 +1256,6 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     StateSetter setModalState, {
     double topPadding = 10.0,
     double bottomPadding = 10.0,
-    bool isSmallScreen = false,
   }) {
     return InkWell(
       onTap: () {
@@ -1504,16 +1283,16 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                 children: [
                   Text(
                     value,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: isSmallScreen ? 13 : 15,
+                      fontSize: 15,
                     ),
                   ),
                   Text(
                     description,
                     style: TextStyle(
                       color: Colors.grey[600], 
-                      fontSize: isSmallScreen ? 11 : 13,
+                      fontSize: 13,
                     ),
                   ),
                 ],
@@ -1522,22 +1301,6 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildStarRating(double rating, [bool isSmallScreen = false]) {
-    final starSize = isSmallScreen ? 14.0 : 16.0;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List.generate(5, (index) {
-        if (index < rating.floor()) {
-          return Icon(Icons.star, color: Colors.orange, size: starSize);
-        } else if (index < rating) {
-          return Icon(Icons.star_half, color: Colors.orange, size: starSize);
-        } else {
-          return Icon(Icons.star_border, color: Colors.grey, size: starSize);
-        }
-      }),
     );
   }
 }
