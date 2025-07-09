@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'favourites.dart';
 import 'bookNow.dart';
+import 'footer.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,11 +47,12 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
   final ScrollController _venuesScrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
-  bool _isScrolled = false;
-  bool _showVenues = false;
   bool _isLoading = true;
   String _selectedSport = '';
   String _searchQuery = '';
+
+  // Footer state
+  int _currentFooterIndex = 0;
 
   // Theme colors
   final Color _themeNavyBlue = const Color(0xFF1B2C4F);
@@ -171,7 +173,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
   @override
   void initState() {
     super.initState();
-    _venuesScrollController.addListener(_onScroll);
     _searchController.addListener(_onSearchChanged);
 
     // Set the initial sport if provided
@@ -216,7 +217,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
         }
 
         _isLoading = false;
-        _showVenues = _filteredVenues.isNotEmpty;
 
         if (_filteredVenues.isEmpty && widget.initialSport.isNotEmpty) {
           debugPrint('⚠️ No venues found for sport: ${widget.initialSport}');
@@ -234,23 +234,10 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
 
   @override
   void dispose() {
-    _venuesScrollController.removeListener(_onScroll);
     _venuesScrollController.dispose();
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    if (_venuesScrollController.offset > 0 && !_isScrolled) {
-      setState(() {
-        _isScrolled = true;
-      });
-    } else if (_venuesScrollController.offset <= 0 && _isScrolled) {
-      setState(() {
-        _isScrolled = false;
-      });
-    }
   }
 
   void _onSearchChanged() {
@@ -275,9 +262,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
 
         return titleMatch || locationMatch;
       }).toList();
-
-      // Show venues section if we have search results
-      _showVenues = _filteredVenues.isNotEmpty;
     });
   }
 
@@ -297,14 +281,12 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     setState(() {
       _selectedSport = sportName;
       _isLoading = true;
-      _showVenues = false;
     });
 
     // Using a slight delay to improve UX by showing loading state
     Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
         _isLoading = false;
-        _showVenues = true;
 
         // Filter venues by selected sport
         _filterVenuesBySport(sportName);
@@ -425,6 +407,12 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     );
   }
 
+  void _onFooterTabSelected(int index) {
+    setState(() {
+      _currentFooterIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // Count favorites for badge display
@@ -434,83 +422,81 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
-      body: CustomScrollView(
-        controller: _venuesScrollController,
-        slivers: [
-          SliverAppBar(
-            elevation: _isScrolled ? 4 : 0,
-            toolbarHeight: 50,
-            floating: false,
-            pinned: true,
-            backgroundColor: const Color(0xFF1B2C4F),
-            centerTitle: false,
-            title: const Text(
-              "Available Sports",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Poppins',
-                color: Colors.white,
-              ),
-            ),
-            leading: Container(
-              margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
-              child: IconButton(
-                icon: const Icon(
-                  Icons.chevron_left,
-                  color: Colors.white,
-                  size: 28,
-                ),
-                onPressed: () => Navigator.pop(context),
-                tooltip: 'Back',
-              ),
-            ),
-            actions: [
-              // Add a favorites indicator with count in the app bar
-              if (favoriteCount > 0)
-                Padding(
-                  padding: const EdgeInsets.only(right: 16.0),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.favorite, color: Colors.white),
-                        onPressed: () {
-                          _navigateToFavorites();
-                        },
-                      ),
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 16,
-                            minHeight: 16,
-                          ),
-                          child: Text(
-                            '$favoriteCount',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
+      appBar: AppBar(
+        elevation: 4,
+        toolbarHeight: 60,
+        backgroundColor: const Color(0xFF1B2C4F),
+        centerTitle: false,
+        title: const Text(
+          "Available Sports",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Poppins',
+            color: Colors.white,
           ),
-          SliverToBoxAdapter(
+        ),
+        leading: Container(
+          margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
+          child: IconButton(
+            icon: const Icon(
+              Icons.chevron_left,
+              color: Colors.white,
+              size: 28,
+            ),
+            onPressed: () => Navigator.pop(context),
+            tooltip: 'Back',
+          ),
+        ),
+        actions: [
+          // Add a favorites indicator with count in the app bar
+          if (favoriteCount > 0)
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.favorite, color: Colors.white),
+                    onPressed: () {
+                      _navigateToFavorites();
+                    },
+                  ),
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        '$favoriteCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+      body: Column(
+        children: [
+          // Fixed Header Section - Search Bar and Sports Categories
+          Container(
+            color: const Color(0xFFF5F6FA),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Search Bar
                 Padding(
@@ -602,343 +588,336 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                     themeLightNavyBlue: _themeLightNavyBlue,
                   ),
                 ),
+              ],
+            ),
+          ),
 
-                // Nearby Venues Section
-                if (_showVenues && _filteredVenues.isNotEmpty) ...[
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Nearby Venues',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: _themeNavyBlue,
-                          ),
-                        ),
-                        Text(
-                          '${_filteredVenues.length} venues',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
+          // Scrollable Venues Section
+          Expanded(
+            child: _isLoading
+                ? Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        _themeNavyBlue,
+                      ),
                     ),
-                  ),
-
-                  // Venues List
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    itemCount: _filteredVenues.length,
-                    itemBuilder: (context, index) {
-                      final venue = _filteredVenues[index];
-                      final bool isFavorite = venue['is_favorite'] ?? false;
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 16.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
+                  )
+                : _filteredVenues.isEmpty
+                    ? Center(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Image with favorite button
-                            Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(16),
-                                    topRight: Radius.circular(16),
-                                  ),
-                                  child: Container(
-                                    height: 200,
-                                    width: double.infinity,
-                                    color: Colors.grey[200],
-                                    child: Image.network(
-                                      venue['image_path'] ?? '',
-                                      fit: BoxFit.cover,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                            return Container(
-                                              color: Colors.grey[300],
-                                              child: const Center(
-                                                child: Icon(
-                                                  Icons.image_not_supported,
-                                                  size: 40,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 12,
-                                  right: 12,
-                                  child: GestureDetector(
-                                    onTap: () => _toggleFavorite(index),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.9),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        isFavorite
-                                            ? Icons.favorite
-                                            : Icons.favorite_border,
-                                        color: isFavorite
-                                            ? Colors.red
-                                            : Colors.grey,
-                                        size: 20,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            Icon(
+                              Icons.search_off,
+                              size: 64,
+                              color: Colors.grey[400],
                             ),
-
-                            // Venue details
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Venue name and distance
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          venue['title'] ?? '',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xFF2D3142),
-                                          ),
-                                        ),
-                                      ),
-                                      Text(
-                                        venue['distance'] ?? '',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey[600],
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  const SizedBox(height: 8),
-
-                                  // Location
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.location_on,
-                                        size: 16,
-                                        color: Colors.grey[600],
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Expanded(
-                                        child: Text(
-                                          venue['location'] ?? '',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  const SizedBox(height: 8),
-
-                                  // Opening hours and rate
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.access_time,
-                                        size: 16,
-                                        color: Colors.grey[600],
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        venue['opening_hours'] ?? '',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Icon(
-                                        Icons.monetization_on,
-                                        size: 16,
-                                        color: Colors.green,
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        venue['rate_per_hour'] ?? '',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.green,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  const SizedBox(height: 2),
-
-                                  // Rating and Book Now button
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          _buildStarRating(
-                                            venue['rating']?.toDouble() ?? 0.0,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            venue['rating']?.toString() ??
-                                                '0.0',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.grey[700],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                              pageBuilder:
-                                                  (
-                                                    context,
-                                                    animation,
-                                                    secondaryAnimation,
-                                                  ) => BookNowScreen(
-                                                    venue: venue,
-                                                  ),
-                                              transitionDuration: Duration.zero,
-                                              reverseTransitionDuration:
-                                                  Duration.zero,
-                                            ),
-                                          );
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: _themeNavyBlue,
-                                          foregroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              20,
-                                            ),
-                                          ),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 20,
-                                            vertical: 8,
-                                          ),
-                                        ),
-                                        child: const Text(
-                                          'Book Now',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                            const SizedBox(height: 16),
+                            Text(
+                              'No venues found',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _selectedSport.isNotEmpty
+                                  ? 'No ${_selectedSport.toLowerCase()} venues available'
+                                  : 'Try adjusting your search',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[500],
                               ),
                             ),
                           ],
                         ),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 20),
-                ],
-
-                // Loading state
-                if (_isLoading)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(40.0),
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          _themeNavyBlue,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                // Empty state when no venues found
-                if (!_isLoading && _showVenues && _filteredVenues.isEmpty)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(40.0),
-                      child: Column(
+                      )
+                    : Column(
                         children: [
-                          Icon(
-                            Icons.search_off,
-                            size: 64,
-                            color: Colors.grey[400],
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'No venues found',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.grey[600],
+                          // Section Header
+                          Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Nearby Venues',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: _themeNavyBlue,
+                                  ),
+                                ),
+                                Text(
+                                  '${_filteredVenues.length} venues',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _selectedSport.isNotEmpty
-                                ? 'No ${_selectedSport.toLowerCase()} venues available'
-                                : 'Try adjusting your search',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[500],
+
+                          // Scrollable Venues List
+                          Expanded(
+                            child: ListView.builder(
+                              controller: _venuesScrollController,
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              itemCount: _filteredVenues.length,
+                              itemBuilder: (context, index) {
+                                final venue = _filteredVenues[index];
+                                final bool isFavorite = venue['is_favorite'] ?? false;
+
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 16.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.05),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      // Image with favorite button
+                                      Stack(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: const BorderRadius.only(
+                                              topLeft: Radius.circular(16),
+                                              topRight: Radius.circular(16),
+                                            ),
+                                            child: Container(
+                                              height: 200,
+                                              width: double.infinity,
+                                              color: Colors.grey[200],
+                                              child: Image.network(
+                                                venue['image_path'] ?? '',
+                                                fit: BoxFit.cover,
+                                                errorBuilder:
+                                                    (context, error, stackTrace) {
+                                                      return Container(
+                                                        color: Colors.grey[300],
+                                                        child: const Center(
+                                                          child: Icon(
+                                                            Icons.image_not_supported,
+                                                            size: 40,
+                                                            color: Colors.grey,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 12,
+                                            right: 12,
+                                            child: GestureDetector(
+                                              onTap: () => _toggleFavorite(index),
+                                              child: Container(
+                                                padding: const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white.withOpacity(0.9),
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  isFavorite
+                                                      ? Icons.favorite
+                                                      : Icons.favorite_border,
+                                                  color: isFavorite
+                                                      ? Colors.red
+                                                      : Colors.grey,
+                                                  size: 20,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      // Venue details
+                                      Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            // Venue name and distance
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    venue['title'] ?? '',
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: Color(0xFF2D3142),
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  venue['distance'] ?? '',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.grey[600],
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+
+                                            const SizedBox(height: 8),
+
+                                            // Location
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.location_on,
+                                                  size: 16,
+                                                  color: Colors.grey[600],
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Expanded(
+                                                  child: Text(
+                                                    venue['location'] ?? '',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.grey[600],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+
+                                            const SizedBox(height: 8),
+
+                                            // Opening hours and rate
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.access_time,
+                                                  size: 16,
+                                                  color: Colors.grey[600],
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  venue['opening_hours'] ?? '',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.grey[600],
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 16),
+                                                Icon(
+                                                  Icons.monetization_on,
+                                                  size: 16,
+                                                  color: Colors.green,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  venue['rate_per_hour'] ?? '',
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.green,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+
+                                            const SizedBox(height: 2),
+
+                                            // Rating and Book Now button
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    _buildStarRating(
+                                                      venue['rating']?.toDouble() ?? 0.0,
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      venue['rating']?.toString() ??
+                                                          '0.0',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: Colors.grey[700],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () {
+                                                    Navigator.push(
+                                                      context,
+                                                      PageRouteBuilder(
+                                                        pageBuilder:
+                                                            (
+                                                              context,
+                                                              animation,
+                                                              secondaryAnimation,
+                                                            ) => BookNowScreen(
+                                                              venue: venue,
+                                                            ),
+                                                        transitionDuration: Duration.zero,
+                                                        reverseTransitionDuration:
+                                                            Duration.zero,
+                                                      ),
+                                                    );
+                                                  },
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: _themeNavyBlue,
+                                                    foregroundColor: Colors.white,
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(
+                                                        20,
+                                                      ),
+                                                    ),
+                                                    padding: const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 8,
+                                                    ),
+                                                  ),
+                                                  child: const Text(
+                                                    'Book Now',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ],
                       ),
-                    ),
-                  ),
-
-                // Empty space to fill remaining area
-                Container(
-                  height: MediaQuery.of(context).size.height - 400,
-                  color: const Color(0xFFF5F6FA),
-                ),
-              ],
-            ),
           ),
         ],
+      ),
+      bottomNavigationBar: AppFooter(
+        currentIndex: _currentFooterIndex,
+        onTabSelected: _onFooterTabSelected,
       ),
     );
   }
@@ -1448,7 +1427,7 @@ class _SportsCategoriesState extends State<SportsCategories> {
                             ),
                           ),
                         );
-                      }),
+                      }).toList(),
                     ],
                   ),
                 ),
