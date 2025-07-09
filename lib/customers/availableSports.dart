@@ -47,7 +47,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
   final ScrollController _venuesScrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
-  bool _isLoading = true;
+  bool _isLoading = false;
+  bool _showVenues = false;
   String _selectedSport = '';
   String _searchQuery = '';
 
@@ -175,23 +176,41 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     super.initState();
     _searchController.addListener(_onSearchChanged);
 
-    // Set the initial sport if provided
+    // Set the initial sport if provided and load venues
     if (widget.initialSport.isNotEmpty) {
       _selectedSport = widget.initialSport;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadVenuesForSport(widget.initialSport);
+      });
+    } else {
+      // Just load the venues data but don't show them until sport is selected
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _loadVenuesData();
+      });
     }
-
-    // Initialize with local data
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadVenues();
-    });
   }
 
-  // Load venues from local data instead of Supabase
-  Future<void> _loadVenues() async {
+  // Load venues data from local data without showing them
+  Future<void> _loadVenuesData() async {
+    if (!mounted) return;
+
+    try {
+      setState(() {
+        _venues = List<Map<String, dynamic>>.from(_sampleVenues);
+        debugPrint('🏟️ Venues data loaded: ${_venues.length}');
+      });
+    } catch (error) {
+      debugPrint('❌ Error loading venues data: $error');
+    }
+  }
+
+  // Load and show venues for a specific sport
+  Future<void> _loadVenuesForSport(String sportName) async {
     if (!mounted) return;
 
     setState(() {
       _isLoading = true;
+      _showVenues = false;
     });
 
     // Simulate loading delay for better UX
@@ -200,34 +219,40 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     if (!mounted) return;
 
     try {
-      setState(() {
+      // Ensure venues data is loaded
+      if (_venues.isEmpty) {
         _venues = List<Map<String, dynamic>>.from(_sampleVenues);
-        debugPrint('🏟️ Venues loaded: ${_venues.length}');
+      }
 
-        // Filter venues based on initial sport if provided
-        if (widget.initialSport.isNotEmpty) {
+      setState(() {
+        debugPrint('🏟️ Loading venues for sport: $sportName');
+
+        // Filter venues based on selected sport
+        if (sportName.isEmpty) {
+          _filteredVenues = _venues;
+        } else {
           _filteredVenues = _venues
-              .where((venue) => venue['sport'] == widget.initialSport)
+              .where((venue) => venue['sport'] == sportName)
               .toList();
           debugPrint(
-            '🎯 Filtered for ${widget.initialSport}: ${_filteredVenues.length} venues',
+            '🎯 Filtered for $sportName: ${_filteredVenues.length} venues',
           );
-        } else {
-          _filteredVenues = _venues;
         }
 
         _isLoading = false;
+        _showVenues = true;
 
-        if (_filteredVenues.isEmpty && widget.initialSport.isNotEmpty) {
-          debugPrint('⚠️ No venues found for sport: ${widget.initialSport}');
+        if (_filteredVenues.isEmpty) {
+          debugPrint('⚠️ No venues found for sport: $sportName');
         }
       });
     } catch (error) {
       if (!mounted) return;
 
-      debugPrint('❌ Error loading venues: $error');
+      debugPrint('❌ Error loading venues for sport: $error');
       setState(() {
         _isLoading = false;
+        _showVenues = false;
       });
     }
   }
@@ -280,18 +305,10 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
   void _onSportSelected(String sportName) {
     setState(() {
       _selectedSport = sportName;
-      _isLoading = true;
     });
 
-    // Using a slight delay to improve UX by showing loading state
-    Future.delayed(const Duration(milliseconds: 500), () {
-      setState(() {
-        _isLoading = false;
-
-        // Filter venues by selected sport
-        _filterVenuesBySport(sportName);
-      });
-    });
+    // Load venues for the selected sport
+    _loadVenuesForSport(sportName);
   }
 
   void _navigateToFavorites() {
@@ -596,70 +613,117 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
           Expanded(
             child: _isLoading
                 ? Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        _themeNavyBlue,
-                      ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            _themeNavyBlue,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Loading venues...',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                   )
-                : _filteredVenues.isEmpty
+                : !_showVenues
                     ? Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.search_off,
+                              Icons.sports,
                               size: 64,
                               color: Colors.grey[400],
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'No venues found',
+                              'Select a Sport',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.grey[600],
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              _selectedSport.isNotEmpty
-                                  ? 'No ${_selectedSport.toLowerCase()} venues available'
-                                  : 'Try adjusting your search',
+                              'Choose a sport from above to view available venues',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.grey[500],
                               ),
+                              textAlign: TextAlign.center,
                             ),
                           ],
                         ),
                       )
-                    : Column(
-                        children: [
-                          // Section Header
-                          Padding(
-                            padding: const EdgeInsets.all(20.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    : _filteredVenues.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+                                Icon(
+                                  Icons.search_off,
+                                  size: 64,
+                                  color: Colors.grey[400],
+                                ),
+                                const SizedBox(height: 16),
                                 Text(
-                                  'Nearby Venues',
+                                  'No venues found',
                                   style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.w600,
-                                    color: _themeNavyBlue,
+                                    color: Colors.grey[600],
                                   ),
                                 ),
+                                const SizedBox(height: 8),
                                 Text(
-                                  '${_filteredVenues.length} venues',
+                                  _selectedSport.isNotEmpty
+                                      ? 'No ${_selectedSport.toLowerCase()} venues available'
+                                      : 'Try adjusting your search',
                                   style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                    color: Colors.grey[500],
                                   ),
                                 ),
                               ],
                             ),
-                          ),
+                          )
+                        : Column(
+                            children: [
+                              // Section Header
+                              Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      _selectedSport.isNotEmpty 
+                                          ? '$_selectedSport Venues' 
+                                          : 'All Venues',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: _themeNavyBlue,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${_filteredVenues.length} venues',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
 
                           // Scrollable Venues List
                           Expanded(
@@ -696,7 +760,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                               topRight: Radius.circular(16),
                                             ),
                                             child: Container(
-                                              height: 200,
+                                              height: 160,
                                               width: double.infinity,
                                               color: Colors.grey[200],
                                               child: Image.network(
@@ -746,7 +810,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
 
                                       // Venue details
                                       Padding(
-                                        padding: const EdgeInsets.all(16.0),
+                                        padding: const EdgeInsets.all(12.0),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
@@ -776,7 +840,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                               ],
                                             ),
 
-                                            const SizedBox(height: 8),
+                                            const SizedBox(height: 6),
 
                                             // Location
                                             Row(
@@ -799,7 +863,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                               ],
                                             ),
 
-                                            const SizedBox(height: 8),
+                                            const SizedBox(height: 6),
 
                                             // Opening hours and rate
                                             Row(
