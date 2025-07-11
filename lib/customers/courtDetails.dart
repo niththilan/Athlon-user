@@ -2,6 +2,7 @@
 // ignore_for_file: deprecated_member_use, file_names, duplicate_ignore
 
 import 'package:flutter/material.dart';
+import 'footer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,6 +28,31 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// VenueModel class for similar venues
+class VenueModel {
+  final String id;
+  final String title;
+  final String location;
+  final double rating;
+  final String imageUrl;
+  final List<String> sports;
+  final double distance;
+  final String openingHours;
+  final String ratePerHour;
+
+  VenueModel({
+    required this.id,
+    required this.title,
+    required this.location,
+    required this.rating,
+    required this.imageUrl,
+    required this.sports,
+    required this.distance,
+    required this.openingHours,
+    required this.ratePerHour,
+  });
+}
+
 class CourtDetailScreen extends StatefulWidget {
   final Map<String, dynamic>? courtData;
 
@@ -39,9 +65,86 @@ class CourtDetailScreen extends StatefulWidget {
 class _CourtDetailScreenState extends State<CourtDetailScreen> {
   bool _isFavorite = false;
   int _currentImageIndex = 0;
+  int _currentIndex = 0; // For footer navigation
 
   // Mock court data
   late Map<String, dynamic> _courtDetails;
+
+  // Similar venues data from nearbyVenues.dart
+  final List<VenueModel> _similarVenues = [
+    VenueModel(
+      id: '1',
+      title: "CR7 FUTSAL & INDOOR CRICKET",
+      location: "23 Mile Post Ave, Colombo 00300",
+      rating: 4.75,
+      distance: 1.2,
+      imageUrl:
+          "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+      sports: ["Futsal", "Cricket", "Indoor"],
+      openingHours: "6:00 AM - 11:00 PM",
+      ratePerHour: "Rs. 3,000",
+    ),
+    VenueModel(
+      id: '2',
+      title: "ARK SPORTS - INDOOR CRICKET & FUTSAL",
+      location: "141/A, Wattala 11300",
+      rating: 4.23,
+      distance: 3.5,
+      imageUrl:
+          "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+      sports: ["Futsal", "Cricket", "Indoor"],
+      openingHours: "7:00 AM - 10:00 PM",
+      ratePerHour: "Rs. 2,500",
+    ),
+    VenueModel(
+      id: '3',
+      title: "CHAMPION'S ARENA",
+      location: "45 Sports Complex Road, Rajagiriya 10100",
+      rating: 4.89,
+      distance: 0.8,
+      imageUrl:
+          "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+      sports: ["Badminton", "Tennis", "Squash", "Outdoor"],
+      openingHours: "6:00 AM - 10:00 PM",
+      ratePerHour: "Rs. 2,000",
+    ),
+    VenueModel(
+      id: '4',
+      title: "AQUA SPORTS CENTER",
+      location: "78 Poolside Avenue, Mount Lavinia 10370",
+      rating: 4.67,
+      distance: 5.2,
+      imageUrl:
+          "https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+      sports: ["Swimming", "Water Polo", "Diving"],
+      openingHours: "5:30 AM - 9:30 PM",
+      ratePerHour: "Rs. 1,200",
+    ),
+    VenueModel(
+      id: '5',
+      title: "ELITE BASKETBALL ACADEMY",
+      location: "92 Court Lane, Dehiwala 10350",
+      rating: 4.45,
+      distance: 2.7,
+      imageUrl:
+          "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+      sports: ["Basketball", "Volleyball"],
+      openingHours: "7:00 AM - 11:00 PM",
+      ratePerHour: "Rs. 1,800",
+    ),
+    VenueModel(
+      id: '6',
+      title: "VICTORY VALLEY GOLF CLUB",
+      location: "156 Greens Road, Kandy 20000",
+      rating: 4.92,
+      distance: 8.6,
+      imageUrl:
+          "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+      sports: ["Golf"],
+      openingHours: "6:00 AM - 8:00 PM",
+      ratePerHour: "Rs. 5,000",
+    ),
+  ];
 
   @override
   void initState() {
@@ -130,58 +233,6 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
-    );
-  }
-
-  void _navigateToChat() {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Row(
-            children: [
-              const Icon(Icons.message, color: Color(0xFF1B2C4F)),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Message ${_courtDetails['name']}',
-                  style: const TextStyle(fontSize: 16),
-                ),
-              ),
-            ],
-          ),
-          content: const Text(
-            'Chat functionality will open here.\n\nYou can message the venue directly to inquire about availability, pricing, or any special requirements.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Close'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Chat feature coming soon!'),
-                    backgroundColor: Color(0xFF1B2C4F),
-                    duration: Duration(seconds: 2),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1B2C4F),
-                foregroundColor: Colors.white,
-              ),
-              child: const Text('Start Chat'),
-            ),
-          ],
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        );
-      },
     );
   }
 
@@ -322,24 +373,100 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     );
   }
 
-  Widget _buildBottomNavItem(IconData icon, String label, bool isSelected, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey,
-            size: 24,
+  Widget _buildVenueCard(VenueModel venue) {
+    return Container(
+      width: 180,
+      margin: const EdgeInsets.only(right: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey,
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Image
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(12),
+            ),
+            child: Container(
+              height: 110,
+              width: double.infinity,
+              color: Colors.grey[200],
+              child: Image.network(
+                venue.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.grey[100],
+                    child: const Center(
+                      child: Icon(
+                        Icons.image_not_supported,
+                        size: 40,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          // Venue details
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  venue.title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF2D3142),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  venue.location,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(Icons.star, color: Colors.amber, size: 16),
+                    const SizedBox(width: 4),
+                    Text(
+                      venue.rating.toString(),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2D3142),
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      venue.ratePerHour,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1B2C4F),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -606,41 +733,24 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Description Section
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                  // Similar Venues Section
+                  const Text(
+                    'Similar Venues',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2D3142),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'About',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF2D3142),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          _courtDetails['description'],
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
-                            height: 1.5,
-                          ),
-                        ),
-                      ],
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 240,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _similarVenues.length,
+                      itemBuilder: (context, index) {
+                        return _buildVenueCard(_similarVenues[index]);
+                      },
                     ),
                   ),
 
@@ -651,29 +761,14 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
           ),
         ],
       ),
-      // Bottom Navigation Bar
-      bottomNavigationBar: Container(
-        height: 80,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: _buildBottomNavItem(Icons.home, 'Home', true, () {}),
-            ),
-            Expanded(
-              child: _buildBottomNavItem(Icons.chat_bubble_outline, 'Chat', false, _navigateToChat),
-            ),
-          ],
-        ),
+      // Bottom Navigation Bar using AppFooter
+      bottomNavigationBar: AppFooter(
+        currentIndex: _currentIndex,
+        onTabSelected: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
     );
   }
