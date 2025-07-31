@@ -18,14 +18,66 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1B2C4F),
+          seedColor: const Color(0xFF050E22),
           brightness: Brightness.light,
         ),
-        scaffoldBackgroundColor: const Color(0xFFF5F6FA),
+        scaffoldBackgroundColor: const Color(0xFFFAFAFA),
       ),
       home: const CourtDetailScreen(),
     );
   }
+}
+
+class DirectionsIconPainter extends CustomPainter {
+  final Color color;
+
+  DirectionsIconPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final center = Offset(size.width / 2, size.height / 2);
+    final diamondSize = size.width * 0.7;
+
+    // Draw diamond shape
+    final path = Path();
+    path.moveTo(center.dx, center.dy - diamondSize / 2); // Top
+    path.lineTo(center.dx + diamondSize / 2, center.dy); // Right
+    path.lineTo(center.dx, center.dy + diamondSize / 2); // Bottom
+    path.lineTo(center.dx - diamondSize / 2, center.dy); // Left
+    path.close();
+
+    canvas.drawPath(path, paint);
+
+    // Draw dots inside
+    final dotRadius = size.width * 0.08;
+    final dotPaint = Paint()
+      ..color = color == Colors.white ? const Color(0xFF050E22) : Colors.white
+      ..style = PaintingStyle.fill;
+
+    // Center dot
+    canvas.drawCircle(center, dotRadius, dotPaint);
+    
+    // Top dot
+    canvas.drawCircle(
+      Offset(center.dx, center.dy - diamondSize * 0.25),
+      dotRadius * 0.7,
+      dotPaint,
+    );
+    
+    // Bottom dot
+    canvas.drawCircle(
+      Offset(center.dx, center.dy + diamondSize * 0.25),
+      dotRadius * 0.7,
+      dotPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // VenueModel class for similar venues
@@ -108,42 +160,6 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
       openingHours: "6:00 AM - 10:00 PM",
       ratePerHour: "Rs. 2,000",
     ),
-    VenueModel(
-      id: '4',
-      title: "AQUA SPORTS CENTER",
-      location: "78 Poolside Avenue, Mount Lavinia 10370",
-      rating: 4.67,
-      distance: 5.2,
-      imageUrl:
-          "https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Swimming", "Water Polo", "Diving"],
-      openingHours: "5:30 AM - 9:30 PM",
-      ratePerHour: "Rs. 1,200",
-    ),
-    VenueModel(
-      id: '5',
-      title: "ELITE BASKETBALL ACADEMY",
-      location: "92 Court Lane, Dehiwala 10350",
-      rating: 4.45,
-      distance: 2.7,
-      imageUrl:
-          "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Basketball", "Volleyball"],
-      openingHours: "7:00 AM - 11:00 PM",
-      ratePerHour: "Rs. 1,800",
-    ),
-    VenueModel(
-      id: '6',
-      title: "VICTORY VALLEY GOLF CLUB",
-      location: "156 Greens Road, Kandy 20000",
-      rating: 4.92,
-      distance: 8.6,
-      imageUrl:
-          "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Golf"],
-      openingHours: "6:00 AM - 8:00 PM",
-      ratePerHour: "Rs. 5,000",
-    ),
   ];
 
   @override
@@ -156,65 +172,30 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     _courtDetails = widget.courtData ??
         {
           'id': 'court_001',
-          'name': 'CR7 FUTSAL & INDOOR CRICKET ARENA',
+          'name': 'ARK SPORTS',
           'type': 'Futsal Court',
-          'location': '23 Mile Post Ave, Colombo 00300',
-          'rating': 4.75,
+          'location': '141/A, Wattala 11300',
+          'distance': '2.5 km away',
+          'rating': 4.6,
           'total_reviews': 124,
-          'distance': '2.3 km',
           'price_per_hour': 2500.0,
-          'opening_hours': '6:00 AM - 11:00 PM',
+          'opening_hours': 'Open Now',
+          'closing_time': 'Closes at 11:00 PM',
           'phone': '+94 77 123 4567',
-          'email': 'info@cr7arena.lk',
-          'website': 'www.cr7arena.lk',
+          'email': 'info@arksports.lk',
+          'website': 'www.arksports.lk',
           'description':
-              'Premium indoor futsal and cricket facility with state-of-the-art equipment and professional-grade surfaces. Perfect for casual games, tournaments, and training sessions.',
-          'owner_name': 'Ahmed Silva',
-          'owner_avatar': null,
+              'Premium indoor futsal and cricket facility with state-of-the-art equipment and professional-grade surfaces.',
           'images': [
             'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
             'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
             'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-            'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
           ],
-          'amenities': [
-            {'name': 'Parking', 'icon': Icons.local_parking, 'available': true},
-            {'name': 'Changing Rooms', 'icon': Icons.wc, 'available': true},
-            {'name': 'Shower Facilities', 'icon': Icons.shower, 'available': true},
-            {'name': 'Equipment Rental', 'icon': Icons.sports_soccer, 'available': true},
-            {'name': 'Refreshments', 'icon': Icons.local_cafe, 'available': true},
-            {'name': 'First Aid', 'icon': Icons.medical_services, 'available': true},
-            {'name': 'CCTV Security', 'icon': Icons.security, 'available': true},
-            {'name': 'Air Conditioning', 'icon': Icons.ac_unit, 'available': true},
-            {'name': 'WiFi', 'icon': Icons.wifi, 'available': false},
-            {'name': 'Scoreboard', 'icon': Icons.leaderboard, 'available': true},
-          ],
-          'sports_available': ['Futsal', 'Indoor Cricket', 'Basketball'],
-          'surface_type': 'Artificial Turf',
-          'capacity': '5v5 - 10 players',
-          'court_dimensions': '40m x 20m',
-          'booking_advance_days': 30,
-          'cancellation_policy':
-              'Free cancellation up to 24 hours before booking',
-          'reviews': [
-            {
-              'id': '1',
-              'user_name': 'Kasun Perera',
-              'user_avatar': null,
-              'rating': 5.0,
-              'date': '2024-01-15',
-              'comment':
-                  'Excellent facility! The surface is perfect and the equipment is top-notch. Highly recommended for serious players.',
-            },
-            {
-              'id': '2',
-              'user_name': 'Nimal Fernando',
-              'user_avatar': null,
-              'rating': 4.5,
-              'date': '2024-01-10',
-              'comment':
-                  'Great place to play futsal. Clean facilities and friendly staff. The only downside is parking can be limited during peak hours.',
-            },
+          'sports_available': ['Football', 'Cricket', 'Basketball'],
+          'sport_images': [
+            'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+            'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+            'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
           ],
         };
   }
@@ -223,252 +204,158 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     setState(() {
       _isFavorite = !_isFavorite;
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          _isFavorite ? 'Added to favorites' : 'Removed from favorites',
-        ),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
   }
 
-  Widget _buildActionButton(String text, IconData icon, Color backgroundColor, Color textColor, VoidCallback onPressed) {
+  Widget _buildDirectionsIcon({Color color = Colors.white, double size = 20}) {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          foregroundColor: textColor,
-          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 0,
-          minimumSize: const Size(0, 48),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 20),
-            const SizedBox(height: 4),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              child: Text(
-                text,
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 1,
-              ),
-            ),
-          ],
-        ),
+      width: size,
+      height: size,
+      child: CustomPaint(
+        painter: DirectionsIconPainter(color: color),
       ),
     );
   }
 
-  Widget _buildOverlayIcon(IconData icon, VoidCallback onTap, {Color? iconColor}) {
-    return GestureDetector(
-      onTap: onTap,
+  Widget _buildActionButton(String text, dynamic icon, Color backgroundColor, Color textColor, VoidCallback onPressed) {
+    return Expanded(
       child: Container(
-        padding: const EdgeInsets.all(8),
+        height: 60,
         decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.5),
-          shape: BoxShape.circle,
-        ),
-        child: Icon(
-          icon,
-          color: iconColor ?? Colors.white,
-          size: 20,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSportCard(String sport) {
-    return Container(
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Text(
-        sport,
-        style: const TextStyle(
-          fontSize: 14,
-          fontWeight: FontWeight.w600,
-          color: Color(0xFF2D3142),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(IconData icon, String title, String content) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1B2C4F).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: const Color(0xFF1B2C4F), size: 20),
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: backgroundColor != const Color(0xFF050E22) ? [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    content,
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+          ] : [],
         ),
-      ),
-    );
-  }
-
-  Widget _buildVenueCard(VenueModel venue) {
-    return Container(
-      width: 180,
-      margin: const EdgeInsets.only(right: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image
-          ClipRRect(
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(12),
-              topRight: Radius.circular(12),
-            ),
-            child: Container(
-              height: 110,
-              width: double.infinity,
-              color: Colors.grey[200],
-              child: Image.network(
-                venue.imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: Colors.grey[100],
-                    child: const Center(
-                      child: Icon(
-                        Icons.image_not_supported,
-                        size: 40,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          // Venue details
-          Padding(
-            padding: const EdgeInsets.all(12),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: onPressed,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  venue.title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF2D3142),
-                  ),
-                ),
+                if (icon is IconData)
+                  Icon(icon, color: textColor, size: 20)
+                else if (icon is Widget)
+                  icon
+                else
+                  _buildDirectionsIcon(color: textColor, size: 20),
                 const SizedBox(height: 4),
                 Text(
-                  venue.location,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Icon(Icons.star, color: Colors.amber, size: 16),
-                    const SizedBox(width: 4),
-                    Text(
-                      venue.rating.toString(),
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF2D3142),
-                      ),
-                    ),
-                    const Spacer(),
-                    Text(
-                      venue.ratePerHour,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF1B2C4F),
-                      ),
-                    ),
-                  ],
+                  text,
+                  style: TextStyle(
+                    color: textColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOverlayIcon(IconData icon, VoidCallback onTap, {Color? backgroundColor, Color? iconColor}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+          color: backgroundColor ?? Colors.white.withOpacity(0.9),
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(
+          icon,
+          color: iconColor ?? Colors.black87,
+          size: 18,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoCard(IconData icon, String title, String subtitle, {VoidCallback? onTap, bool showDivider = true}) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xFFFBFBFB), // Slightly off-white for cards
+      ),
+      child: Column(
+        children: [
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F3F5),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        icon,
+                        color: const Color(0xFF4A5568),
+                        size: 18,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Color(0xFF2D3748),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF718096),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(
+                      Icons.chevron_right,
+                      color: Color(0xFFCBD5E0),
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          if (showDivider)
+            Container(
+              margin: const EdgeInsets.only(left: 68),
+              height: 1,
+              color: const Color(0xFFF1F3F5),
+            ),
         ],
       ),
     );
@@ -477,14 +364,13 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: const Color(0xFFFAFAFA),
       body: CustomScrollView(
         slivers: [
-          // Top Image Carousel as Sliver
+          // Top Image Carousel
           SliverToBoxAdapter(
             child: Container(
               height: 300,
-              width: double.infinity,
               child: Stack(
                 children: [
                   // Image Carousel
@@ -501,61 +387,43 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         fit: BoxFit.cover,
                         width: double.infinity,
                         height: double.infinity,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            color: Colors.grey[300],
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                                color: const Color(0xFF1B2C4F),
-                              ),
-                            ),
-                          );
-                        },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: Colors.grey[300],
-                            child: const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.broken_image, size: 50),
-                                Text('Failed to load image'),
-                              ],
+                            child: const Center(
+                              child: Icon(Icons.image_not_supported, size: 50),
                             ),
                           );
                         },
                       );
                     },
                   ),
-                  // Overlay icons on top right
+                  
+                  // Top overlay icons
                   Positioned(
-                    top: 50,
+                    top: MediaQuery.of(context).padding.top + 12,
                     right: 16,
-                    child: Row(
-                      children: [
-                        _buildOverlayIcon(Icons.grid_view, () {}),
-                        const SizedBox(width: 8),
-                        _buildOverlayIcon(
-                          _isFavorite ? Icons.favorite : Icons.favorite_border,
-                          _toggleFavorite,
-                          iconColor: _isFavorite ? Colors.red : Colors.white,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '2',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                        const SizedBox(width: 8),
-                        _buildOverlayIcon(Icons.notifications_outlined, () {}),
-                      ],
+                      ),
                     ),
                   ),
-                  // Back button
-                  Positioned(
-                    top: 50,
-                    left: 16,
-                    child: _buildOverlayIcon(Icons.arrow_back, () => Navigator.pop(context)),
-                  ),
-                  // White circular indicator dots at bottom center
+
+                  // Bottom indicators
                   Positioned(
                     bottom: 20,
                     left: 0,
@@ -565,7 +433,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                       children: List.generate(
                         _courtDetails['images'].length,
                         (index) => Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
@@ -583,174 +451,161 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
             ),
           ),
 
-          // Sticky Header with Matching Background
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: _StickyHeaderDelegate(
-              child: Text(
-                _courtDetails['name'],
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D3142),
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-
-          // Scrollable Content
+          // Content Section
           SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
+            child: Container(
+              color: const Color(0xFFFEFEFE), // Off-white content background
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Rating Row (now scrollable)
-                  Row(
-                    children: [
-                      Text(
-                        '${_courtDetails['rating']}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2D3142),
+                  // Title and Rating Section
+                  Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                _courtDetails['name'],
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF2D3748),
+                                ),
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                ...List.generate(5, (index) {
+                                  return Icon(
+                                    Icons.star,
+                                    size: 16,
+                                    color: index < _courtDetails['rating'].floor()
+                                        ? const Color(0xFFFBBF24)
+                                        : const Color(0xFFE5E7EB),
+                                  );
+                                }),
+                                const SizedBox(width: 6),
+                                Text(
+                                  _courtDetails['rating'].toString(),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF2D3748),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Row(
-                        children: List.generate(5, (index) {
-                          return Icon(
-                            Icons.star,
-                            size: 18,
-                            color: index < _courtDetails['rating']
-                                ? Colors.amber
-                                : Colors.grey[300],
-                          );
-                        }),
-                      ),
-                    ],
+                        const SizedBox(height: 20),
+                        
+                        // Action Buttons
+                        Row(
+                          children: [
+                            _buildActionButton(
+                              'Directions',
+                              _buildDirectionsIcon(color: Colors.white, size: 20),
+                              const Color(0xFF050E22),
+                              Colors.white,
+                              () {},
+                            ),
+                            const SizedBox(width: 12),
+                            _buildActionButton(
+                              'Call',
+                              Icons.phone,
+                              Colors.white,
+                              const Color(0xFF050E22),
+                              () {},
+                            ),
+                            const SizedBox(width: 12),
+                            _buildActionButton(
+                              'Share',
+                              Icons.share,
+                              Colors.white,
+                              const Color(0xFF050E22),
+                              () {},
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
 
-                  const SizedBox(height: 20),
-                  // Three Action Buttons Row
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildActionButton(
-                          'Directions',
-                          Icons.directions,
-                          const Color(0xFF1B2C4F),
-                          Colors.white,
-                          () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Opening directions...')),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _buildActionButton(
-                          'Call',
-                          Icons.phone,
-                          Colors.grey[200]!,
-                          const Color(0xFF2D3142),
-                          () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Calling ${_courtDetails['phone']}...')),
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _buildActionButton(
-                          'Share',
-                          Icons.share,
-                          Colors.grey[200]!,
-                          const Color(0xFF2D3142),
-                          () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Sharing...')),
-                            );
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
+                  const SizedBox(height: 8),
 
-                  const SizedBox(height: 20),
-
-                  // Address Card
+                  // Info Cards
                   _buildInfoCard(
                     Icons.location_on,
-                    'Address',
                     _courtDetails['location'],
+                    _courtDetails['distance'],
                   ),
-
-                  const SizedBox(height: 12),
-
-                  // Open Hours Card
+                  
                   _buildInfoCard(
                     Icons.access_time,
-                    'Open Hours',
-                    'Today 6:00 AM - 11:00 PM',
+                    _courtDetails['opening_hours'],
+                    _courtDetails['closing_time'],
                   ),
-
-                  const SizedBox(height: 12),
-
-                  // Review Card
+                  
                   _buildInfoCard(
                     Icons.star,
-                    'Reviews',
-                    'Overall ${_courtDetails['rating']} rating • ${_courtDetails['total_reviews']} reviews',
+                    'Write a Review',
+                    'Share your experience',
+                    showDivider: false,
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 32),
 
                   // Available Sports Section
-                  const Text(
-                    'Available Sports',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2D3142),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 50,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _courtDetails['sports_available'].length,
-                      itemBuilder: (context, index) {
-                        return _buildSportCard(_courtDetails['sports_available'][index]);
-                      },
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Similar Venues Section
-                  const Text(
-                    'Similar Venues',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2D3142),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 240,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _similarVenues.length,
-                      itemBuilder: (context, index) {
-                        return _buildVenueCard(_similarVenues[index]);
-                      },
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Available Sports',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2D3748),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: List.generate(
+                            _courtDetails['sport_images'].length,
+                            (index) => Expanded(
+                              child: Container(
+                                margin: EdgeInsets.only(
+                                  right: index < _courtDetails['sport_images'].length - 1 ? 8 : 0,
+                                ),
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: Colors.grey[200],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    _courtDetails['sport_images'][index],
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: Colors.grey[200],
+                                        child: const Center(
+                                          child: Icon(Icons.sports, color: Colors.grey),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
@@ -761,52 +616,75 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
           ),
         ],
       ),
-      // Bottom Navigation Bar using AppFooter
-      bottomNavigationBar: AppFooter(
-        currentIndex: _currentIndex,
-        onTabSelected: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
-    );
-  }
-}
-
-class _StickyHeaderDelegate extends SliverPersistentHeaderDelegate {
-  final Widget child;
-
-  _StickyHeaderDelegate({required this.child});
-
-  @override
-  double get minExtent => 120; // Increased height to accommodate safe area + text
-  
-  @override
-  double get maxExtent => 120; // Same height to keep it simple
-
-  @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-    final safePadding = MediaQuery.of(context).padding.top;
-    
-    return Container(
-      height: 120,
-      color: const Color(0xFFF5F6FA),
-      padding: EdgeInsets.only(
-        top: safePadding + 8, // Safe area + minimal padding
-        left: 16,
-        right: 16,
-        bottom: 8,
-      ),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: child,
+      
+      // Bottom Navigation Bar
+      bottomNavigationBar: Container(
+        height: 80 + MediaQuery.of(context).padding.bottom,
+        decoration: BoxDecoration(
+          color: const Color(0xFFFEFEFE), // Off-white navigation background
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildNavItem(Icons.home_outlined, 'Home', 0),
+              _buildNavItem(Icons.arrow_back_ios, '', 1),
+              _buildNavItem(Icons.arrow_forward_ios, '', 2),
+              _buildNavItem(Icons.chat_bubble_outline, 'Chat', 3),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  @override
-  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-    return false;
+  Widget _buildNavItem(IconData icon, String label, int index) {
+    final isActive = _currentIndex == index;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: isActive ? const Color(0xFF050E22) : Colors.transparent,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                color: isActive ? Colors.white : const Color(0xFF9CA3AF),
+                size: 20,
+              ),
+            ),
+            if (label.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isActive ? const Color(0xFF050E22) : const Color(0xFF9CA3AF),
+                  fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }
