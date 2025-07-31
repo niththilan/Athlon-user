@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFF050E22),
           brightness: Brightness.light,
         ),
-        scaffoldBackgroundColor: const Color(0xFFFAFAFA),
+        scaffoldBackgroundColor: const Color(0xFFF5F6F8), // Light gray background like in image
       ),
       home: const CourtDetailScreen(),
     );
@@ -42,7 +42,7 @@ class DirectionsIconPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final diamondSize = size.width * 0.7;
 
-    // Draw diamond shape
+    // Draw diamond shape (outline style like in the image)
     final path = Path();
     path.moveTo(center.dx, center.dy - diamondSize / 2); // Top
     path.lineTo(center.dx + diamondSize / 2, center.dy); // Right
@@ -52,8 +52,8 @@ class DirectionsIconPainter extends CustomPainter {
 
     canvas.drawPath(path, paint);
 
-    // Draw dots inside
-    final dotRadius = size.width * 0.08;
+    // Draw inner dots pattern like in the image
+    final dotRadius = size.width * 0.06;
     final dotPaint = Paint()
       ..color = color == Colors.white ? const Color(0xFF050E22) : Colors.white
       ..style = PaintingStyle.fill;
@@ -64,14 +64,28 @@ class DirectionsIconPainter extends CustomPainter {
     // Top dot
     canvas.drawCircle(
       Offset(center.dx, center.dy - diamondSize * 0.25),
-      dotRadius * 0.7,
+      dotRadius * 0.8,
       dotPaint,
     );
     
-    // Bottom dot
+    // Bottom dot  
     canvas.drawCircle(
       Offset(center.dx, center.dy + diamondSize * 0.25),
-      dotRadius * 0.7,
+      dotRadius * 0.8,
+      dotPaint,
+    );
+
+    // Left dot
+    canvas.drawCircle(
+      Offset(center.dx - diamondSize * 0.25, center.dy),
+      dotRadius * 0.6,
+      dotPaint,
+    );
+
+    // Right dot
+    canvas.drawCircle(
+      Offset(center.dx + diamondSize * 0.25, center.dy),
+      dotRadius * 0.6,
       dotPaint,
     );
   }
@@ -187,15 +201,15 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
           'description':
               'Premium indoor futsal and cricket facility with state-of-the-art equipment and professional-grade surfaces.',
           'images': [
-            'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-            'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-            'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+            'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
+            'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
+            'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
           ],
           'sports_available': ['Football', 'Cricket', 'Basketball'],
           'sport_images': [
-            'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-            'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
-            'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+            'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
+            'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
           ],
         };
   }
@@ -223,11 +237,11 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: backgroundColor != const Color(0xFF050E22) ? [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+          boxShadow: backgroundColor == const Color(0xFFFFFFFF) ? [
+            const BoxShadow(
+              color: Color(0xFFE5E7EB), // Solid shadow color, no opacity
               blurRadius: 8,
-              offset: const Offset(0, 2),
+              offset: Offset(0, 2),
             ),
           ] : [],
         ),
@@ -291,7 +305,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   Widget _buildInfoCard(IconData icon, String title, String subtitle, {VoidCallback? onTap, bool showDivider = true}) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFFFBFBFB), // Slightly off-white for cards
+        color: Colors.white, // Pure white for info cards
       ),
       child: Column(
         children: [
@@ -334,7 +348,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             subtitle,
                             style: const TextStyle(
                               fontSize: 14,
-                              color: Color(0xFF718096),
+                              color: Color(0xFF6B7280), // More subtle gray to match image
                             ),
                           ),
                         ],
@@ -342,7 +356,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     ),
                     const Icon(
                       Icons.chevron_right,
-                      color: Color(0xFFCBD5E0),
+                      color: Color(0xFF050E22), // Solid dark navy for chevrons
                       size: 20,
                     ),
                   ],
@@ -354,7 +368,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
             Container(
               margin: const EdgeInsets.only(left: 68),
               height: 1,
-              color: const Color(0xFFF1F3F5),
+              color: const Color(0xFFE5E7EB), // Subtle but visible divider
             ),
         ],
       ),
@@ -364,7 +378,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAFA),
+      backgroundColor: const Color(0xFFF5F6F8), // Light gray background like in image
       body: CustomScrollView(
         slivers: [
           // Top Image Carousel
@@ -387,11 +401,32 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         fit: BoxFit.cover,
                         width: double.infinity,
                         height: double.infinity,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: const Color(0xFFFFFFFF),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                                color: const Color(0xFF050E22),
+                              ),
+                            ),
+                          );
+                        },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            color: Colors.grey[300],
-                            child: const Center(
-                              child: Icon(Icons.image_not_supported, size: 50),
+                            color: const Color(0xFFFFFFFF),
+                            child: const Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.sports_soccer, size: 50, color: Color(0xFF050E22)),
+                                SizedBox(height: 8),
+                                Text('ARK SPORTS', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF050E22))),
+                                Text('Indoor Sports Facility', style: TextStyle(fontSize: 12, color: Color(0xFF050E22))),
+                              ],
                             ),
                           );
                         },
@@ -454,7 +489,8 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
           // Content Section
           SliverToBoxAdapter(
             child: Container(
-              color: const Color(0xFFFEFEFE), // Off-white content background
+              color: Colors.white, // Pure white content section for contrast
+              margin: const EdgeInsets.symmetric(horizontal: 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -467,12 +503,12 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         Row(
                           children: [
                             Expanded(
-                              child: Text(
+                              child:                               Text(
                                 _courtDetails['name'],
                                 style: const TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF2D3748),
+                                  color: Color(0xFF050E22), // Solid dark navy
                                 ),
                               ),
                             ),
@@ -493,7 +529,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
-                                    color: Color(0xFF2D3748),
+                                    color: Color(0xFF050E22), // Solid dark navy
                                   ),
                                 ),
                               ],
@@ -516,7 +552,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             _buildActionButton(
                               'Call',
                               Icons.phone,
-                              Colors.white,
+                              const Color(0xFFFFFFFF), // Pure white, no opacity
                               const Color(0xFF050E22),
                               () {},
                             ),
@@ -524,7 +560,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             _buildActionButton(
                               'Share',
                               Icons.share,
-                              Colors.white,
+                              const Color(0xFFFFFFFF), // Pure white, no opacity
                               const Color(0xFF050E22),
                               () {},
                             ),
@@ -569,7 +605,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF2D3748),
+                            color: Color(0xFF050E22), // Solid dark navy
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -584,7 +620,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                                 height: 80,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
-                                  color: Colors.grey[200],
+                                  color: const Color(0xFFFFFFFF), // Pure white for sport images
                                 ),
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
@@ -593,9 +629,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Container(
-                                        color: Colors.grey[200],
+                                        color: const Color(0xFFFFFFFF),
                                         child: const Center(
-                                          child: Icon(Icons.sports, color: Colors.grey),
+                                          child: Icon(Icons.sports, color: Color(0xFF050E22)),
                                         ),
                                       );
                                     },
@@ -621,7 +657,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
       bottomNavigationBar: Container(
         height: 80 + MediaQuery.of(context).padding.bottom,
         decoration: BoxDecoration(
-          color: const Color(0xFFFEFEFE), // Off-white navigation background
+          color: Colors.white, // Pure white navigation background
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -667,7 +703,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
               ),
               child: Icon(
                 icon,
-                color: isActive ? Colors.white : const Color(0xFF9CA3AF),
+                color: isActive ? Colors.white : const Color(0xFF050E22), // Solid dark navy for inactive
                 size: 20,
               ),
             ),
@@ -677,7 +713,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                 label,
                 style: TextStyle(
                   fontSize: 11,
-                  color: isActive ? const Color(0xFF050E22) : const Color(0xFF9CA3AF),
+                  color: isActive ? const Color(0xFF050E22) : const Color(0xFF050E22), // Solid dark navy
                   fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
                 ),
               ),
