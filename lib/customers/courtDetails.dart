@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFF050E22),
           brightness: Brightness.light,
         ),
-        scaffoldBackgroundColor: const Color(0xFFF5F6F8), // Light gray background like in image
+        scaffoldBackgroundColor: const Color.fromARGB(255, 191, 190, 190), // Light gray background like in image
       ),
       home: const CourtDetailScreen(),
     );
@@ -326,7 +326,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                       ),
                       child: Icon(
                         icon,
-                        color: const Color(0xFF4A5568),
+                        color: const Color.fromARGB(255, 0, 0, 0),
                         size: 18,
                       ),
                     ),
@@ -340,7 +340,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xFF2D3748),
+                              color: Color.fromARGB(255, 0, 0, 0),
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -356,7 +356,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     ),
                     const Icon(
                       Icons.chevron_right,
-                      color: Color(0xFF050E22), // Solid dark navy for chevrons
+                      color: Color.fromARGB(255, 0, 0, 0), // Solid dark navy for chevrons
                       size: 20,
                     ),
                   ],
@@ -418,7 +418,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            color: const Color(0xFFFFFFFF),
+                            color: const Color.fromARGB(255, 143, 133, 133),
                             child: const Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -434,29 +434,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     },
                   ),
                   
-                  // Top overlay icons
-                  Positioned(
-                    top: MediaQuery.of(context).padding.top + 12,
-                    right: 16,
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '2',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  
 
                   // Bottom indicators
                   Positioned(
@@ -489,7 +467,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
           // Content Section
           SliverToBoxAdapter(
             child: Container(
-              color: Colors.white, // Pure white content section for contrast
+              color: const Color.fromARGB(255, 237, 237, 237), // Pure white content section for contrast
               margin: const EdgeInsets.symmetric(horizontal: 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -570,27 +548,47 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  // ...existing code...
 
-                  // Info Cards
-                  _buildInfoCard(
-                    Icons.location_on,
-                    _courtDetails['location'],
-                    _courtDetails['distance'],
-                  ),
-                  
-                  _buildInfoCard(
-                    Icons.access_time,
-                    _courtDetails['opening_hours'],
-                    _courtDetails['closing_time'],
-                  ),
-                  
-                  _buildInfoCard(
-                    Icons.star,
-                    'Write a Review',
-                    'Share your experience',
-                    showDivider: false,
-                  ),
+Container(
+  margin: const EdgeInsets.symmetric(horizontal: 20), // Add margin on both sides
+  decoration: BoxDecoration(
+    color: Colors.white, // Box background
+    borderRadius: BorderRadius.circular(12),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.04),
+        blurRadius: 8,
+        offset: const Offset(0, 2),
+      ),
+    ],
+  ),
+  child: Column(
+    children: [
+      const SizedBox(height: 5),
+
+      // Info Cards
+      _buildInfoCard(
+        Icons.location_on,
+        _courtDetails['location'],
+        _courtDetails['distance'],
+      ),
+      _buildInfoCard(
+        Icons.access_time,
+        _courtDetails['opening_hours'],
+        _courtDetails['closing_time'],
+      ),
+      _buildInfoCard(
+        Icons.star,
+        'Write a Review',
+        'Share your experience',
+        showDivider: false,
+      ),
+    ],
+  ),
+),
+
+
 
                   const SizedBox(height: 32),
 
