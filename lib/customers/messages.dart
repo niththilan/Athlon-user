@@ -2,10 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'dart:async'; // Add Timer for debouncing
-import 'dart:ui';
-import 'home.dart';
-import 'search.dart';
-import 'footer.dart';
 
 void main() {
   runApp(
@@ -24,26 +20,26 @@ void main() {
   );
 }
 
-/// Represents a chat conversation with a sports facility
+/// Represents a chat conversation with a customer
 class ChatMessage {
+  final String? conversationId; // Add conversation ID for database operations
   final String name;
   String lastMessage;
   final String time;
   int unreadCount;
   final String avatarUrl;
-  final bool isOnline;
   List<Message> messages;
   bool isArchived;
   bool isPinned;
   bool isMuted;
 
   ChatMessage({
+    this.conversationId,
     required this.name,
     required this.lastMessage,
     required this.time,
     required this.unreadCount,
     required this.avatarUrl,
-    required this.isOnline,
     required this.messages,
     this.isArchived = false,
     this.isPinned = false,
@@ -58,6 +54,7 @@ class Message {
   final bool isSentByMe;
 
   const Message({
+    // Add const constructor for immutability
     required this.content,
     required this.time,
     required this.isSentByMe,
@@ -73,8 +70,8 @@ class MessagesScreen extends StatefulWidget {
 
 class _MessagesScreenState extends State<MessagesScreen> {
   final TextEditingController _searchController = TextEditingController();
-  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
-      GlobalKey<RefreshIndicatorState>();
+  // final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey =
+  //     GlobalKey<RefreshIndicatorState>();
 
   // Add timer for debouncing search
   Timer? _debounceTimer;
@@ -90,111 +87,121 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeMessages();
+    // _loadConversationsFromDatabase();
   }
 
-  // Extract method for better code organization
-  void _initializeMessages() {
-    _messages = [
-      ChatMessage(
-        name: "Ark Sports",
-        lastMessage: "Yes, the futsal court is available at 3pm tomorrow",
-        time: "2m ago",
-        unreadCount: 1,
-        avatarUrl: "assets/ark.jpg",
-        isOnline: true,
-        isArchived: false,
-        isPinned: false,
-        isMuted: false,
-        messages: [
-          Message(
-            content: "Is the futsal court available tomorrow at 3pm?",
-            time: "10m ago",
-            isSentByMe: true,
-          ),
-          Message(
-            content: "Let me check our schedule for you.",
-            time: "8m ago",
-            isSentByMe: false,
-          ),
-          Message(
-            content: "Yes, the futsal court is available at 3pm tomorrow",
-            time: "2m ago",
-            isSentByMe: false,
-          ),
-        ],
-      ),
-      ChatMessage(
-        name: "Stadium Sports Complex",
-        lastMessage: "Thank you for your booking! See you tomorrow.",
-        time: "1h ago",
-        unreadCount: 0,
-        avatarUrl: "assets/crickett.jpg",
-        isOnline: false,
-        isArchived: false,
-        isPinned: false,
-        isMuted: false,
-        messages: [
-          Message(
-            content: "I'd like to book the cricket pitch for tomorrow morning",
-            time: "2h ago",
-            isSentByMe: true,
-          ),
-          Message(
-            content: "Great! I can book you for 9 AM to 11 AM. Does that work?",
-            time: "2h ago",
-            isSentByMe: false,
-          ),
-          Message(
-            content: "Perfect, I'll take it!",
-            time: "1h ago",
-            isSentByMe: true,
-          ),
-          Message(
-            content: "Thank you for your booking! See you tomorrow.",
-            time: "1h ago",
-            isSentByMe: false,
-          ),
-        ],
-      ),
-    ];
-    _filteredMessages = List.from(_messages);
-  }
-
-  Future<void> _refreshMessages() async {
+  // Load conversations from database instead of mock data
+  /*
+  Future<void> _loadConversationsFromDatabase() async {
     if (_isDisposed) return;
 
     setState(() {
       _isRefreshing = true;
     });
 
-    // Simulate network request
-    await Future.delayed(const Duration(milliseconds: 1500));
-
-    // Add error handling
     try {
-      // Update the messages (in a real app, this would fetch from a server)
+      final conversationsData = await SupabaseService.getChatConversations();
+
+      List<ChatMessage> loadedMessages = [];
+
+      for (var conversationData in conversationsData) {
+        // Get messages for this conversation
+        final messagesData = await SupabaseService.getChatMessages(
+          conversationData['id'],
+        );
+
+        // Convert database messages to Message objects
+        List<Message> messages = messagesData
+            .map(
+              (messageData) => Message(
+                content: messageData['message'] ?? messageData['content'] ?? '',
+                time:
+                    messageData['time'] ??
+                    _formatTime(messageData['created_at']),
+                isSentByMe: messageData['sender_type'] == 'vendor',
+              ),
+            )
+            .toList();
+
+        // Create ChatMessage object
+        ChatMessage chatMessage = ChatMessage(
+          conversationId: conversationData['id'],
+          name: conversationData['customer']?['name'] ?? 'Unknown Customer',
+          lastMessage: conversationData['last_message'] ?? 'No messages yet',
+          time: _formatTime(conversationData['last_message_time']),
+          unreadCount: (conversationData['is_read_by_vendor'] == false) ? 1 : 0,
+          avatarUrl: "",
+          messages: messages,
+          isArchived: false,
+          isPinned: false,
+          isMuted: false,
+        );
+
+        loadedMessages.add(chatMessage);
+      }
+
       if (!_isDisposed) {
         setState(() {
-          _messages.sort((a, b) => a.time.compareTo(b.time));
-          _filteredMessages = _filterMessagesByCategory(_selectedCategory);
+          _messages = loadedMessages;
+          _filteredMessages = List.from(_messages);
           _isRefreshing = false;
         });
       }
     } catch (e) {
+      print('Error loading conversations: $e');
       if (!_isDisposed) {
         setState(() {
+          _messages = []; // Empty list instead of mock data
+          _filteredMessages = [];
           _isRefreshing = false;
         });
 
-        // Show error message
+        // Show error message to user
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to refresh messages: ${e.toString()}'),
+            content: Text('Failed to load conversations: ${e.toString()}'),
             backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
+    }
+  }
+  */
+
+  // Helper method to format timestamp
+  String _formatTime(dynamic timestamp) {
+    if (timestamp == null) return 'Unknown';
+
+    try {
+      DateTime dateTime;
+      if (timestamp is String) {
+        dateTime = DateTime.parse(timestamp);
+      } else {
+        dateTime = timestamp as DateTime;
+      }
+
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+
+      if (messageDate == today) {
+        // Today - show time
+        final hour = dateTime.hour > 12
+            ? dateTime.hour - 12
+            : (dateTime.hour == 0 ? 12 : dateTime.hour);
+        final minute = dateTime.minute.toString().padLeft(2, '0');
+        final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+        return '$hour:$minute $period';
+      } else if (messageDate == today.subtract(Duration(days: 1))) {
+        // Yesterday
+        return 'Yesterday';
+      } else {
+        // Older dates
+        return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+      }
+    } catch (e) {
+      return 'Unknown';
     }
   }
 
@@ -245,165 +252,100 @@ class _MessagesScreenState extends State<MessagesScreen> {
     return filtered;
   }
 
+  /*
   void _filterByCategory(String category) {
     if (_isDisposed) return;
 
+    // Map localized strings to internal keys
+    String internalCategory;
+    final localizations = AppLocalizations.of(context)!;
+
+    if (category == localizations.all) {
+      internalCategory = 'All';
+    } else if (category == localizations.unread) {
+      internalCategory = 'Unread';
+    } else if (category == localizations.archive) {
+      internalCategory = 'Archive';
+    } else {
+      internalCategory = category; // fallback
+    }
+
     setState(() {
-      _selectedCategory = category;
-      _filteredMessages = _filterMessagesByCategory(category);
+      _selectedCategory = internalCategory;
+      _filteredMessages = _filterMessagesByCategory(internalCategory);
     });
   }
+  */
 
   @override
   Widget build(BuildContext context) {
+    /*
+    if (_isRefreshing) {
+      return const FootballLoadingWidget(); // No AppBar or Footer here
+    }
+    */
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1B2C4F),
         elevation: 2,
         toolbarHeight: 50,
-        title: const Padding(
-          padding: EdgeInsets.only(left: 16),
-          child: Text(
-            "Messages",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Poppins',
-              color: Colors.white,
-            ),
+        leading: Container(
+          margin: const EdgeInsets.fromLTRB(8, 3, 0, 8),
+          child: IconButton(
+            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+            onPressed: () {
+              /*
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              } else {
+                // If there's no previous route, navigate to home screen (index 0)
+                NavigationService.navigateToScreen(0);
+              }
+              */
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            },
+          ),
+        ),
+        title: Text(
+          // AppLocalizations.of(context)!.messages,
+          'Messages',
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Poppins',
+            color: Colors.white,
           ),
         ),
         centerTitle: false,
-        automaticallyImplyLeading: false,
-        leadingWidth: 20,
+        leadingWidth: 56,
       ),
       body: SafeArea(
         child: Column(
           children: [
             _buildSearchBar(),
-            _buildMessageCategories(),
+            // _buildMessageCategories(),
             Expanded(
-              child: _isRefreshing
-                  ? const Center(child: CircularProgressIndicator())
-                  : RefreshIndicator(
-                      key: _refreshIndicatorKey,
-                      onRefresh: _refreshMessages,
-                      color: const Color(0xFF1B2C4F),
-                      child: _filteredMessages.isEmpty
-                          ? _buildEmptyState()
-                          : _buildMessageList(),
-                    ),
+              child: _filteredMessages.isEmpty
+                  ? _buildEmptyState()
+                  : _buildMessageList(),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF1B2C4F),
-        onPressed: () {
-          _showNewChatOptions();
-        },
-        child: const Icon(Icons.edit_outlined, color: Colors.white),
-      ),
-      bottomNavigationBar: AppFooter(
-        currentIndex: 3,
-        onTabSelected: (index) {
-          if (index == 0) {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    const HomeScreen(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
-          } else if (index == 1) {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    const SearchScreen(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
-          } else if (index == 3) {
-            // Already on Messages tab, do nothing
-          }
-        },
-      ),
+      // bottomNavigationBar: UnifiedAppFooter(currentIndex: 2),
     );
   }
 
-  void _showNewChatOptions() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.25,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                width: 50,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              const Text(
-                "New Conversation",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1B2C4F),
-                  fontFamily: 'Poppins',
-                ),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: _buildNewChatOption(
-                    icon: Icons.sports,
-                    title: "Find Facilities",
-                    subtitle: "Browse and message sports facilities",
-                    color: const Color(0xFF1B2C4F),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNewChatOption({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color color,
-  }) {
+  Widget _buildSearchBar() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: const Color(0xFF1B2C4F).withOpacity(0.1),
-          width: 1,
-        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -412,146 +354,53 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            Navigator.pop(context);
-            // Implement the specific action
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icon, color: color, size: 24),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF2D3142),
-                          fontSize: 16,
-                          fontFamily: 'Poppins',
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          color: const Color(0xFF2D3142).withOpacity(0.7),
-                          fontSize: 14,
-                          fontFamily: 'Poppins',
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.chevron_right,
-                  color: const Color(0xFF1B2C4F).withOpacity(0.5),
-                  size: 20,
-                ),
-              ],
-            ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: _filterMessages,
+        keyboardType: TextInputType.text,
+        textInputAction: TextInputAction.search,
+        decoration: InputDecoration(
+          // hintText: AppLocalizations.of(context)!.searchMessages,
+          hintText: 'Search messages',
+          hintStyle: TextStyle(
+            color: const Color(0xFF1B2C4F).withOpacity(0.5),
+            fontFamily: 'Poppins',
           ),
+          prefixIcon: const Icon(
+            Icons.search,
+            color: Color(0xFF1B2C4F),
+            size: 20,
+          ),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(
+                    Icons.clear,
+                    color: Color(0xFF1B2C4F),
+                    size: 20,
+                  ),
+                  tooltip: 'Clear search',
+                  onPressed: () {
+                    setState(() {
+                      _searchController.clear();
+                      _filterMessages('');
+                    });
+                  },
+                )
+              : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+          isDense: true,
         ),
       ),
     );
   }
 
-  Widget _buildSearchBar() {
-    return Container(
-      margin: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF1B2C4F).withOpacity(0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Row(
-          children: [
-            const Icon(
-              Icons.search_outlined,
-              color: Color(0xFF1B2C4F),
-              size: 22,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: TextField(
-                controller: _searchController,
-                keyboardType: TextInputType.text,
-                textInputAction: TextInputAction.search,
-                style: const TextStyle(
-                  fontSize: 14,
-                  //fontFamily: 'Poppins',
-                  color: Color(0xFF1B2C4F),
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Search conversations...',
-                  hintStyle: TextStyle(
-                    color: const Color(0xFF1B2C4F).withOpacity(0.4),
-                    fontSize: 14,
-                    //fontFamily: 'Poppins',
-                  ),
-                  border: InputBorder.none,
-                  isCollapsed: true,
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    _filterMessages(value);
-                  });
-                },
-                onSubmitted: (value) {
-                  setState(() {
-                    _searchController.clear();
-                    _filterMessages('');
-                  });
-                },
-              ),
-            ),
-            if (_searchController.text.isNotEmpty)
-              IconButton(
-                icon: const Icon(
-                  Icons.clear_rounded,
-                  color: Color(0xFF1B2C4F),
-                  size: 20,
-                ),
-                tooltip: 'Clear search',
-                onPressed: () {
-                  setState(() {
-                    _searchController.clear();
-                    _filterMessages('');
-                  });
-                },
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
+  /*
   Widget _buildMessageCategories() {
     return Container(
       height: 40,
@@ -561,14 +410,25 @@ class _MessagesScreenState extends State<MessagesScreen> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
-          _buildCategoryChip('All', _selectedCategory == 'All'),
-          _buildCategoryChip('Unread', _selectedCategory == 'Unread'),
-          _buildCategoryChip('Archive', _selectedCategory == 'Archive'),
+          _buildCategoryChip(
+            AppLocalizations.of(context)!.all,
+            _selectedCategory == 'All',
+          ),
+          _buildCategoryChip(
+            AppLocalizations.of(context)!.unread,
+            _selectedCategory == 'Unread',
+          ),
+          _buildCategoryChip(
+            AppLocalizations.of(context)!.archive,
+            _selectedCategory == 'Archive',
+          ),
         ],
       ),
     );
   }
+  */
 
+  /*
   Widget _buildCategoryChip(String label, bool isSelected) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
@@ -608,6 +468,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
       ),
     );
   }
+  */
 
   Widget _buildMessageList() {
     return ListView.builder(
@@ -670,15 +531,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
 
+    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Conversation with ${message.name} archived'),
+        content: Text(
+          '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.archived}',
+        ),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
-          label: 'Undo',
+          label: AppLocalizations.of(context)!.undo,
           textColor: Colors.white,
           onPressed: () {
             setState(() {
@@ -689,6 +553,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
     );
+    */
   }
 
   void _pinMessage(ChatMessage message) {
@@ -697,18 +562,20 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
 
+    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           message.isPinned
-              ? 'Conversation with ${message.name} pinned'
-              : 'Conversation with ${message.name} unpinned',
+              ? '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.pinned}'
+              : '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.unpinned}',
         ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 2),
       ),
     );
+    */
   }
 
   void _muteMessage(ChatMessage message) {
@@ -717,18 +584,20 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
 
+    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           message.isMuted
-              ? 'Notifications muted for ${message.name}'
-              : 'Notifications unmuted for ${message.name}',
+              ? '${AppLocalizations.of(context)!.notificationsMuted} ${message.name}'
+              : '${AppLocalizations.of(context)!.notificationsUnmuted} ${message.name}',
         ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 2),
       ),
     );
+    */
   }
 
   void _unarchiveMessage(ChatMessage message) {
@@ -737,15 +606,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
 
+    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Conversation with ${message.name} unarchived'),
+        content: Text(
+          '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.unarchived}',
+        ),
         backgroundColor: Colors.blue,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
-          label: 'Undo',
+          label: AppLocalizations.of(context)!.undo,
           textColor: Colors.white,
           onPressed: () {
             setState(() {
@@ -756,26 +628,30 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
     );
+    */
   }
 
   void _deleteMessage(ChatMessage message) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.delete_outline, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Delete Conversation'),
+            const Icon(Icons.delete_outline, color: Colors.red),
+            const SizedBox(width: 8),
+            // Text(AppLocalizations.of(context)!.deleteChat),
+            Text('Delete Chat'),
           ],
         ),
         content: Text(
-          'Are you sure you want to delete the conversation with ${message.name}?',
+          // '${AppLocalizations.of(context)!.deleteChatConfirmation} ${message.name}?',
+          'Are you sure you want to delete chat with ${message.name}?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            // child: Text(AppLocalizations.of(context)!.cancel),
+            child: Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -787,9 +663,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 );
               });
 
+              /*
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Conversation with ${message.name} deleted'),
+                  content: Text(
+                    '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.deleted}',
+                  ),
                   backgroundColor: Colors.red,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
@@ -797,7 +676,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   ),
                   duration: const Duration(seconds: 3),
                   action: SnackBarAction(
-                    label: 'Undo',
+                    label: AppLocalizations.of(context)!.undo,
                     textColor: Colors.white,
                     onPressed: () {
                       setState(() {
@@ -810,9 +689,17 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   ),
                 ),
               );
+              */
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            // child: Text(
+            //   AppLocalizations.of(context)!.delete,
+            //   style: const TextStyle(color: Colors.white),
+            // ),
+            child: const Text(
+              'Delete',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -836,7 +723,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                _isSearching ? 'No results found' : 'No conversations yet',
+                _isSearching
+                    // ? AppLocalizations.of(context)!.noResultsFound
+                    // : AppLocalizations.of(context)!.noCustomerMessagesYet,
+                    ? 'No results found'
+                    : 'No customer messages yet',
                 style: const TextStyle(
                   fontSize: 20,
                   color: Color(0xFF2D3142),
@@ -848,8 +739,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Text(
                   _isSearching
-                      ? 'Try different keywords or check for typos'
-                      : 'Start chatting with sports facilities to book your next game',
+                      // ? AppLocalizations.of(context)!.tryDifferentKeywords
+                      // : AppLocalizations.of(context)!.whenCustomersInquire,
+                      ? 'Try different keywords'
+                      : 'When customers inquire, you will see their messages here.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
@@ -880,7 +773,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Tip: Message facilities directly to check availability',
+                          // AppLocalizations.of(context)!.tipRespondQuickly,
+                          'Tip: Respond quickly to increase your chances of booking.',
                           style: const TextStyle(
                             color: Color(0xFF1B2C4F),
                             fontSize: 13,
@@ -890,25 +784,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
                         ),
                       ),
                     ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    _showNewChatOptions();
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text('Start New Conversation'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1B2C4F),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
                   ),
                 ),
               ],
@@ -923,7 +798,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   void dispose() {
     _isDisposed = true;
     _searchController.dispose();
-    _debounceTimer?.cancel();
+    _debounceTimer?.cancel(); // Cancel timer to prevent memory leaks
     super.dispose();
   }
 }
@@ -1096,7 +971,7 @@ class ChatTile extends StatelessWidget {
                   Icons.archive_outlined,
                   color: Colors.green,
                 ),
-                title: const Text('Archive Conversation'),
+                title: const Text('Archive Chat'),
                 onTap: () {
                   Navigator.pop(context);
                   onArchive();
@@ -1108,7 +983,7 @@ class ChatTile extends StatelessWidget {
                   color: const Color(0xFF1B2C4F),
                 ),
                 title: Text(
-                  message.isPinned ? 'Unpin Conversation' : 'Pin Conversation',
+                  message.isPinned ? 'Unpin Chat' : 'Pin Chat',
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -1123,9 +998,7 @@ class ChatTile extends StatelessWidget {
                   color: const Color(0xFF1B2C4F),
                 ),
                 title: Text(
-                  message.isMuted
-                      ? 'Unmute Notifications'
-                      : 'Mute Notifications',
+                  message.isMuted ? 'Unmute Notifications' : 'Mute Notifications',
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -1138,7 +1011,7 @@ class ChatTile extends StatelessWidget {
                   Icons.unarchive_outlined,
                   color: Colors.blue,
                 ),
-                title: const Text('Unarchive Conversation'),
+                title: const Text('Unarchive Chat'),
                 onTap: () {
                   Navigator.pop(context);
                   onUnarchive();
@@ -1147,7 +1020,7 @@ class ChatTile extends StatelessWidget {
             ],
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text('Delete Conversation'),
+              title: const Text('Delete Chat'),
               onTap: () {
                 Navigator.pop(context);
                 onMore();
@@ -1175,31 +1048,25 @@ class ChatTile extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
-        child: Image.asset(
-          message.avatarUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              color: const Color(0xFF1B2C4F).withOpacity(0.1),
-              child: Center(
-                child: Text(
-                  message.name.isNotEmpty ? message.name[0] : '?',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1B2C4F),
-                  ),
-                ),
+        child: Container(
+          color: const Color(0xFF1B2C4F).withOpacity(0.1),
+          child: Center(
+            child: Text(
+              message.name.isNotEmpty ? message.name[0] : '?',
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1B2C4F),
               ),
-            );
-          },
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-// Chat Screen
+// Keep the existing ChatScreen class as is but update the AppBar
 class ChatScreen extends StatefulWidget {
   final ChatMessage chatMessage;
 
@@ -1214,7 +1081,24 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
   bool _showAttachments = false;
+  bool _showQuickReplies = false;
   late List<Message> messages;
+
+  // Quick replies for vendors
+  /*
+  List<String> _getQuickReplies(BuildContext context) {
+    return [
+      AppLocalizations.of(context)!.thankYouInquiry,
+      AppLocalizations.of(context)!.checkAvailability,
+      AppLocalizations.of(context)!.ratesStartFrom,
+      AppLocalizations.of(context)!.whatTimeWorks,
+      AppLocalizations.of(context)!.availabilityThisWeek,
+      AppLocalizations.of(context)!.sendBookingForm,
+      AppLocalizations.of(context)!.thanksForChoosing,
+      AppLocalizations.of(context)!.howManyPeople,
+    ];
+  }
+  */
 
   @override
   void initState() {
@@ -1260,7 +1144,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   },
                 ),
               ),
-              _buildAttachmentSection(),
               _buildMessageInput(),
             ],
           ),
@@ -1286,22 +1169,16 @@ class _ChatScreenState extends State<ChatScreen> {
           CircleAvatar(
             backgroundColor: Colors.white.withOpacity(0.2),
             radius: 16,
-            backgroundImage: AssetImage(widget.chatMessage.avatarUrl),
-            onBackgroundImageError: (exception, stackTrace) {
-              // Handle image error
-            },
-            child: widget.chatMessage.avatarUrl.isEmpty
-                ? Text(
-                    widget.chatMessage.name.isNotEmpty
-                        ? widget.chatMessage.name[0]
-                        : '?',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  )
-                : null,
+            child: Text(
+              widget.chatMessage.name.isNotEmpty
+                  ? widget.chatMessage.name[0]
+                  : '?',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1322,9 +1199,12 @@ class _ChatScreenState extends State<ChatScreen> {
         IconButton(
           icon: const Icon(Icons.call_outlined, color: Colors.white, size: 20),
           onPressed: () {
+            /*
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Calling ${widget.chatMessage.name}...'),
+                content: Text(
+                  '${AppLocalizations.of(context)!.calling} ${widget.chatMessage.name}...',
+                ),
                 backgroundColor: const Color(0xFF1B2C4F),
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
@@ -1333,6 +1213,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 duration: Duration(seconds: 2),
               ),
             );
+            */
           },
         ),
         IconButton(
@@ -1356,37 +1237,33 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.info_outline, color: Color(0xFF1B2C4F)),
-              title: const Text('View Facility Info'),
-              onTap: () {
-                Navigator.pop(context);
-                // Implement facility info view
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.block, color: Colors.red),
-              title: const Text('Block Facility'),
+              // title: Text(AppLocalizations.of(context)!.blockUser),
+              title: Text('Block User'),
               onTap: () {
-                Navigator.pop(context);
                 // Implement block functionality
+                Navigator.pop(context);
               },
             ),
             ListTile(
               leading: const Icon(Icons.report_problem, color: Colors.orange),
-              title: const Text('Report'),
+              // title: Text(AppLocalizations.of(context)!.report),
+              title: Text('Report'),
               onTap: () {
-                Navigator.pop(context);
                 // Implement report functionality
+                Navigator.pop(context);
               },
             ),
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text('Clear Chat'),
+              // title: Text(AppLocalizations.of(context)!.clearChat),
+              title: Text('Clear Chat'),
               onTap: () {
-                Navigator.pop(context);
+                // Implement clear chat functionality
                 setState(() {
                   messages.clear();
                 });
+                Navigator.pop(context);
               },
             ),
           ],
@@ -1458,170 +1335,212 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget _buildAttachmentSection() {
-    if (!_showAttachments) return const SizedBox.shrink();
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildAttachmentOption(Icons.image, 'Photo'),
-          _buildAttachmentOption(Icons.camera_alt, 'Camera'),
-          _buildAttachmentOption(Icons.location_on, 'Location'),
-          _buildAttachmentOption(Icons.file_copy, 'Document'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAttachmentOption(IconData icon, String label) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _showAttachments = false;
-        });
-        // Implement attachment functionality
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F6FA),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: const Color(0xFF1B2C4F)),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF1B2C4F)),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildMessageInput() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
+    return Column(
+      children: [
+        // Quick replies section
+        /*
+        if (_showQuickReplies)
+          Container(
+            padding: const EdgeInsets.all(16),
+            color: Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.quickReplies,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1B2C4F),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _getQuickReplies(context)
+                      .map(
+                        (reply) => InkWell(
+                          onTap: () {
+                            _messageController.text = reply;
+                            setState(() {
+                              _showQuickReplies = false;
+                            });
+                            _focusNode.requestFocus();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF5F6FA),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: const Color(0xFF1B2C4F).withOpacity(0.2),
+                              ),
+                            ),
+                            child: Text(
+                              reply,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF1B2C4F),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.attach_file, color: Color(0xFF1B2C4F)),
-            onPressed: () {
-              setState(() {
-                _showAttachments = !_showAttachments;
-              });
-              _focusNode.unfocus();
-            },
-          ),
-          Expanded(
-            child: TextField(
-              controller: _messageController,
-              focusNode: _focusNode,
-              decoration: InputDecoration(
-                hintText: 'Type a message...',
-                hintStyle: TextStyle(
-                  color: const Color(0xFF1B2C4F).withOpacity(0.5),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(24),
-                  borderSide: BorderSide.none,
-                ),
-                filled: true,
-                fillColor: const Color(0xFFF5F6FA),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                isDense: true,
+        */
+
+        // Message input
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, -2),
               ),
-              maxLines: 4,
-              minLines: 1,
-              textCapitalization: TextCapitalization.sentences,
-              onChanged: (text) {
-                setState(() {}); // Rebuild to update send button state
-              },
-            ),
+            ],
           ),
-          const SizedBox(width: 8),
-          CircleAvatar(
-            backgroundColor: _messageController.text.trim().isEmpty
-                ? const Color(0xFF1B2C4F).withOpacity(0.5)
-                : const Color(0xFF1B2C4F),
-            child: IconButton(
-              icon: const Icon(Icons.send, color: Colors.white, size: 20),
-              onPressed: _messageController.text.trim().isEmpty
-                  ? null
-                  : _sendMessage,
-            ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.flash_on,
+                  color: _showQuickReplies
+                      ? const Color(0xFF1B2C4F)
+                      : const Color(0xFF1B2C4F).withOpacity(0.5),
+                ),
+                onPressed: () {
+                  setState(() {
+                    _showQuickReplies = !_showQuickReplies;
+                  });
+                  _focusNode.unfocus();
+                },
+              ),
+              Expanded(
+                child: TextField(
+                  controller: _messageController,
+                  focusNode: _focusNode,
+                  decoration: InputDecoration(
+                    // hintText: AppLocalizations.of(context)!.typeAMessage,
+                    hintText: 'Type a message',
+                    hintStyle: TextStyle(
+                      color: const Color(0xFF1B2C4F).withOpacity(0.5),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(24),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: const Color(0xFFF5F6FA),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    isDense: true,
+                  ),
+                  maxLines: 4,
+                  minLines: 1,
+                  textCapitalization: TextCapitalization.sentences,
+                  onChanged: (text) {
+                    setState(() {});
+                  },
+                ),
+              ),
+              const SizedBox(width: 8),
+              CircleAvatar(
+                backgroundColor: _messageController.text.trim().isEmpty
+                    ? const Color(0xFF1B2C4F).withOpacity(0.5)
+                    : const Color(0xFF1B2C4F),
+                child: IconButton(
+                  icon: const Icon(Icons.send, color: Colors.white, size: 20),
+                  onPressed: _messageController.text.trim().isEmpty
+                      ? null
+                      : _sendMessage,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     if (_messageController.text.trim().isEmpty) return;
 
-    final newMessage = Message(
-      content: _messageController.text.trim(),
-      time: 'Just now',
-      isSentByMe: true,
-    );
+    final messageContent = _messageController.text.trim();
 
+    _messageController.clear();
     setState(() {
-      messages.add(newMessage);
-      widget.chatMessage.messages = messages;
-      widget.chatMessage.lastMessage = _messageController.text.trim();
-      _messageController.clear();
+      _showQuickReplies = false;
     });
 
-    // Simulate auto-reply from facility
-    Future.delayed(Duration(seconds: 2), () {
-      if (mounted) {
-        final autoReplyMessages = [
-          "Thanks for your message! I'll check availability and get back to you.",
-          "Hi! Thanks for reaching out. Let me look into that for you.",
-          "Got your inquiry! I'll send you the details shortly.",
-          "Thank you for contacting us. I'll respond with more information soon.",
-        ];
-
-        final autoReply =
-            autoReplyMessages[DateTime.now().millisecond %
-                autoReplyMessages.length];
-
-        setState(() {
-          messages.add(
-            Message(content: autoReply, time: 'Just now', isSentByMe: false),
-          );
-          widget.chatMessage.lastMessage = autoReply;
-          widget.chatMessage.unreadCount = 1;
-        });
+    try {
+      /*
+      if (widget.chatMessage.conversationId != null) {
+        await SupabaseService.sendChatMessage(
+          widget.chatMessage.conversationId!,
+          messageContent,
+          true,
+        );
       }
-    });
+      */
 
-    // Scroll to bottom
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-      }
-    });
+      final newMessage = Message(
+        content: messageContent,
+        time: _formatCurrentTime(),
+        isSentByMe: true,
+      );
+
+      setState(() {
+        messages.add(newMessage);
+        widget.chatMessage.messages = messages;
+        widget.chatMessage.lastMessage = messageContent;
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+        }
+      });
+    } catch (e) {
+      print('Error sending message: $e');
+
+      /*
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to send message: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      */
+
+      _messageController.text = messageContent;
+    }
+  }
+
+  // Helper method to format current time
+  String _formatCurrentTime() {
+    final now = DateTime.now();
+    final hour = now.hour > 12
+        ? now.hour - 12
+        : (now.hour == 0 ? 12 : now.hour);
+    final minute = now.minute.toString().padLeft(2, '0');
+    final period = now.hour >= 12 ? 'PM' : 'AM';
+    return '$hour:$minute $period';
   }
 
   @override
