@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, file_names, avoid_print, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'help_support.dart';
 import 'settings.dart'; // Import the settings screen
 
@@ -52,9 +53,6 @@ class UserProfileScreen extends StatefulWidget {
 // Mock Authentication Service
 class MockAuthService {
   Future<Map<String, dynamic>> getCurrentUser() async {
-    // Remove the artificial delay
-    // await Future.delayed(const Duration(seconds: 1));
-
     // Return mock user data immediately
     return {
       'id': '12345',
@@ -84,6 +82,15 @@ class MockUserService {
   }
 }
 
+// Country code data
+class CountryCode {
+  final String name;
+  final String code;
+  final String flag;
+
+  CountryCode({required this.name, required this.code, required this.flag});
+}
+
 class _UserProfileScreenState extends State<UserProfileScreen> {
   // Scroll tracking
   final ScrollController _scrollController = ScrollController();
@@ -93,19 +100,33 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final MockAuthService _authRepository = MockAuthService();
   final MockUserService _userRepository = MockUserService();
 
-  // User data and loading state - start with loading as false
+  // User data and loading state
   Map<String, dynamic>? _user;
-  bool _isLoading = false; // Change from true to false
+  bool _isLoading = false;
 
   // Add dropdown functionality
   bool _activitiesExpanded = false;
   bool _venuesExpanded = false;
 
+  // Country codes list
+  final List<CountryCode> _countryCodes = [
+    CountryCode(name: 'Sri Lanka', code: '+94', flag: '🇱🇰'),
+    CountryCode(name: 'India', code: '+91', flag: '🇮🇳'),
+    CountryCode(name: 'United States', code: '+1', flag: '🇺🇸'),
+    CountryCode(name: 'United Kingdom', code: '+44', flag: '🇬🇧'),
+    CountryCode(name: 'Australia', code: '+61', flag: '🇦🇺'),
+    CountryCode(name: 'Canada', code: '+1', flag: '🇨🇦'),
+    CountryCode(name: 'Germany', code: '+49', flag: '🇩🇪'),
+    CountryCode(name: 'France', code: '+33', flag: '🇫🇷'),
+    CountryCode(name: 'Japan', code: '+81', flag: '🇯🇵'),
+    CountryCode(name: 'Singapore', code: '+65', flag: '🇸🇬'),
+  ];
+
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    _loadUserProfile(); // This will now load instantly
+    _loadUserProfile();
   }
 
   void _onScroll() {
@@ -128,17 +149,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   // Load user profile from repository
   Future<void> _loadUserProfile() async {
-    // Remove the loading state delay
-    // setState(() {
-    //   _isLoading = true;
-    // });
-
     try {
       final userData = await _authRepository.getCurrentUser();
 
       setState(() {
         _user = userData;
-        _isLoading = false; // Set loading to false immediately
+        _isLoading = false;
       });
     } catch (e) {
       print('Error loading user profile: $e');
@@ -146,6 +162,33 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  // Helper method to format Sri Lankan phone number
+  String _formatSriLankanNumber(String phone) {
+    // Remove all non-digit characters
+    String digitsOnly = phone.replaceAll(RegExp(r'[^\d]'), '');
+
+    // If it starts with 94, remove it
+    if (digitsOnly.startsWith('94')) {
+      digitsOnly = digitsOnly.substring(2);
+    }
+
+    // If it starts with 0, remove it
+    if (digitsOnly.startsWith('0')) {
+      digitsOnly = digitsOnly.substring(1);
+    }
+
+    return digitsOnly;
+  }
+
+  // Helper method to get country code from phone number
+  CountryCode _getCountryCodeFromPhone(String phone) {
+    if (phone.startsWith('+94')) {
+      return _countryCodes.firstWhere((c) => c.code == '+94');
+    }
+    // Default to Sri Lanka
+    return _countryCodes.firstWhere((c) => c.code == '+94');
   }
 
   // Helper method to build profile detail items
@@ -288,7 +331,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // Method to build action buttons - matching vendor screen
+  // Method to build action buttons
   Widget _buildActionButton({
     required IconData icon,
     required String label,
@@ -299,7 +342,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }) {
     return Expanded(
       child: Container(
-        height: 85, // Increased height from 85 to 95
+        height: 85,
         margin: const EdgeInsets.symmetric(horizontal: 4),
         child: ElevatedButton(
           onPressed: onPressed,
@@ -312,10 +355,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(color: Colors.grey.shade200, width: 1),
             ),
-            padding: const EdgeInsets.symmetric(
-              vertical: 8,
-              horizontal: 4,
-            ), // Adjusted padding
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -325,12 +365,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 10, // Reduced from 13 to 12
+                  fontSize: 10,
                   fontWeight: FontWeight.w500,
                   color: textColor ?? textDarkColor,
                 ),
                 textAlign: TextAlign.center,
-                maxLines: 2, // Allow text to wrap to 2 lines
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
             ],
@@ -353,7 +393,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // Help and Support action
   // Help and Support action
   void _showHelpAndSupport() {
     Navigator.push(
@@ -404,60 +443,74 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // Helper method for form fields (payment style)
-  Widget _buildPaymentStyleField({
+  // Helper method for modern form fields
+  Widget _buildModernField({
     required TextEditingController controller,
     required String label,
-    required IconData icon,
     required String hint,
     int maxLines = 1,
     TextInputType keyboardType = TextInputType.text,
     bool readOnly = false,
+    Widget? suffix,
+    List<TextInputFormatter>? inputFormatters,
   }) {
-    return TextFormField(
-      controller: controller,
-      maxLines: maxLines,
-      keyboardType: keyboardType,
-      readOnly: readOnly,
-      style: const TextStyle(fontSize: 14),
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hint,
-        prefixIcon: Icon(icon, size: 18, color: primaryColor.withOpacity(0.7)),
-        filled: true,
-        fillColor: Colors.white,
-        floatingLabelStyle: const TextStyle(
-          color: primaryColor,
-          fontWeight: FontWeight.w600,
-          fontSize: 12,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: Colors.grey[700],
+          ),
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 14,
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          maxLines: maxLines,
+          keyboardType: keyboardType,
+          readOnly: readOnly,
+          inputFormatters: inputFormatters,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(
+              color: Colors.grey[400],
+              fontWeight: FontWeight.normal,
+            ),
+            suffixIcon: suffix,
+            filled: true,
+            fillColor: Colors.grey[50],
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.grey[300]!),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: primaryColor, width: 2),
+            ),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'This field is required';
+            }
+            return null;
+          },
         ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: primaryColor, width: 2),
-        ),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'This field is required';
-        }
-        return null;
-      },
+      ],
     );
   }
 
-  // Method to show edit profile dialog
+  // Method to show edit profile dialog with new UI
   void _showEditProfileDialog() {
     if (_user == null) {
       return;
@@ -477,7 +530,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       text: _user!['address'] ?? '',
     );
     final emailController = TextEditingController(text: _user!['email'] ?? '');
-    final phoneController = TextEditingController(text: _user!['phone'] ?? '');
+
+    // Extract country code and phone number
+    final currentPhone = _user!['phone'] ?? '';
+    CountryCode selectedCountryCode = _getCountryCodeFromPhone(currentPhone);
+    final phoneController = TextEditingController(
+      text: _formatSriLankanNumber(currentPhone),
+    );
+
     final formKey = GlobalKey<FormState>();
 
     showModalBottomSheet(
@@ -486,44 +546,53 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (context, setModalState) {
             return Container(
-              height: MediaQuery.of(context).size.height * 0.9,
+              height: MediaQuery.of(context).size.height * 0.92,
               decoration: const BoxDecoration(
-                color: backgroundColor,
+                color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: Column(
                 children: [
-                  // Header
+                  // Header with close button
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    child: Column(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
+                    decoration: BoxDecoration(
+                      color: primaryColor,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(20),
+                      ),
+                    ),
+                    child: Row(
                       children: [
-                        // Drag handle
-                        Container(
-                          margin: const EdgeInsets.only(top: 8),
-                          width: 40,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade300,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
                         const Text(
                           'Edit Profile',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 20,
                             fontWeight: FontWeight.w600,
-                            color: primaryColor,
+                            color: Colors.white,
                           ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
                       ],
                     ),
                   ),
 
-                  // Form Area
+                  // Form content
                   Expanded(
                     child: Form(
                       key: formKey,
@@ -532,256 +601,346 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                           bottom: MediaQuery.of(context).viewInsets.bottom + 20,
                           left: 20,
                           right: 20,
-                          top: 20,
+                          top: 24,
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Profile image section
-                            Center(
-                              child: Stack(
+                            // Description (Status)
+                            _buildModernField(
+                              controller: nameController,
+                              label: "Full Name",
+                              hint: "Jhon Doe",
+                              maxLines: 1,
+                            ),
+                            const SizedBox(height: 8),
+
+                            _buildModernField(
+                              controller: statusController,
+                              label: "Stats",
+                              hint: "Cricket Enthusiastic",
+                              maxLines: 1,
+                            ),
+                            const SizedBox(height: 8),
+
+                            // Location with icon
+                            _buildModernField(
+                              controller: locationController,
+                              label: "Country/City",
+                              hint: "Srilanka",
+                              suffix: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Container(
-                                    width: 100,
-                                    height: 100,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(
-                                        color: primaryColor,
-                                        width: 2,
-                                      ),
-                                      color: primaryColor.withOpacity(0.1),
-                                    ),
-                                    child: const Icon(
-                                      Icons.person,
-                                      size: 50,
-                                      color: primaryColor,
-                                    ),
+                                  Icon(
+                                    Icons.edit,
+                                    size: 20,
+                                    color: Colors.grey[600],
                                   ),
-                                  Positioned(
-                                    bottom: 0,
-                                    right: 0,
-                                    child: Container(
-                                      padding: const EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color: primaryColor,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: Colors.white,
-                                          width: 2,
-                                        ),
-                                      ),
-                                      child: const Icon(
-                                        Icons.camera_alt,
-                                        color: Colors.white,
-                                        size: 16,
-                                      ),
-                                    ),
+                                  const SizedBox(width: 8),
+                                  Icon(
+                                    Icons.location_on,
+                                    size: 20,
+                                    color: Colors.grey[600],
                                   ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(height: 30),
-
-                            // Form sections
-                            const Text(
-                              "Personal Information",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: primaryColor,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            _buildPaymentStyleField(
-                              controller: nameController,
-                              label: "Full Name",
-                              icon: Icons.person,
-                              hint: "Your full name",
-                            ),
-                            const SizedBox(height: 14),
-                            _buildPaymentStyleField(
-                              controller: statusController,
-                              label: "Status",
-                              icon: Icons.sports_cricket,
-                              hint: "Brief description about yourself",
-                              maxLines: 2,
                             ),
                             const SizedBox(height: 24),
 
-                            const Text(
-                              "Location & Contact",
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: primaryColor,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            _buildPaymentStyleField(
-                              controller: locationController,
-                              label: "City/Country",
-                              icon: Icons.location_on,
-                              hint: "Your city and country",
-                            ),
-                            const SizedBox(height: 14),
-                            _buildPaymentStyleField(
+                            // Address
+                            _buildModernField(
                               controller: addressController,
                               label: "Address",
-                              icon: Icons.home,
-                              hint: "Your full address",
+                              hint: "Sagara lane",
                             ),
-                            const SizedBox(height: 14),
-                            _buildPaymentStyleField(
+                            const SizedBox(height: 24),
+
+                            // Email Address (read-only)
+                            _buildModernField(
                               controller: emailController,
-                              label: "Email",
-                              icon: Icons.email,
-                              hint: "Your email address",
+                              label: "Email Address",
+                              hint: "knishvaraj@gmail.com",
                               keyboardType: TextInputType.emailAddress,
                               readOnly: true,
                             ),
-                            const SizedBox(height: 14),
-                            _buildPaymentStyleField(
-                              controller: phoneController,
-                              label: "Phone",
-                              icon: Icons.phone,
-                              hint: "Your phone number",
-                              keyboardType: TextInputType.phone,
-                            ),
+                            const SizedBox(height: 24),
 
-                            const SizedBox(height: 35),
-
-                            // Save Button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 55,
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  if (formKey.currentState!.validate()) {
-                                    try {
-                                      final userId = _user!['id'];
-
-                                      final result = await _userRepository
-                                          .updateUserProfile(
-                                            userId: userId,
-                                            userData: {
-                                              'full_name': nameController.text,
-                                              'status': statusController.text,
-                                              'location':
-                                                  locationController.text,
-                                              'address': addressController.text,
-                                              'phone': phoneController.text,
-                                            },
-                                          );
-
-                                      if (result) {
-                                        // Update local data
-                                        setState(() {
-                                          _user!['full_name'] =
-                                              nameController.text;
-                                          _user!['status'] =
-                                              statusController.text;
-                                          _user!['location'] =
-                                              locationController.text;
-                                          _user!['address'] =
-                                              addressController.text;
-                                          _user!['phone'] =
-                                              phoneController.text;
-                                        });
-
-                                        // Close dialog
-                                        Navigator.pop(context);
-
-                                        // Show success message
-                                        _showSuccessSnackBar(
-                                          'Profile Updated',
-                                          message:
-                                              "Profile updated successfully",
-                                        );
-                                      } else {
-                                        _showErrorSnackBar(
-                                          'Failed to update profile',
-                                        );
-                                      }
-                                    } catch (e) {
-                                      _showErrorSnackBar(
-                                        'Error: ${e.toString()}',
-                                      );
-                                    }
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: primaryColor,
-                                  foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Save Changes',
+                            // Phone with country code dropdown
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Phone",
                                   style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey[700],
                                   ),
                                 ),
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-
-                            // Cancel Button
-                            SizedBox(
-                              width: double.infinity,
-                              height: 55,
-                              child: TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Colors.grey.shade100,
-                                  foregroundColor: Colors.grey[600],
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                ),
-                                child: const Text(
-                                  'Cancel',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 30),
-
-                            // Privacy note at bottom
-                            Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.security_outlined,
-                                    size: 14,
-                                    color: Colors.grey.shade600,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'Your personal info is stored securely',
-                                    style: TextStyle(
-                                      color: Colors.grey.shade600,
-                                      fontSize: 12,
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    // Country code dropdown
+                                    Container(
+                                      height: 56,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[50],
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: Colors.grey[300]!,
+                                        ),
+                                      ),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton<CountryCode>(
+                                          value: selectedCountryCode,
+                                          items: _countryCodes.map((country) {
+                                            return DropdownMenuItem<
+                                              CountryCode
+                                            >(
+                                              value: country,
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Text(
+                                                    country.flag,
+                                                    style: const TextStyle(
+                                                      fontSize: 18,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    country.code,
+                                                    style: const TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                          onChanged: (CountryCode? newValue) {
+                                            if (newValue != null) {
+                                              setModalState(() {
+                                                selectedCountryCode = newValue;
+                                                // Auto-format phone number when country changes
+                                                if (newValue.code == '+94') {
+                                                  String currentText =
+                                                      phoneController.text;
+                                                  phoneController.text =
+                                                      _formatSriLankanNumber(
+                                                        currentText,
+                                                      );
+                                                }
+                                              });
+                                            }
+                                          },
+                                          icon: const Icon(
+                                            Icons.arrow_drop_down,
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
+                                    const SizedBox(width: 12),
+                                    // Phone number field
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: phoneController,
+                                        keyboardType: TextInputType.phone,
+                                        inputFormatters:
+                                            selectedCountryCode.code == '+94'
+                                            ? [
+                                                FilteringTextInputFormatter
+                                                    .digitsOnly,
+                                                LengthLimitingTextInputFormatter(
+                                                  9,
+                                                ),
+                                              ]
+                                            : [
+                                                FilteringTextInputFormatter
+                                                    .digitsOnly,
+                                              ],
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        decoration: InputDecoration(
+                                          hintText:
+                                              selectedCountryCode.code == '+94'
+                                              ? "75 7288154"
+                                              : "Phone number",
+                                          hintStyle: TextStyle(
+                                            color: Colors.grey[400],
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.grey[50],
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 16,
+                                                vertical: 16,
+                                              ),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey[300]!,
+                                            ),
+                                          ),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: BorderSide(
+                                              color: Colors.grey[300]!,
+                                            ),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                            borderSide: const BorderSide(
+                                              color: primaryColor,
+                                              width: 2,
+                                            ),
+                                          ),
+                                        ),
+                                        onChanged: (value) {
+                                          // Auto-format Sri Lankan numbers
+                                          if (selectedCountryCode.code ==
+                                              '+94') {
+                                            String formatted =
+                                                _formatSriLankanNumber(value);
+                                            if (formatted != value) {
+                                              phoneController
+                                                  .value = TextEditingValue(
+                                                text: formatted,
+                                                selection:
+                                                    TextSelection.collapsed(
+                                                      offset: formatted.length,
+                                                    ),
+                                              );
+                                            }
+                                          }
+                                        },
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Phone number is required';
+                                          }
+                                          if (selectedCountryCode.code ==
+                                                  '+94' &&
+                                              value.length != 9) {
+                                            return 'Invalid Sri Lankan phone number';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                            const SizedBox(height: 20),
+                            //const SizedBox(height: 24),
+
+                            // // Website field (optional)
+                            // _buildModernField(
+                            //   controller: TextEditingController(
+                            //     text: "https://wed.lk",
+                            //   ),
+                            //   label: "Website",
+                            //   hint: "https://wed.lk",
+                            //   keyboardType: TextInputType.url,
+                            // ),
+                            const SizedBox(height: 40),
                           ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Save button at bottom
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, -2),
+                        ),
+                      ],
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (formKey.currentState!.validate()) {
+                            try {
+                              final userId = _user!['id'];
+
+                              // Format final phone number
+                              String finalPhone =
+                                  selectedCountryCode.code +
+                                  phoneController.text;
+
+                              final result = await _userRepository
+                                  .updateUserProfile(
+                                    userId: userId,
+                                    userData: {
+                                      'full_name': nameController.text,
+                                      'status': statusController.text,
+                                      'location': locationController.text,
+                                      'address': addressController.text,
+                                      'phone': finalPhone,
+                                    },
+                                  );
+
+                              if (result) {
+                                // Update local data
+                                setState(() {
+                                  _user!['full_name'] = nameController.text;
+                                  _user!['status'] = statusController.text;
+                                  _user!['location'] = locationController.text;
+                                  _user!['address'] = addressController.text;
+                                  _user!['phone'] = finalPhone;
+                                });
+
+                                // Close dialog
+                                Navigator.pop(context);
+
+                                // Show success message
+                                _showSuccessSnackBar(
+                                  'Profile Updated',
+                                  message: "Profile updated successfully",
+                                );
+                              } else {
+                                _showErrorSnackBar('Failed to update profile');
+                              }
+                            } catch (e) {
+                              _showErrorSnackBar('Error: ${e.toString()}');
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Save Changes',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
