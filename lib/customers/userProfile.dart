@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use, file_names, avoid_print, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'help_support.dart';
 import 'settings.dart'; // Import the settings screen
 
 // Constants for consistent styling - matching vendor screen
@@ -353,8 +354,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   // Help and Support action
+  // Help and Support action
   void _showHelpAndSupport() {
-    _showSuccessSnackBar('Help & Support', message: "Opening help center...");
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            const HelpSupportScreen(),
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
   }
 
   // Logout action
