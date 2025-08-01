@@ -3,10 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../customers/footer.dart';
-// import 'widgets/football_spinner.dart';
-// import '../services/supabase_service.dart';
-// import 'package:provider/provider.dart';
-// import '../providers/date_provider.dart';
+import 'home.dart' as home;
 
 /// Simplified History Screen with user-friendly design
 class HistoryScreen extends StatefulWidget {
@@ -190,7 +187,17 @@ class HistoryScreenState extends State<HistoryScreen> {
                   color: Colors.white,
                   size: 28,
                 ),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  // Navigate to home page with no animation
+                  Navigator.pushReplacement(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) => home.HomeScreen(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
+                },
                 tooltip: 'Back',
               ),
             ),
@@ -211,7 +218,20 @@ class HistoryScreenState extends State<HistoryScreen> {
       bottomNavigationBar: AppFooter(
         currentIndex: 2,
         onTabSelected: (int index) {
-          // No-op or you can add logic if needed
+          if (index != 2) {
+            // Home = 0, Favorites = 1, Bookings = 2, Chat = 3
+            switch (index) {
+              case 0:
+                Navigator.pushReplacementNamed(context, '/');
+                break;
+              case 1:
+                // The AppFooter already handles navigation to favorites
+                break;
+              case 3:
+                Navigator.pushReplacementNamed(context, '/messages');
+                break;
+            }
+          }
         },
       ),
     );
