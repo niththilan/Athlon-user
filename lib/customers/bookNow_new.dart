@@ -597,6 +597,7 @@ class TimeSlotSelectionScreen extends StatefulWidget {
 class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
   Set<String> selectedSlots = {};
   Set<String> selectedForRemoval = {};
+  int _currentFooterIndex = 0; // For footer navigation
 
   List<TimeSlot> timeSlots = [
     TimeSlot('07:00 AM', SlotStatus.available),
@@ -699,6 +700,14 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: AppFooter(
+        currentIndex: _currentFooterIndex,
+        onTabSelected: (index) {
+          setState(() {
+            _currentFooterIndex = index;
+          });
+        },
       ),
     );
   }
@@ -833,7 +842,7 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: Padding(
-                padding: const EdgeInsets.only(top: 16, right: 8),
+                padding: const EdgeInsets.only(top: 0, right: 8),
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
