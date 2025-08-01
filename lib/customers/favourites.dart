@@ -5,6 +5,7 @@ import 'footer.dart';
 
 import 'home.dart';
 import 'courtDetails.dart';
+import 'nearbyVenues.dart';
 
 class FavoritesScreen extends StatefulWidget {
   final List<Map<String, dynamic>> favoriteVenues;
@@ -182,7 +183,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              // Navigate to Nearby Venues screen
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const NearByVenueScreen(),
+                ),
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1B2C4F),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

@@ -323,12 +323,14 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     },
                   ),
 
-                  // Back arrow on top left - Navigate to BookNow
+                  // Back arrow on top left - Go back to previous page
                   Positioned(
                     top: MediaQuery.of(context).padding.top + 12,
                     left: 16,
                     child: GestureDetector(
-                      onTap: _navigateToBookNow,
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
                       child: Container(
                         width: 40,
                         height: 40,
@@ -356,57 +358,28 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                   Positioned(
                     top: MediaQuery.of(context).padding.top + 12,
                     right: 16,
-                    child: Row(
-                      children: [
-                        GestureDetector(
-                          onTap: _toggleFavorite,
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+                    child: GestureDetector(
+                      onTap: _toggleFavorite, // <-- This adds/removes from favorites
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.9),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
                             ),
-                            child: Icon(
-                              _isFavorite ? Icons.favorite : Icons.favorite_border,
-                              color: _isFavorite ? Colors.red : const Color(0xFF050E22),
-                              size: 24,
-                            ),
-                          ),
+                          ],
                         ),
-                        const SizedBox(width: 8),
-                        // Add a favorites icon to navigate to favorites page
-                        GestureDetector(
-                          onTap: _goToFavorites,
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.9),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.favorite,
-                              color: Color(0xFF050E22),
-                              size: 20,
-                            ),
-                          ),
+                        child: Icon(
+                          _isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: _isFavorite ? Colors.red : const Color(0xFF050E22),
+                          size: 24,
                         ),
-                      ],
+                      ),
                     ),
                   ),
 
