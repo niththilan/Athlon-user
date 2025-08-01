@@ -323,7 +323,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
-            height: 44,
+            height: 52,
             child: ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -342,13 +342,13 @@ class _BookNowScreenState extends State<BookNowScreen> {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
                 ),
               ),
               child: const Text(
                 'Continue',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -842,7 +842,7 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
             Align(
               alignment: Alignment.centerRight,
               child: Padding(
-                padding: const EdgeInsets.only(top: 0, right: 8),
+                padding: const EdgeInsets.only(top: 16, right: 8),
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Text(
@@ -923,7 +923,7 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(
-            Icons.sports_cricket,
+            Icons.sports_soccer,
             size: iconSize,
             color: label == 'Available' ? const Color(0xFF666666) : color,
           ),
