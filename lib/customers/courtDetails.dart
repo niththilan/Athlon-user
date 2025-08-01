@@ -1,8 +1,9 @@
-// ignore: file_names
-// ignore_for_file: deprecated_member_use, file_names, duplicate_ignore
+// ignore_for_file: deprecated_member_use, file_names
 
 import 'package:flutter/material.dart';
 import 'footer.dart';
+import 'favourites.dart';
+import 'BookNow.dart'; // Import BookNow.dart
 
 void main() {
   runApp(const MyApp());
@@ -68,6 +69,9 @@ class SportItem {
 class CourtDetailScreen extends StatefulWidget {
   final Map<String, dynamic>? courtData;
 
+  // Static favorites list for demo purposes
+  static List<Map<String, dynamic>> favorites = [];
+
   const CourtDetailScreen({super.key, this.courtData});
 
   @override
@@ -117,7 +121,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeCourtData(); // <-- Ensure this is called first
+    _initializeCourtData();
     _startSlideshow();
   }
 
@@ -166,6 +170,57 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     setState(() {
       _isFavorite = !_isFavorite;
     });
+
+    // Add to favorites if not already present
+    if (_isFavorite) {
+      final favVenue = {
+        'id': _courtDetails['id'],
+        'title': _courtDetails['name'],
+        'location': _courtDetails['location'],
+        'rating': _courtDetails['rating'],
+        'imagePath': 'assets/placeholder.jpg', // Use asset or network as needed
+        'distance': _courtDetails['distance'],
+      };
+
+      // Prevent duplicates
+      if (!CourtDetailScreen.favorites.any((v) => v['id'] == favVenue['id'])) {
+        CourtDetailScreen.favorites.add(favVenue);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Added to favorites')),
+        );
+      }
+    } else {
+      // Remove from favorites
+      CourtDetailScreen.favorites.removeWhere((v) => v['id'] == _courtDetails['id']);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Removed from favorites')),
+      );
+    }
+  }
+
+  // Add this method to navigate to FavoritesScreen
+  void _goToFavorites() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FavoritesScreen(
+          favoriteVenues: CourtDetailScreen.favorites,
+          onRemoveFavorite: (venue) {
+            setState(() {
+              CourtDetailScreen.favorites.removeWhere((v) => v['id'] == venue['id']);
+            });
+          },
+        ),
+      ),
+    );
+  }
+
+  // Navigate back to BookNow screen
+  void _navigateToBookNow() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => BookNowScreen()),
+    );
   }
 
   Widget _buildActionButton(String text, IconData icon, Color backgroundColor, Color textColor, VoidCallback onPressed) {
@@ -201,97 +256,6 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(IconData icon, String title, String subtitle, {VoidCallback? onTap, bool showDivider = true, bool showEdit = false, VoidCallback? onEdit}) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF1F3F5),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: const Color(0xFF050E22),
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF050E22),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF6B7280),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (showEdit && onEdit != null)
-                  GestureDetector(
-                    onTap: onEdit,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF050E22),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                        size: 16,
-                      ),
-                    ),
-                  )
-                else
-                  Icon(
-                    showEdit ? Icons.keyboard_arrow_down : Icons.chevron_right,
-                    color: const Color(0xFF050E22),
-                    size: 24,
-                  ),
               ],
             ),
           ),
@@ -358,33 +322,91 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                       );
                     },
                   ),
-                  
-                  // Top overlay heart icon for favorite
+
+                  // Back arrow on top left - Navigate to BookNow
                   Positioned(
                     top: MediaQuery.of(context).padding.top + 12,
-                    right: 16,
+                    left: 16,
                     child: GestureDetector(
-                      onTap: _toggleFavorite,
+                      onTap: _navigateToBookNow,
                       child: Container(
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.8),
+                          color: Colors.white.withOpacity(0.9),
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
+                              color: Colors.black.withOpacity(0.1),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
                           ],
                         ),
-                        child: Icon(
-                          _isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: _isFavorite ? Colors.red : const Color(0xFF050E22),
-                          size: 24,
+                        child: const Icon(
+                          Icons.arrow_back_ios,
+                          color: Color(0xFF050E22),
+                          size: 20,
                         ),
                       ),
+                    ),
+                  ),
+
+                  // Top overlay heart icon for favorite and favorites navigation
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 12,
+                    right: 16,
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: _toggleFavorite,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.9),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              _isFavorite ? Icons.favorite : Icons.favorite_border,
+                              color: _isFavorite ? Colors.red : const Color(0xFF050E22),
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Add a favorites icon to navigate to favorites page
+                        GestureDetector(
+                          onTap: _goToFavorites,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.9),
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.favorite,
+                              color: Color(0xFF050E22),
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
@@ -476,13 +498,13 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         ],
                       ),
                       const SizedBox(height: 20),
-                      
+
                       // Action Buttons
                       Row(
                         children: [
                           _buildActionButton(
                             'Directions',
-                            Icons.directions, // Using default direction icon
+                            Icons.directions,
                             const Color(0xFF050E22),
                             Colors.white,
                             () {},
@@ -662,7 +684,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                       ),
                       const SizedBox(height: 16),
                       SizedBox(
-                        height: 150, // Reduced from 160 to 150 to prevent overflow
+                        height: 150,
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: _sportsItems.length,
@@ -690,7 +712,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                                     borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                                     child: Image.network(
                                       sport.imageUrl,
-                                      height: 90, // Reduced from 100 to 90
+                                      height: 90,
                                       width: double.infinity,
                                       fit: BoxFit.cover,
                                       errorBuilder: (context, error, stackTrace) {
@@ -705,7 +727,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.all(8), // Reduced from 10 to 8
+                                    padding: const EdgeInsets.all(8),
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
@@ -756,7 +778,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
           ),
         ],
       ),
-      
+
       // Bottom Navigation Bar
       bottomNavigationBar: Container(
         height: 80 + MediaQuery.of(context).padding.bottom,
