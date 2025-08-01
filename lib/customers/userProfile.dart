@@ -64,6 +64,35 @@ class MockAuthService {
       'phone': '+94 71 234 5678',
       'avatar_url': null, // No avatar URL, will use asset image
       'member_since': 'January 2023',
+      'recent_activities': [
+        {
+          'title': 'Played Cricket',
+          'location': 'CR7 Arena',
+          'time': '2 hours ago',
+          'icon': Icons.sports_cricket,
+        },
+        {
+          'title': 'Booked Venue',
+          'location': 'Ark Sports Complex',
+          'time': 'Yesterday',
+          'icon': Icons.calendar_today,
+        },
+        {
+          'title': 'Joined Team',
+          'location': 'Blue Dragons',
+          'time': '2 days ago',
+          'icon': Icons.group_add,
+        },
+      ],
+      'favorite_venues': [
+        {'name': 'CR7 Arena', 'rating': '4.8', 'image': 'assets/cr7.jpg'},
+        {'name': 'Ark Sports', 'rating': '4.6', 'image': 'assets/ark.jpg'},
+        {
+          'name': 'SportHub',
+          'rating': '4.7',
+          'image': 'assets/Ark Sport 2.jpg',
+        },
+      ],
     };
   }
 }
@@ -103,10 +132,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   // User data and loading state
   Map<String, dynamic>? _user;
   bool _isLoading = false;
-
-  // Add dropdown functionality
-  bool _activitiesExpanded = false;
-  bool _venuesExpanded = false;
 
   // Country codes list
   final List<CountryCode> _countryCodes = [
@@ -328,6 +353,28 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         ),
         Text(time, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
       ],
+    );
+  }
+
+  // Helper method to build empty state message
+  Widget _buildEmptyState(String message, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          Icon(icon, size: 48, color: Colors.grey[400]),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            style: TextStyle(
+              color: Colors.grey[500],
+              fontSize: 14,
+              fontStyle: FontStyle.italic,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
@@ -844,17 +891,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                 ),
                               ],
                             ),
-                            //const SizedBox(height: 24),
-
-                            // // Website field (optional)
-                            // _buildModernField(
-                            //   controller: TextEditingController(
-                            //     text: "https://wed.lk",
-                            //   ),
-                            //   label: "Website",
-                            //   hint: "https://wed.lk",
-                            //   keyboardType: TextInputType.url,
-                            // ),
                             const SizedBox(height: 40),
                           ],
                         ),
@@ -1041,6 +1077,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final email = _user!['email'] ?? 'email@example.com';
     final phone = _user!['phone'] ?? 'Phone not set';
     final memberSince = _user!['member_since'] ?? 'January 2023';
+    final recentActivities =
+        _user!['recent_activities'] as List<Map<String, dynamic>>? ?? [];
+    final favoriteVenues =
+        _user!['favorite_venues'] as List<Map<String, dynamic>>? ?? [];
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -1247,7 +1287,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
           const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
-          // Recent Activities Section - with dropdown
+          // Recent Activities Section - Always visible, up to 3 activities
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -1267,56 +1307,35 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _activitiesExpanded = !_activitiesExpanded;
-                        });
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Recent Activities",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: textDarkColor,
-                            ),
-                          ),
-                          Icon(
-                            _activitiesExpanded
-                                ? Icons.keyboard_arrow_up
-                                : Icons.keyboard_arrow_down,
-                            color: primaryColor,
-                            size: 24,
-                          ),
-                        ],
+                    const Text(
+                      "Recent Activities",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: textDarkColor,
                       ),
                     ),
-                    if (_activitiesExpanded) ...[
-                      const SizedBox(height: 16),
-                      _buildActivityItem(
-                        "Played Cricket",
-                        "CR7 Arena",
-                        "2 hours ago",
-                        Icons.sports_cricket,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildActivityItem(
-                        "Booked Venue",
-                        "Ark Sports Complex",
-                        "Yesterday",
-                        Icons.calendar_today,
-                      ),
-                      const SizedBox(height: 12),
-                      _buildActivityItem(
-                        "Joined Team",
-                        "Blue Dragons",
-                        "2 days ago",
-                        Icons.group_add,
-                      ),
-                    ],
+                    const SizedBox(height: 16),
+                    if (recentActivities.isEmpty)
+                      _buildEmptyState(
+                        "No recent activities found",
+                        Icons.history,
+                      )
+                    else
+                      ...recentActivities.take(3).map((activity) {
+                        final index = recentActivities.indexOf(activity);
+                        return Column(
+                          children: [
+                            if (index > 0) const SizedBox(height: 12),
+                            _buildActivityItem(
+                              activity['title'] ?? '',
+                              activity['location'] ?? '',
+                              activity['time'] ?? '',
+                              activity['icon'] ?? Icons.sports,
+                            ),
+                          ],
+                        );
+                      }).toList(),
                   ],
                 ),
               ),
@@ -1325,7 +1344,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
           const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
-          // Favorite Venues Section - with dropdown
+          // Favorite Venues Section - Always visible
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -1345,60 +1364,39 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _venuesExpanded = !_venuesExpanded;
-                        });
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Favorite Venues",
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: textDarkColor,
-                            ),
-                          ),
-                          Icon(
-                            _venuesExpanded
-                                ? Icons.keyboard_arrow_up
-                                : Icons.keyboard_arrow_down,
-                            color: primaryColor,
-                            size: 24,
-                          ),
-                        ],
+                    const Text(
+                      "Favorite Venues",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: textDarkColor,
                       ),
                     ),
-                    if (_venuesExpanded) ...[
-                      const SizedBox(height: 16),
+                    const SizedBox(height: 16),
+                    if (favoriteVenues.isEmpty)
+                      _buildEmptyState(
+                        "No favorite venues added yet",
+                        Icons.location_on,
+                      )
+                    else
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
-                          children: [
-                            _buildVenueCard(
-                              "CR7 Arena",
-                              "4.8",
-                              "assets/cr7.jpg",
-                            ),
-                            const SizedBox(width: 12),
-                            _buildVenueCard(
-                              "Ark Sports",
-                              "4.6",
-                              "assets/ark.jpg",
-                            ),
-                            const SizedBox(width: 12),
-                            _buildVenueCard(
-                              "SportHub",
-                              "4.7",
-                              "assets/Ark Sport 2.jpg",
-                            ),
-                          ],
+                          children: favoriteVenues.map((venue) {
+                            final index = favoriteVenues.indexOf(venue);
+                            return Row(
+                              children: [
+                                if (index > 0) const SizedBox(width: 12),
+                                _buildVenueCard(
+                                  venue['name'] ?? '',
+                                  venue['rating'] ?? '0.0',
+                                  venue['image'] ?? '',
+                                ),
+                              ],
+                            );
+                          }).toList(),
                         ),
                       ),
-                    ],
                   ],
                 ),
               ),
