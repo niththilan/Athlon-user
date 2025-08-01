@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'footer.dart';
-import 'favourites.dart';
 import 'bookNow_new.dart'; // Import BookNow.dart
 
 void main() {
@@ -82,41 +81,10 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   bool _isFavorite = false;
   int _currentImageIndex = 0;
   int _currentIndex = 0; // For footer navigation
-  bool _showLocationEdit = false;
-  bool _showTimeEdit = false;
-  bool _showReviewEdit = false;
+
 
   // Mock court data
   late Map<String, dynamic> _courtDetails;
-
-  // Sports data with names and ratings
-  final List<SportItem> _sportsItems = [
-    SportItem(
-      name: "Football",
-      imageUrl: "https://images.unsplash.com/photo-1553778263-73a83bab9b0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      rating: 4.8,
-    ),
-    SportItem(
-      name: "Cricket",
-      imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      rating: 4.6,
-    ),
-    SportItem(
-      name: "Basketball",
-      imageUrl: "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
-      rating: 4.7,
-    ),
-    SportItem(
-      name: "Tennis",
-      imageUrl: "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-      rating: 4.5,
-    ),
-    SportItem(
-      name: "Badminton",
-      imageUrl: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
-      rating: 4.9,
-    ),
-  ];
 
   @override
   void initState() {
@@ -198,31 +166,6 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     }
   }
 
-  // Add this method to navigate to FavoritesScreen
-  void _goToFavorites() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => FavoritesScreen(
-          favoriteVenues: CourtDetailScreen.favorites,
-          onRemoveFavorite: (venue) {
-            setState(() {
-              CourtDetailScreen.favorites.removeWhere((v) => v['id'] == venue['id']);
-            });
-          },
-        ),
-      ),
-    );
-  }
-
-  // Navigate back to BookNow screen
-  void _navigateToBookNow() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => BookNowScreen()),
-    );
-  }
-
   Widget _buildActionButton(String text, IconData icon, Color backgroundColor, Color textColor, VoidCallback onPressed) {
     return Expanded(
       child: Container(
@@ -302,7 +245,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                   
                   const SizedBox(width: 10),
                   Text(
-                    'Book Now - Rs. ${_courtDetails['price_per_hour'].toStringAsFixed(0)}/hr',
+                    'Book Now',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -544,7 +487,16 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                   child: Column(
                     children: [
                       ListTile(
-                        leading: const Icon(Icons.location_on, color: Color(0xFF1B2C4F)),
+
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF3F4F6),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.location_on, color: Color(0xFF1B2C4F), size: 20),
+                        ),
                         title: Text(
                           _courtDetails['location'],
                           style: const TextStyle(
@@ -569,7 +521,15 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         endIndent: 16,
                       ),
                       ListTile(
-                        leading: const Icon(Icons.access_time, color: Color(0xFF1B2C4F)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF3F4F6),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.access_time, color: Color(0xFF1B2C4F), size: 20),
+                        ),
                         title: Text(
                           _courtDetails['opening_hours'],
                           style: const TextStyle(
@@ -594,7 +554,15 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         endIndent: 16,
                       ),
                       ListTile(
-                        leading: const Icon(Icons.star, color: Color(0xFF1B2C4F)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF3F4F6),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(Icons.star, color: Color(0xFF1B2C4F), size: 20),
+                        ),
                         title: const Text(
                           'Write a Review',
                           style: TextStyle(
@@ -625,7 +593,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                 // Available Sports Section
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -640,107 +608,37 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Available Sports',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF1B2C4F),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _courtDetails['name'],
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF6B7280),
-                        ),
+                      const SizedBox(height: 0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              "Available Sports in this Venue",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF2D3142),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 16),
-                      SizedBox(
-                        height: 150,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: _sportsItems.length,
-                          separatorBuilder: (context, index) => const SizedBox(width: 16),
-                          itemBuilder: (context, index) {
-                            final sport = _sportsItems[index];
-                            return Container(
-                              width: 140,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                color: const Color(0xFFF8F9FA),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.04),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                                    child: Image.network(
-                                      sport.imageUrl,
-                                      height: 90,
-                                      width: double.infinity,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stackTrace) {
-                                        return Container(
-                                          height: 90,
-                                          color: const Color(0xFFF8F9FA),
-                                          child: const Center(
-                                            child: Icon(Icons.sports, color: Color(0xFF1B2C4F)),
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          sport.name,
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xFF1B2C4F),
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Row(
-                                          children: [
-                                            const Icon(
-                                              Icons.star,
-                                              size: 13,
-                                              color: Color(0xFFFBBF24),
-                                            ),
-                                            const SizedBox(width: 2),
-                                            Text(
-                                              sport.rating.toString(),
-                                              style: const TextStyle(
-                                                fontSize: 13,
-                                                color: Color(0xFF6B7280),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _SportsCard(sport: "Football", imagePath: "assets/football.jpg"),
+                            _SportsCard(sport: "Basketball", imagePath: "assets/basket.jpg"),
+                            _SportsCard(sport: "Tennis", imagePath: "assets/tennis.jpg"),
+                            _SportsCard(sport: "Cricket", imagePath: "assets/crickett.jpg"),
+                            _SportsCard(
+                              sport: "Badminton",
+                              imagePath: "assets/badminton.jpg",
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -765,6 +663,49 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
             _currentIndex = index;
           });
         },
+      ),
+    );
+  }
+}
+
+class _SportsCard extends StatelessWidget {
+  final String sport;
+  final String imagePath;
+
+  const _SportsCard({required this.sport, required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: GestureDetector(
+        onTap: () {
+          // You can add navigation logic here if needed
+        },
+        child: Column(
+          children: [
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                image: DecorationImage(
+                  image: AssetImage(imagePath),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              sport,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Color(0xFF2D3142),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

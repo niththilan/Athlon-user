@@ -131,7 +131,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     VenueModel(
       id: '3',
       title: "CHAMPION'S ARENA",
-      location: "45 Sports Complex Road, Rajagiriya 10100",
+      location: "45 Sports Complex Road, 10100",
       rating: 4.89,
       distance: 0.8,
       imageUrl:
