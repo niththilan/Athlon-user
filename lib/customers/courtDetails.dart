@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'footer.dart';
 import 'favourites.dart';
-import 'BookNow.dart'; // Import BookNow.dart
+import 'bookNow_new.dart'; // Import BookNow.dart
 
 void main() {
   runApp(const MyApp());
@@ -147,7 +147,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
           'type': 'Futsal Court',
           'location': '141/A, Wattala 11300',
           'distance': '2.5 km away',
-          'rating': 4.6,
+          'rating': 4.8,
           'total_reviews': 124,
           'price_per_hour': 2500.0,
           'opening_hours': 'Open Now',
@@ -226,7 +226,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   Widget _buildActionButton(String text, IconData icon, Color backgroundColor, Color textColor, VoidCallback onPressed) {
     return Expanded(
       child: Container(
-        height: 60,
+        height: 70,
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(12),
@@ -380,7 +380,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
 
                   // Back arrow on top left - Go back to previous page
                   Positioned(
-                    top: MediaQuery.of(context).padding.top + 12,
+                    top: MediaQuery.of(context).padding.top + 4,
                     left: 16,
                     child: GestureDetector(
                       onTap: () {
@@ -389,20 +389,13 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                       child: Container(
                         width: 40,
                         height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
+                        decoration: const BoxDecoration(
+                          color: Colors.transparent,
                           shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
                         ),
                         child: const Icon(
                           Icons.arrow_back_ios,
-                          color: Color(0xFF1B2C4F),
+                          color: Colors.white,
                           size: 16,
                         ),
                       ),
@@ -411,7 +404,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
 
                   // Top overlay heart icon for favorite and favorites navigation
                   Positioned(
-                    top: MediaQuery.of(context).padding.top + 12,
+                    top: MediaQuery.of(context).padding.top + 4,
                     right: 16,
                     child: GestureDetector(
                       onTap: _toggleFavorite, // <-- This adds/removes from favorites
@@ -468,7 +461,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                 // Title and Rating Section
                 // Remove the outer Container, keep only the inner content
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -478,7 +471,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             child: Text(
                               _courtDetails['name'],
                               style: const TextStyle(
-                                fontSize: 24,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF1B2C4F),
                               ),
@@ -495,15 +488,6 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                                       : const Color(0xFFE5E7EB),
                                 );
                               }),
-                              const SizedBox(width: 6),
-                              Text(
-                                _courtDetails['rating'].toString(),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Color(0xFF1B2C4F),
-                                ),
-                              ),
                             ],
                           ),
                         ],
