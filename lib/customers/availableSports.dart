@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'favourites.dart';
-import 'bookNow.dart';
+import 'bookNow_new.dart';
 import 'footer.dart';
 
 Future<void> main() async {
