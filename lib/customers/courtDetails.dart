@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF050E22),
+          seedColor: const Color(0xFF1B2C4F),
           brightness: Brightness.light,
         ),
         scaffoldBackgroundColor: const Color(0xFFF5F6F8), // Grey background
@@ -300,7 +300,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                                     ? loadingProgress.cumulativeBytesLoaded /
                                         loadingProgress.expectedTotalBytes!
                                     : null,
-                                color: const Color(0xFF050E22),
+                                color: const Color(0xFF1B2C4F),
                               ),
                             ),
                           );
@@ -311,10 +311,10 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             child: const Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.sports_soccer, size: 50, color: Color(0xFF050E22)),
+                                Icon(Icons.sports_soccer, size: 50, color: Color(0xFF1B2C4F)),
                                 SizedBox(height: 8),
-                                Text('ARK SPORTS', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF050E22))),
-                                Text('Indoor Sports Facility', style: TextStyle(fontSize: 12, color: Color(0xFF050E22))),
+                                Text('ARK SPORTS', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1B2C4F))),
+                                Text('Indoor Sports Facility', style: TextStyle(fontSize: 12, color: Color(0xFF1B2C4F))),
                               ],
                             ),
                           );
@@ -347,7 +347,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         ),
                         child: const Icon(
                           Icons.arrow_back_ios,
-                          color: Color(0xFF050E22),
+                          color: Color(0xFF1B2C4F),
                           size: 20,
                         ),
                       ),
@@ -376,7 +376,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         ),
                         child: Icon(
                           _isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: _isFavorite ? Colors.red : const Color(0xFF050E22),
+                          color: _isFavorite ? Colors.red : const Color(0xFF1B2C4F),
                           size: 24,
                         ),
                       ),
@@ -442,7 +442,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w600,
-                                color: Color(0xFF050E22),
+                                color: Color(0xFF1B2C4F),
                               ),
                             ),
                           ),
@@ -463,7 +463,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF050E22),
+                                  color: Color(0xFF1B2C4F),
                                 ),
                               ),
                             ],
@@ -478,7 +478,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                           _buildActionButton(
                             'Directions',
                             Icons.directions,
-                            const Color(0xFF050E22),
+                            const Color(0xFF1B2C4F),
                             Colors.white,
                             () {},
                           ),
@@ -487,7 +487,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             'Call',
                             Icons.phone,
                             Colors.white,
-                            const Color(0xFF050E22),
+                            const Color(0xFF1B2C4F),
                             () {},
                           ),
                           const SizedBox(width: 12),
@@ -495,7 +495,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             'Share',
                             Icons.share,
                             Colors.white,
-                            const Color(0xFF050E22),
+                            const Color(0xFF1B2C4F),
                             () {},
                           ),
                         ],
@@ -523,13 +523,13 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                   child: Column(
                     children: [
                       ListTile(
-                        leading: const Icon(Icons.location_on, color: Color(0xFF050E22)),
+                        leading: const Icon(Icons.location_on, color: Color(0xFF1B2C4F)),
                         title: Text(
                           _courtDetails['location'],
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF050E22),
+                            color: Color(0xFF1B2C4F),
                           ),
                         ),
                         subtitle: Text(
@@ -548,13 +548,13 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         endIndent: 16,
                       ),
                       ListTile(
-                        leading: const Icon(Icons.access_time, color: Color(0xFF050E22)),
+                        leading: const Icon(Icons.access_time, color: Color(0xFF1B2C4F)),
                         title: Text(
                           _courtDetails['opening_hours'],
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF050E22),
+                            color: Color(0xFF1B2C4F),
                           ),
                         ),
                         subtitle: Text(
@@ -573,13 +573,13 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         endIndent: 16,
                       ),
                       ListTile(
-                        leading: const Icon(Icons.star, color: Color(0xFF050E22)),
+                        leading: const Icon(Icons.star, color: Color(0xFF1B2C4F)),
                         title: const Text(
                           'Write a Review',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF050E22),
+                            color: Color(0xFF1B2C4F),
                           ),
                         ),
                         subtitle: const Text(
@@ -619,7 +619,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF050E22),
+                          color: Color(0xFF1B2C4F),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -669,7 +669,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                                           height: 90,
                                           color: const Color(0xFFF8F9FA),
                                           child: const Center(
-                                            child: Icon(Icons.sports, color: Color(0xFF050E22)),
+                                            child: Icon(Icons.sports, color: Color(0xFF1B2C4F)),
                                           ),
                                         );
                                       },
@@ -685,7 +685,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                                           style: const TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w600,
-                                            color: Color(0xFF050E22),
+                                            color: Color(0xFF1B2C4F),
                                           ),
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
