@@ -245,7 +245,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                   
                   const SizedBox(width: 10),
                   Text(
-                    'Book Now',
+                    'Check Availability',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
