@@ -539,14 +539,6 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             color: Color(0xFF6B7280),
                           ),
                         ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.edit, color: Color(0xFF050E22), size: 20),
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Edit location pressed')),
-                            );
-                          },
-                        ),
                       ),
                       const Divider(
                         color: Color(0xFFE5E7EB),
@@ -572,14 +564,6 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             color: Color(0xFF6B7280),
                           ),
                         ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.edit, color: Color(0xFF050E22), size: 20),
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Edit time pressed')),
-                            );
-                          },
-                        ),
                       ),
                       const Divider(
                         color: Color(0xFFE5E7EB),
@@ -604,14 +588,6 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             fontSize: 14,
                             color: Color(0xFF6B7280),
                           ),
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.edit, color: Color(0xFF050E22), size: 20),
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Edit review pressed')),
-                            );
-                          },
                         ),
                       ),
                     ],
