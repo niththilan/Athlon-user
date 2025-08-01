@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../customers/footer.dart';
 import 'home.dart' as home;
+import 'messages.dart';
 
 /// Simplified History Screen with user-friendly design
 class HistoryScreen extends StatefulWidget {
@@ -376,7 +377,7 @@ class HistoryScreenState extends State<HistoryScreen> {
             title: const Text(
               "Booking Details",
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Poppins',
                 color: Colors.white,
@@ -425,13 +426,27 @@ class HistoryScreenState extends State<HistoryScreen> {
             // Home = 0, Favorites = 1, Bookings = 2, Chat = 3
             switch (index) {
               case 0:
-                Navigator.pushReplacementNamed(context, '/');
+                Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => home.HomeScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  ),
+                );
                 break;
               case 1:
-                // The AppFooter already handles navigation to favorites
+                // Let the AppFooter handle navigation to favorites
                 break;
               case 3:
-                Navigator.pushReplacementNamed(context, '/messages');
+                Navigator.pushReplacement(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) => const MessagesScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  ),
+                );
                 break;
             }
           }

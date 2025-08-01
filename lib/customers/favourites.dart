@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'footer.dart';
 
-import 'home.dart';
 import 'courtDetails.dart';
 import 'nearbyVenues.dart';
 
@@ -22,7 +21,7 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  int _currentIndex = 2; // Set to favorites tab index
+  int _currentIndex = 1; // Set to favorites tab index (1 in footer structure)
   late List<Map<String, dynamic>> _favoriteVenues;
 
   @override
@@ -31,22 +30,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     _favoriteVenues = List.from(widget.favoriteVenues);
   }
 
-  // Improve the footer navigation to ensure we properly handle returning to venues
+  // Footer navigation to handle all tabs
   void _onTabSelected(int index) {
-    if (index == _currentIndex) return; // Avoid rebuilding if same tab
-
+    print('Navigation selected: index $index'); // Debug output
+    
+    // Just update the current index for UI state
+    // Let the footer handle the actual navigation
     setState(() {
       _currentIndex = index;
     });
-
-    if (index == 0) {
-      // Navigate to home
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } else if (index == 1) {
-      // Navigate to venues with explicit state preservation
-    }
   }
 
   // Handle removing favorite
@@ -115,21 +107,29 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         backgroundColor: const Color(0xFF1B2C4F),
         elevation: 2,
         toolbarHeight: 50,
-        title: Padding(
-          padding: const EdgeInsets.only(left: 16),
-          child: Text(
-            "Favourite Venues (${_favoriteVenues.length})",
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Poppins',
-              color: Colors.white,
-            ),
+        title: Text(
+          "Favourite Venues (${_favoriteVenues.length})",
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Poppins',
+            color: Colors.white,
           ),
         ),
         centerTitle: false,
-        automaticallyImplyLeading: false,
-        leadingWidth: 20,
+        leading: Container(
+          margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
+          child: IconButton(
+            icon: const Icon(
+              Icons.chevron_left,
+              color: Colors.white,
+              size: 28,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
       ),
       body: hasNoFavorites
           ? _buildEmptyState()
@@ -155,7 +155,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               },
             ),
       bottomNavigationBar: AppFooter(
-        currentIndex: 1,
+        currentIndex: 1, // Favorites tab index
         onTabSelected: _onTabSelected,
       ),
     );
