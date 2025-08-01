@@ -472,20 +472,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Title and Rating Section
-                Container(
-                  margin: const EdgeInsets.all(16),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
+                // Remove the outer Container, keep only the inner content
+                Padding(
+                  padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -558,7 +547,6 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 8),
 
                 // Info Cards combined in one box
