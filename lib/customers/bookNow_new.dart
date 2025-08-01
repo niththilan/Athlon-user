@@ -69,7 +69,6 @@ class BookNowScreen extends StatefulWidget {
 class _BookNowScreenState extends State<BookNowScreen> {
   String? selectedSport;
   DateTime selectedDate = DateTime.now(); // Changed from nullable
-  bool isLoadingCalendar = false;
   int _currentFooterIndex = 0; // For footer navigation
   
   // Date scroll and calendar state from history.dart
@@ -151,13 +150,8 @@ class _BookNowScreenState extends State<BookNowScreen> {
                   VenueSelectionSection(venue: widget.venue),
                   const SizedBox(height: 32),
                   _buildSportSelection(),
-                  if (selectedSport != null) ...[
-                    const SizedBox(height: 32),
-                    if (isLoadingCalendar)
-                      _buildLoadingIndicator()
-                    else
-                      _buildCalendarSection(),
-                  ],
+                  const SizedBox(height: 32),
+                  _buildCalendarSection(),
                 ],
               ),
             ),
@@ -189,123 +183,101 @@ class _BookNowScreenState extends State<BookNowScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 3.2,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
-          ),
-          itemCount: availableSports.length,
-          itemBuilder: (context, index) {
-            final sport = availableSports[index];
-            final isSelected = selectedSport == sport;
-            
-            return GestureDetector(
-              onTap: () async {
-                setState(() {
-                  selectedSport = sport;
-                  isLoadingCalendar = true;
-                });
-                
-                // Simulate loading delay
-                await Future.delayed(const Duration(milliseconds: 800));
-                
-                setState(() {
-                  isLoadingCalendar = false;
-                });
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isSelected 
-                      ? const Color(0xFF1B2C4F) 
-                      : Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isSelected 
-                        ? const Color(0xFF1B2C4F) 
-                        : const Color(0xFFE5E7EB),
-                    width: 1,
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          _getSportIcon(sport),
-                          size: 14,
-                          color: isSelected 
-                              ? Colors.white 
-                              : const Color(0xFF6B7280),
-                        ),
-                        const SizedBox(width: 6),
-                        Flexible(
-                          child: Text(
-                            sport,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: isSelected 
-                                  ? Colors.white 
-                                  : const Color(0xFF374151),
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      _getSportPrice(sport),
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: isSelected 
-                            ? Colors.white 
-                            : const Color(0xFF6B7280),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLoadingIndicator() {
-    return Container(
-      height: 400,
-      width: double.infinity,
-      child: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1B2C4F)),
-              strokeWidth: 3,
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFFE5E7EB),
+              width: 1,
             ),
-            SizedBox(height: 16),
-            Text(
-              'Loading calendar...',
-              style: TextStyle(
-                color: Color(0xFF666666),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: selectedSport,
+              hint: Row(
+                children: [
+                  Icon(
+                    Icons.sports_soccer,
+                    size: 18,
+                    color: const Color(0xFF6B7280),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Choose a sport',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF6B7280),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+                color: Color(0xFF6B7280),
+                size: 24,
+              ),
+              isExpanded: true,
+              style: const TextStyle(
                 fontSize: 14,
+                color: Color(0xFF374151),
                 fontWeight: FontWeight.w500,
               ),
+              dropdownColor: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              elevation: 8,
+              items: availableSports.map((String sport) {
+                return DropdownMenuItem<String>(
+                  value: sport,
+                  child: Row(
+                    children: [
+                      Icon(
+                        _getSportIcon(sport),
+                        size: 18,
+                        color: const Color(0xFF1B2C4F),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          sport,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF374151),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        _getSportPrice(sport),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF6B7280),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  selectedSport = newValue;
+                });
+              },
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -324,42 +296,8 @@ class _BookNowScreenState extends State<BookNowScreen> {
         ),
         const SizedBox(height: 12),
         _buildCalendarContent(),
-        if (selectedSport != null) ...[
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TimeSlotSelectionScreen(
-                      venue: widget.venue,
-                      sport: selectedSport!,
-                      selectedDate: selectedDate,
-                    ),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1B2C4F),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-              child: const Text(
-                'Continue',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
+        const SizedBox(height: 16),
+        _buildContinueButton(),
       ],
     );
   }
@@ -747,6 +685,182 @@ class _BookNowScreenState extends State<BookNowScreen> {
     }
   }
 
+  /// Continue button next to calendar with validation
+  Widget _buildContinueButton() {
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: ElevatedButton(
+        onPressed: _handleContinuePressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF1B2C4F),
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+        ),
+        child: const Text(
+          'Continue',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Handle continue button press with validation
+  void _handleContinuePressed() {
+    // Validate sport selection
+    if (selectedSport == null) {
+      _showValidationDialog(
+        title: 'Sport Required',
+        message: 'Please select a sport before continuing.',
+        icon: Icons.sports_soccer,
+      );
+      return;
+    }
+
+    // Check if a future date is selected (not past date)
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final selectedDateOnly = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    
+    if (selectedDateOnly.isBefore(today)) {
+      _showValidationDialog(
+        title: 'Invalid Date',
+        message: 'Please select today\'s date or a future date.',
+        icon: Icons.calendar_today,
+      );
+      return;
+    }
+
+    // If all validations pass, navigate to time slot selection
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TimeSlotSelectionScreen(
+          venue: widget.venue,
+          sport: selectedSport!,
+          selectedDate: selectedDate,
+        ),
+      ),
+    );
+  }
+
+  /// Show validation dialog with modern styling matching the app's design
+  void _showValidationDialog({
+    required String title,
+    required String message,
+    required IconData icon,
+  }) {
+    // Color constants matching the app theme
+    const Color primaryColor = Color(0xFF1B2C4F);
+    const Color cardColor = Colors.white;
+    const Color textDarkColor = Color(0xFF2D3142);
+    const Color textLightColor = Color(0xFF8A8E99);
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.4),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        backgroundColor: cardColor,
+        elevation: 8,
+        child: Container(
+          // Make width responsive based on screen size
+          width: MediaQuery.of(context).size.width > 500
+              ? 400
+              : MediaQuery.of(context).size.width * 0.85,
+          constraints: BoxConstraints(
+            maxWidth: 400,
+            minWidth: 280,
+            maxHeight: MediaQuery.of(context).size.height * 0.6,
+          ),
+          padding: EdgeInsets.all(
+            MediaQuery.of(context).size.width < 400 ? 20 : 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Icon container with modern styling
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: primaryColor,
+                ),
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.width < 400 ? 16 : 20,
+              ),
+              // Title with responsive font size
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width < 400 ? 16 : 18,
+                  fontWeight: FontWeight.w600,
+                  color: textDarkColor,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.width < 400 ? 8 : 12,
+              ),
+              // Message with proper styling
+              Text(
+                message,
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 15,
+                  color: textLightColor,
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(
+                height: MediaQuery.of(context).size.width < 400 ? 20 : 24,
+              ),
+              // Modern button with responsive styling
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: MediaQuery.of(context).size.width < 400 ? 12 : 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'OK',
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 }
 
 // TimeSlotSelectionScreen - New screen for time slot selection
@@ -862,8 +976,6 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 20),
-                  _buildBookingInfo(),
-                  const SizedBox(height: 20),
                   _buildSlotsSection(),
                   const SizedBox(height: 20),
                   const PricingSummarySection(),
@@ -880,82 +992,6 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
             _currentFooterIndex = index;
           });
         },
-      ),
-    );
-  }
-
-  Widget _buildBookingInfo() {
-    final venueData = widget.venue ?? {
-      'title': 'CR7 Futsal Arena',
-      'location': 'Downtown, 2.5 km',
-      'sport': 'Football',
-      'rating': 4.8,
-      'rate_per_hour': 'Rs. 700',
-      'distance': '2.5 km',
-    };
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Booking Summary',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF1B2C4F),
-            ),
-          ),
-          const SizedBox(height: 12),
-          _buildInfoRow('Venue', venueData['title']?.toString() ?? 'Venue'),
-          _buildInfoRow('Sport', widget.sport),
-          _buildInfoRow('Date', DateFormat('EEEE, MMMM d, yyyy').format(widget.selectedDate)),
-          _buildInfoRow('Location', venueData['location']?.toString() ?? 'Location'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 80,
-            child: Text(
-              '$label:',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF1B2C4F),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
