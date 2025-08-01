@@ -479,134 +479,109 @@ class HistoryScreenState extends State<HistoryScreen> {
           width: 1,
         ),
       ),
-      child: Column(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          // Left: Court details above customer name
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  booking.courtName,
+                  style: TextStyle(fontSize: 14, color: textSecondary),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  booking.customerName,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  '${DateFormat('MMM d').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
+                  style: TextStyle(fontSize: 13, color: textSecondary),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  'Phone: ${booking.customerPhone}',
+                  style: TextStyle(fontSize: 12, color: textSecondary),
+                ),
+              ],
+            ),
+          ),
+          // ...existing code for right side (price, icons)...
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              // Left side - main info
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      booking.customerName,
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: textPrimary,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      booking.courtName,
-                      style: TextStyle(fontSize: 14, color: textSecondary),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      '${DateFormat('MMM d').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
-                      style: TextStyle(fontSize: 13, color: textSecondary),
-                    ),
-                  ],
+              Text(
+                'LKR ${booking.price.toStringAsFixed(0)}',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
                 ),
               ),
-
-              // Right side - price and status
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              SizedBox(height: 8),
+              Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'LKR ${booking.price.toStringAsFixed(0)}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  if (booking.status.toLowerCase() != 'confirmed')
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: _getStatusColor(booking.status),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        booking.status.toUpperCase(),
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                  Container(
+                    width: 40,
+                    height: 40,
+                    margin: EdgeInsets.only(right: 4),
+                    child: GestureDetector(
+                      onTap: () => _makePhoneCall(booking.customerPhone),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 41, 107, 65),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Icon(Icons.phone, size: 20, color: Colors.white),
                         ),
                       ),
                     ),
+                  ),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    child: GestureDetector(
+                      onTap: () => _showBookingDetails(booking),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: primaryColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Icon(Icons.info_outline, size: 20, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
-            ],
-          ),
-          
-          // Action buttons row
-          SizedBox(height: 12),
-          Row(
-            children: [
-              // Call button
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _makePhoneCall(booking.customerPhone),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: darkGreenColor, // Changed to dark green
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.phone, size: 16, color: Colors.white),
-                        SizedBox(width: 6),
-                        Text(
-                          'Call',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+              // Status box (right, below price, aligned with court details/time)
+              if (booking.status.toLowerCase() != 'confirmed')
+                Container(
+                  margin: EdgeInsets.only(top: 6),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(booking.status),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    booking.status.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white,
                     ),
                   ),
                 ),
-              ),
-              
-              SizedBox(width: 8),
-              
-              // Details button
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _showBookingDetails(booking),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    decoration: BoxDecoration(
-                      color: primaryColor,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.info_outline, size: 16, color: Colors.white),
-                        SizedBox(width: 6),
-                        Text(
-                          'Details',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
             ],
           ),
         ],
