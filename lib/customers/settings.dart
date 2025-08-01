@@ -1210,131 +1210,94 @@ class _SettingsScreenState extends State<SettingsScreen>
   }
 
   void _showLogoutDialog() {
+    if (!mounted) return;
+
     showDialog(
       context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: const Text(
+          'Log Out',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF2D3142),
           ),
-          elevation: 8,
-          backgroundColor: cardColor,
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 320, minWidth: 280),
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title
-                Text(
-                  'Confirm Logout',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                    color: textDarkColor,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Content
-                Text(
-                  'Are you sure you want to log out of your account?',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: textLightColor,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // Actions
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                          color: textLightColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          // Close the dialog
-                          Navigator.of(context).pop();
-
-                          // Navigate to login page and clear the navigation stack
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                              builder: (context) => const Scaffold(
-                                body: Center(
-                                  child: Text('Login Page - To be implemented'),
-                                ),
-                              ),
-                            ),
-                            (route) => false,
-                          );
-                        } catch (error) {
-                          // Close the dialog
-                          Navigator.of(context).pop();
-
-                          // Show error message
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Error logging out: ${error.toString()}',
-                              ),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        elevation: 2,
-                      ),
-                      child: const Text(
-                        'Log Out',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+        ),
+        content: const Text(
+          'Are you sure you want to log out of your account?',
+          style: TextStyle(fontSize: 14, color: Colors.grey),
+        ),
+        contentPadding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+        titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
             ),
           ),
-        );
-      },
+          Container(
+            height: 36,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                _showSuccessSnackBar(
+                  'Logged out',
+                  message: "You have been logged out successfully",
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+              ),
+              child: const Text(
+                'Logout',
+                style: TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+              ),
+            ),
+          ),
+        ],
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.white,
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String title, {String? message}) {
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.check_circle, color: Colors.white),
+                const SizedBox(width: 8),
+                Expanded(child: Text(title)),
+              ],
+            ),
+            if (message != null) ...[
+              const SizedBox(height: 4),
+              Text(message, style: const TextStyle(fontSize: 12)),
+            ],
+          ],
+        ),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        duration: const Duration(seconds: 4),
+      ),
     );
   }
 }
