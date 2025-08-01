@@ -418,20 +418,14 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                       child: Container(
                         width: 40,
                         height: 40,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
+                        // Remove background color and boxShadow for transparent background
+                        decoration: const BoxDecoration(
+                          color: Color.fromARGB(0, 0, 0, 0),
                           shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
                         ),
                         child: Icon(
                           _isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: _isFavorite ? Colors.red : const Color(0xFF1B2C4F),
+                          color: _isFavorite ? Colors.red : const Color.fromARGB(255, 255, 255, 255),
                           size: 24,
                         ),
                       ),
