@@ -3,6 +3,7 @@ import 'package:athlon_user/customers/courtDetails.dart';
 import 'package:athlon_user/customers/footer.dart';
 import 'package:flutter/material.dart';
 //import 'bookNow.dart';
+import 'filter_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -426,9 +427,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   @override
   Widget build(BuildContext context) {
     // Count favorites for badge display
-    final int favoriteCount = _favoriteStatus.values
-        .where((isFavorite) => isFavorite == true)
-        .length;
+    // final int favoriteCount = _favoriteStatus.values
+    //     .where((isFavorite) => isFavorite == true)
+    //     .length;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
@@ -449,64 +450,60 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
         leading: Container(
           margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
           child: IconButton(
-            icon: const Icon(
-              Icons.chevron_left,
-              color: Colors.white,
-              size: 28,
-            ),
+            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
             onPressed: () => Navigator.pop(context),
             tooltip: 'Back',
           ),
         ),
 
-        actions: [
-          // Add a favorites indicator with count in the app bar
-          if (favoriteCount > 0)
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.favorite, color: Colors.white),
-                    onPressed: () {
-                      // Navigate to favorites
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('$favoriteCount favorites saved'),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    },
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
-                      ),
-                      child: Text(
-                        '$favoriteCount',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-        ],
+        // actions: [
+        // Add a favorites indicator with count in the app bar
+        //     if (favoriteCount > 0)
+        //       Padding(
+        //         padding: const EdgeInsets.only(right: 16.0),
+        //         child: Stack(
+        //           alignment: Alignment.center,
+        //           children: [
+        //             IconButton(
+        //               icon: const Icon(Icons.favorite, color: Colors.white),
+        //               onPressed: () {
+        //                 // Navigate to favorites
+        //                 ScaffoldMessenger.of(context).showSnackBar(
+        //                   SnackBar(
+        //                     content: Text('$favoriteCount favorites saved'),
+        //                     duration: const Duration(seconds: 2),
+        //                   ),
+        //                 );
+        //               },
+        //             ),
+        //             Positioned(
+        //               top: 8,
+        //               right: 8,
+        //               child: Container(
+        //                 padding: const EdgeInsets.all(2),
+        //                 decoration: BoxDecoration(
+        //                   color: Colors.red,
+        //                   borderRadius: BorderRadius.circular(10),
+        //                 ),
+        //                 constraints: const BoxConstraints(
+        //                   minWidth: 16,
+        //                   minHeight: 16,
+        //                 ),
+        //                 child: Text(
+        //                   '$favoriteCount',
+        //                   style: const TextStyle(
+        //                     color: Colors.white,
+        //                     fontSize: 10,
+        //                     fontWeight: FontWeight.bold,
+        //                   ),
+        //                   textAlign: TextAlign.center,
+        //                 ),
+        //               ),
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //   ],
       ),
       body: GestureDetector(
         onTap: () {
@@ -569,7 +566,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       color: Color(0xFF1B2C4F),
                     ),
                     label: Text(
-                      _activeFilter != 'All' 
+                      _activeFilter != 'All'
                           ? '$_sortingMode | $_activeFilter'
                           : _sortingMode,
                       style: const TextStyle(
@@ -591,7 +588,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       ),
                     ),
                     onPressed: () {
-                      _showSortingOptions(context);
+                      _navigateToFilterScreen(context);
                     },
                   ),
                 ],
@@ -621,31 +618,27 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   // Search bar method - matches home page style
   Widget _buildSearchBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1B2C4F).withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
+            color: const Color(0xFF1B2C4F).withOpacity(0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(2),
-              child: const Icon(
-                Icons.search_rounded,
-                color: Color(0xFF1B2C4F),
-                size: 24,
-              ),
+            const Icon(
+              Icons.search_outlined, // outlined version
+              color: Color(0xFF1B2C4F),
+              size: 22,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: TextField(
                 controller: _searchController,
@@ -658,8 +651,18 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                     fontWeight: FontWeight.w400,
                   ),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
+                  isCollapsed: true,
                 ),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF1B2C4F),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
                 onSubmitted: (value) {
                   if (value.trim().isNotEmpty) {
                     _addToSearchHistory(value);
@@ -681,6 +684,8 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                     _searchQuery = '';
                   });
                 },
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
           ],
         ),
@@ -795,6 +800,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                     ),
                   ),
                   // Favorite button
+                  // Favorite button
                   Positioned(
                     top: 12,
                     right: 12,
@@ -803,20 +809,27 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color:
+                              Colors.transparent, // Make background transparent
                           shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
                         ),
                         child: Icon(
                           isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: isFavorite ? Colors.red : Colors.grey[600],
-                          size: 20,
+                          color: isFavorite
+                              ? Colors.red
+                              : Colors
+                                    .white, // White outline when not favorited, red when favorited
+                          size: 24, // Slightly larger for better visibility
+                          shadows: isFavorite
+                              ? []
+                              : [
+                                  // Add shadow to white outline for better visibility
+                                  Shadow(
+                                    color: Colors.black.withOpacity(0.3),
+                                    offset: const Offset(0, 1),
+                                    blurRadius: 2,
+                                  ),
+                                ],
                         ),
                       ),
                     ),
@@ -826,7 +839,10 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                     bottom: 12,
                     left: 12,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.7),
                         borderRadius: BorderRadius.circular(12),
@@ -861,9 +877,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    
+
                     const SizedBox(height: 4),
-                    
+
                     // Location
                     Row(
                       children: [
@@ -886,15 +902,18 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 12),
-                    
+
                     // Rating and Price
                     Row(
                       children: [
                         // Rating
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.orange.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4),
@@ -919,9 +938,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             ],
                           ),
                         ),
-                        
+
                         const SizedBox(width: 8),
-                        
+
                         // Price
                         Text(
                           venue.ratePerHour,
@@ -933,16 +952,19 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 8),
-                    
+
                     // Sports tags (simplified)
                     Wrap(
                       spacing: 4,
                       runSpacing: 4,
                       children: venue.sports.take(3).map((sport) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF1B2C4F).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4),
@@ -963,7 +985,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
               ),
             ],
           ),
-          
+
           // Book Now button positioned in bottom-right corner
           Positioned(
             bottom: 10,
@@ -994,10 +1016,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
               ),
               child: const Text(
                 'Book Now',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -1006,312 +1025,333 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     );
   }
 
-  void _showSortingOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.8,
-      ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 8.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 6.0),
-                      child: Text(
-                        "Sort & Filter",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1B2C4F),
-                        ),
-                      ),
-                    ),
-                    const Divider(),
-
-                    // Distance Range Slider
-                    const Padding(
-                      padding: EdgeInsets.only(top: 6.0),
-                      child: Text(
-                        "Distance Range",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          "${_distanceRadius.round()} km",
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                        Expanded(
-                          child: Slider(
-                            value: _distanceRadius,
-                            min: 0.0,
-                            max: 20.0,
-                            divisions: 20,
-                            label: "${_distanceRadius.round()} km",
-                            activeColor: const Color(0xFF1B2C4F),
-                            onChanged: (value) {
-                              setModalState(() {
-                                _distanceRadius = value;
-                              });
-                              setState(() {
-                                _distanceRadius = value;
-                              });
-                            },
-                          ),
-                        ),
-                        const Text(
-                          "20 km",
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                    // Sorting Options
-                    const Padding(
-                      padding: EdgeInsets.only(top: 2.0),
-                      child: Text(
-                        "Sort By",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-
-                    // Sorting Radio Buttons
-                    _buildSortingOption(
-                      "Nearest",
-                      "Distance: Low to High",
-                      setModalState,
-                      bottomPadding: 1.0,
-                    ),
-                    _buildSortingOption(
-                      "Farthest",
-                      "Distance: High to Low",
-                      setModalState,
-                      topPadding: 1.0,
-                      bottomPadding: 1.0,
-                    ),
-                    _buildSortingOption(
-                      "Highest Rated",
-                      "Rating: High to Low",
-                      setModalState,
-                      topPadding: 1.0,
-                    ),
-
-                    // Sports Filter Section
-                    const Padding(
-                      padding: EdgeInsets.only(top: 16.0),
-                      child: Text(
-                        "Filter by Sport",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    
-                    // Sports Filter Chips in a Wrap
-                    Wrap(
-                      spacing: 8.0,
-                      runSpacing: 4.0,
-                      children: _filterOptionsWithIcons.keys.map((sport) {
-                        final isSelected = _activeFilter == sport;
-                        return FilterChip(
-                          label: Text(
-                            sport,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isSelected ? Colors.white : const Color(0xFF1B2C4F),
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                            ),
-                          ),
-                          backgroundColor: isSelected 
-                              ? const Color(0xFF1B2C4F) 
-                              : Colors.grey[100],
-                          selectedColor: const Color(0xFF1B2C4F),
-                          side: BorderSide(
-                            color: isSelected 
-                                ? const Color(0xFF1B2C4F) 
-                                : Colors.grey[300]!,
-                          ),
-                          selected: isSelected,
-                          showCheckmark: false,
-                          onSelected: (selected) {
-                            setModalState(() {
-                              _activeFilter = selected ? sport : 'All';
-                            });
-                            setState(() {
-                              _activeFilter = selected ? sport : 'All';
-                            });
-                          },
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8, 
-                            vertical: 4
-                          ),
-                        );
-                      }).toList(),
-                    ),
-
-                    // Divider and Reset button
-                    const Padding(
-                      padding: EdgeInsets.only(top: 8.0),
-                      child: Divider(),
-                    ),
-
-                    // Reset button
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton.icon(
-                        onPressed: () {
-                          setModalState(() {
-                            _distanceRadius = 10.0;
-                            _sortingMode = 'Nearest';
-                            _activeFilter = 'All';
-                          });
-                          setState(() {
-                            _distanceRadius = 10.0;
-                            _sortingMode = 'Nearest';
-                            _activeFilter = 'All';
-                          });
-                        },
-                        icon: const Icon(
-                          Icons.refresh,
-                          size: 20,
-                          color: Color(0xFF1B2C4F),
-                        ),
-                        label: const Text(
-                          "Reset Filters",
-                          style: TextStyle(
-                            color: Color(0xFF1B2C4F),
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                          ),
-                        ),
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ),
-                    ),
-
-                    // Apply Button
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2.0, bottom: 12.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1B2C4F),
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              // The distance is already updated in real-time via slider onChange
-                              // Just ensure sorting mode is applied
-                            });
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            "Apply",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    
-                    // Add safe area padding at bottom for devices with notches
-                    SizedBox(height: MediaQuery.of(context).padding.bottom),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildSortingOption(
-    String value,
-    String description,
-    StateSetter setModalState, {
-    double topPadding = 10.0,
-    double bottomPadding = 10.0,
-  }) {
-    return InkWell(
-      onTap: () {
-        setModalState(() {
-          _sortingMode = value;
-        });
-      },
-      child: Padding(
-        padding: EdgeInsets.only(top: topPadding, bottom: bottomPadding),
-        child: Row(
-          children: [
-            Radio<String>(
-              value: value,
-              groupValue: _sortingMode,
-              activeColor: const Color(0xFF1B2C4F),
-              onChanged: (newValue) {
-                setModalState(() {
-                  _sortingMode = newValue!;
-                });
-              },
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 15,
-                    ),
-                  ),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      color: Colors.grey[600], 
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+  // Navigate to filter screen
+  void _navigateToFilterScreen(BuildContext context) async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FilterScreen(
+          currentSortingMode: _sortingMode,
+          currentActiveFilter: _activeFilter,
+          currentDistanceRadius: _distanceRadius,
+          filterOptions: _filterOptionsWithIcons,
         ),
       ),
     );
+
+    if (result != null) {
+      setState(() {
+        _sortingMode = result['sortingMode'] ?? _sortingMode;
+        _activeFilter = result['activeFilter'] ?? _activeFilter;
+        _distanceRadius = result['distanceRadius'] ?? _distanceRadius;
+      });
+    }
   }
+
+  // void _showSortingOptions(BuildContext context) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     constraints: BoxConstraints(
+  //       maxHeight: MediaQuery.of(context).size.height * 0.8,
+  //     ),
+  //     shape: const RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.only(
+  //         topLeft: Radius.circular(20),
+  //         topRight: Radius.circular(20),
+  //       ),
+  //     ),
+  //     builder: (BuildContext context) {
+  //       return StatefulBuilder(
+  //         builder: (context, setModalState) {
+  //           return SingleChildScrollView(
+  //             child: Padding(
+  //               padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 8.0),
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   // Header
+  //                   const Padding(
+  //                     padding: EdgeInsets.symmetric(vertical: 6.0),
+  //                     child: Text(
+  //                       "Sort & Filter",
+  //                       style: TextStyle(
+  //                         fontSize: 18,
+  //                         fontWeight: FontWeight.bold,
+  //                         color: Color(0xFF1B2C4F),
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   const Divider(),
+
+  //                   // Distance Range Slider
+  //                   const Padding(
+  //                     padding: EdgeInsets.only(top: 6.0),
+  //                     child: Text(
+  //                       "Distance Range",
+  //                       style: TextStyle(
+  //                         fontSize: 16,
+  //                         fontWeight: FontWeight.w600,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   Row(
+  //                     children: [
+  //                       Text(
+  //                         "${_distanceRadius.round()} km",
+  //                         style: const TextStyle(fontSize: 14),
+  //                       ),
+  //                       Expanded(
+  //                         child: Slider(
+  //                           value: _distanceRadius,
+  //                           min: 0.0,
+  //                           max: 20.0,
+  //                           divisions: 20,
+  //                           label: "${_distanceRadius.round()} km",
+  //                           activeColor: const Color(0xFF1B2C4F),
+  //                           onChanged: (value) {
+  //                             setModalState(() {
+  //                               _distanceRadius = value;
+  //                             });
+  //                             setState(() {
+  //                               _distanceRadius = value;
+  //                             });
+  //                           },
+  //                         ),
+  //                       ),
+  //                       const Text("20 km", style: TextStyle(fontSize: 14)),
+  //                     ],
+  //                   ),
+  //                   // Sorting Options
+  //                   const Padding(
+  //                     padding: EdgeInsets.only(top: 2.0),
+  //                     child: Text(
+  //                       "Sort By",
+  //                       style: TextStyle(
+  //                         fontSize: 16,
+  //                         fontWeight: FontWeight.w600,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   const SizedBox(height: 2),
+
+  //                   // Sorting Radio Buttons
+  //                   _buildSortingOption(
+  //                     "Nearest",
+  //                     "Distance: Low to High",
+  //                     setModalState,
+  //                     bottomPadding: 1.0,
+  //                   ),
+  //                   _buildSortingOption(
+  //                     "Farthest",
+  //                     "Distance: High to Low",
+  //                     setModalState,
+  //                     topPadding: 1.0,
+  //                     bottomPadding: 1.0,
+  //                   ),
+  //                   _buildSortingOption(
+  //                     "Highest Rated",
+  //                     "Rating: High to Low",
+  //                     setModalState,
+  //                     topPadding: 1.0,
+  //                   ),
+
+  //                   // Sports Filter Section
+  //                   const Padding(
+  //                     padding: EdgeInsets.only(top: 16.0),
+  //                     child: Text(
+  //                       "Filter by Sport",
+  //                       style: TextStyle(
+  //                         fontSize: 16,
+  //                         fontWeight: FontWeight.w600,
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   const SizedBox(height: 8),
+
+  //                   // Sports Filter Chips in a Wrap
+  //                   Wrap(
+  //                     spacing: 8.0,
+  //                     runSpacing: 4.0,
+  //                     children: _filterOptionsWithIcons.keys.map((sport) {
+  //                       final isSelected = _activeFilter == sport;
+  //                       return FilterChip(
+  //                         label: Text(
+  //                           sport,
+  //                           style: TextStyle(
+  //                             fontSize: 12,
+  //                             color: isSelected
+  //                                 ? Colors.white
+  //                                 : const Color(0xFF1B2C4F),
+  //                             fontWeight: isSelected
+  //                                 ? FontWeight.w600
+  //                                 : FontWeight.w500,
+  //                           ),
+  //                         ),
+  //                         backgroundColor: isSelected
+  //                             ? const Color(0xFF1B2C4F)
+  //                             : Colors.grey[100],
+  //                         selectedColor: const Color(0xFF1B2C4F),
+  //                         side: BorderSide(
+  //                           color: isSelected
+  //                               ? const Color(0xFF1B2C4F)
+  //                               : Colors.grey[300]!,
+  //                         ),
+  //                         selected: isSelected,
+  //                         showCheckmark: false,
+  //                         onSelected: (selected) {
+  //                           setModalState(() {
+  //                             _activeFilter = selected ? sport : 'All';
+  //                           });
+  //                           setState(() {
+  //                             _activeFilter = selected ? sport : 'All';
+  //                           });
+  //                         },
+  //                         padding: const EdgeInsets.symmetric(
+  //                           horizontal: 8,
+  //                           vertical: 4,
+  //                         ),
+  //                       );
+  //                     }).toList(),
+  //                   ),
+
+  //                   // Divider and Reset button
+  //                   const Padding(
+  //                     padding: EdgeInsets.only(top: 8.0),
+  //                     child: Divider(),
+  //                   ),
+
+  //                   // Reset button
+  //                   Align(
+  //                     alignment: Alignment.centerLeft,
+  //                     child: TextButton.icon(
+  //                       onPressed: () {
+  //                         setModalState(() {
+  //                           _distanceRadius = 10.0;
+  //                           _sortingMode = 'Nearest';
+  //                           _activeFilter = 'All';
+  //                         });
+  //                         setState(() {
+  //                           _distanceRadius = 10.0;
+  //                           _sortingMode = 'Nearest';
+  //                           _activeFilter = 'All';
+  //                         });
+  //                       },
+  //                       icon: const Icon(
+  //                         Icons.refresh,
+  //                         size: 20,
+  //                         color: Color(0xFF1B2C4F),
+  //                       ),
+  //                       label: const Text(
+  //                         "Reset Filters",
+  //                         style: TextStyle(
+  //                           color: Color(0xFF1B2C4F),
+  //                           fontWeight: FontWeight.w500,
+  //                           fontSize: 14,
+  //                         ),
+  //                       ),
+  //                       style: TextButton.styleFrom(
+  //                         padding: const EdgeInsets.symmetric(vertical: 8),
+  //                         visualDensity: VisualDensity.compact,
+  //                       ),
+  //                     ),
+  //                   ),
+
+  //                   // Apply Button
+  //                   Padding(
+  //                     padding: const EdgeInsets.only(top: 2.0, bottom: 12.0),
+  //                     child: SizedBox(
+  //                       width: double.infinity,
+  //                       child: ElevatedButton(
+  //                         style: ElevatedButton.styleFrom(
+  //                           backgroundColor: const Color(0xFF1B2C4F),
+  //                           foregroundColor: Colors.white,
+  //                           padding: const EdgeInsets.symmetric(vertical: 14),
+  //                           shape: RoundedRectangleBorder(
+  //                             borderRadius: BorderRadius.circular(12),
+  //                           ),
+  //                         ),
+  //                         onPressed: () {
+  //                           setState(() {
+  //                             // The distance is already updated in real-time via slider onChange
+  //                             // Just ensure sorting mode is applied
+  //                           });
+  //                           Navigator.pop(context);
+  //                         },
+  //                         child: const Text(
+  //                           "Apply",
+  //                           style: TextStyle(
+  //                             fontSize: 16,
+  //                             fontWeight: FontWeight.bold,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ),
+
+  //                   // Add safe area padding at bottom for devices with notches
+  //                   SizedBox(height: MediaQuery.of(context).padding.bottom),
+  //                 ],
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
+  //   Widget _buildSortingOption(
+  //     String value,
+  //     String description,
+  //     StateSetter setModalState, {
+  //     double topPadding = 10.0,
+  //     double bottomPadding = 10.0,
+  //   }) {
+  //     return InkWell(
+  //       onTap: () {
+  //         setModalState(() {
+  //           _sortingMode = value;
+  //         });
+  //       },
+  //       child: Padding(
+  //         padding: EdgeInsets.only(top: topPadding, bottom: bottomPadding),
+  //         child: Row(
+  //           children: [
+  //             Radio<String>(
+  //               value: value,
+  //               groupValue: _sortingMode,
+  //               activeColor: const Color(0xFF1B2C4F),
+  //               onChanged: (newValue) {
+  //                 setModalState(() {
+  //                   _sortingMode = newValue!;
+  //                 });
+  //               },
+  //             ),
+  //             Expanded(
+  //               child: Column(
+  //                 crossAxisAlignment: CrossAxisAlignment.start,
+  //                 children: [
+  //                   Text(
+  //                     value,
+  //                     style: const TextStyle(
+  //                       fontWeight: FontWeight.w600,
+  //                       fontSize: 15,
+  //                     ),
+  //                   ),
+  //                   Text(
+  //                     description,
+  //                     style: TextStyle(color: Colors.grey[600], fontSize: 13),
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     );
+  //   }
 }
 
 // Venue Model - Enhanced to match first file data structure

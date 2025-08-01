@@ -474,58 +474,79 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   Widget _buildSearchBar() {
     return Container(
-      margin: const EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF1B2C4F).withOpacity(0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: TextField(
-        controller: _searchController,
-        onChanged: _filterMessages,
-        keyboardType: TextInputType.text,
-        textInputAction: TextInputAction.search,
-        decoration: InputDecoration(
-          hintText: 'Search conversations...',
-          hintStyle: TextStyle(
-            color: const Color(0xFF1B2C4F).withOpacity(0.5),
-            fontFamily: 'Poppins',
-          ),
-          prefixIcon: const Icon(
-            Icons.search,
-            color: Color(0xFF1B2C4F),
-            size: 20,
-          ),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(
-                    Icons.clear,
-                    color: Color(0xFF1B2C4F),
-                    size: 20,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.search_outlined,
+              color: Color(0xFF1B2C4F),
+              size: 22,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                keyboardType: TextInputType.text,
+                textInputAction: TextInputAction.search,
+                style: const TextStyle(
+                  fontSize: 14,
+                  //fontFamily: 'Poppins',
+                  color: Color(0xFF1B2C4F),
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Search conversations...',
+                  hintStyle: TextStyle(
+                    color: const Color(0xFF1B2C4F).withOpacity(0.4),
+                    fontSize: 14,
+                    //fontFamily: 'Poppins',
                   ),
-                  tooltip: 'Clear search',
-                  onPressed: () {
-                    setState(() {
-                      _searchController.clear();
-                      _filterMessages('');
-                    });
-                  },
-                )
-              : null,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide.none,
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(vertical: 12),
-          isDense: true,
+                  border: InputBorder.none,
+                  isCollapsed: true,
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _filterMessages(value);
+                  });
+                },
+                onSubmitted: (value) {
+                  setState(() {
+                    _searchController.clear();
+                    _filterMessages('');
+                  });
+                },
+              ),
+            ),
+            if (_searchController.text.isNotEmpty)
+              IconButton(
+                icon: const Icon(
+                  Icons.clear_rounded,
+                  color: Color(0xFF1B2C4F),
+                  size: 20,
+                ),
+                tooltip: 'Clear search',
+                onPressed: () {
+                  setState(() {
+                    _searchController.clear();
+                    _filterMessages('');
+                  });
+                },
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+          ],
         ),
       ),
     );
