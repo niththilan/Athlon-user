@@ -59,11 +59,7 @@ class SportItem {
   final String imageUrl;
   final double rating;
 
-  SportItem({
-    required this.name,
-    required this.imageUrl,
-    required this.rating,
-  });
+  SportItem({required this.name, required this.imageUrl, required this.rating});
 }
 
 class CourtDetailScreen extends StatefulWidget {
@@ -116,7 +112,8 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   }
 
   void _initializeCourtData() {
-    _courtDetails = widget.courtData ??
+    _courtDetails =
+        widget.courtData ??
         {
           'id': 'court_001',
           'name': 'ARK SPORTS',
@@ -161,33 +158,43 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
       // Prevent duplicates
       if (!CourtDetailScreen.favorites.any((v) => v['id'] == favVenue['id'])) {
         CourtDetailScreen.favorites.add(favVenue);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Added to favorites')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Added to favorites')));
       }
     } else {
       // Remove from favorites
-      CourtDetailScreen.favorites.removeWhere((v) => v['id'] == _courtDetails['id']);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Removed from favorites')),
+      CourtDetailScreen.favorites.removeWhere(
+        (v) => v['id'] == _courtDetails['id'],
       );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Removed from favorites')));
     }
   }
 
-  Widget _buildActionButton(String text, IconData icon, Color backgroundColor, Color textColor, VoidCallback onPressed) {
+  Widget _buildActionButton(
+    String text,
+    IconData icon,
+    Color backgroundColor,
+    Color textColor,
+    VoidCallback onPressed,
+  ) {
     return Expanded(
       child: Container(
         height: 70,
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: backgroundColor == Colors.white ? [
-            const BoxShadow(
-              color: Color(0xFFE5E7EB),
-              blurRadius: 8,
-              offset: Offset(0, 2),
-            ),
-          ] : [],
+          boxShadow: backgroundColor == Colors.white
+              ? [
+                  const BoxShadow(
+                    color: Color(0xFFE5E7EB),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
+                  ),
+                ]
+              : [],
         ),
         child: Material(
           color: Colors.transparent,
@@ -240,9 +247,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
               // Navigate to BookNow screen
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (context) => BookNowScreen(),
-                ),
+                MaterialPageRoute(builder: (context) => BookNowScreen()),
               );
             },
             child: Padding(
@@ -250,7 +255,6 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  
                   const SizedBox(width: 10),
                   Text(
                     'Check Availability',
@@ -273,9 +277,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: FootballLoadingWidget()),
-      );
+      return const Scaffold(body: Center(child: FootballLoadingWidget()));
     }
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8),
@@ -283,7 +285,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
         slivers: [
           // Top Image Carousel
           SliverToBoxAdapter(
-            child: Container(
+            child: SizedBox(
               height: 300,
               child: Stack(
                 children: [
@@ -307,9 +309,10 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             color: Colors.white,
                             child: Center(
                               child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
+                                value:
+                                    loadingProgress.expectedTotalBytes != null
                                     ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
+                                          loadingProgress.expectedTotalBytes!
                                     : null,
                                 color: const Color(0xFF1B2C4F),
                               ),
@@ -322,10 +325,27 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             child: const Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.sports_soccer, size: 50, color: Color(0xFF1B2C4F)),
+                                Icon(
+                                  Icons.sports_soccer,
+                                  size: 50,
+                                  color: Color(0xFF1B2C4F),
+                                ),
                                 SizedBox(height: 8),
-                                Text('ARK SPORTS', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1B2C4F))),
-                                Text('Indoor Sports Facility', style: TextStyle(fontSize: 12, color: Color(0xFF1B2C4F))),
+                                Text(
+                                  'ARK SPORTS',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF1B2C4F),
+                                  ),
+                                ),
+                                Text(
+                                  'Indoor Sports Facility',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF1B2C4F),
+                                  ),
+                                ),
                               ],
                             ),
                           );
@@ -363,7 +383,8 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     top: MediaQuery.of(context).padding.top + 4,
                     right: 16,
                     child: GestureDetector(
-                      onTap: _toggleFavorite, // <-- This adds/removes from favorites
+                      onTap:
+                          _toggleFavorite, // <-- This adds/removes from favorites
                       child: Container(
                         width: 40,
                         height: 40,
@@ -374,7 +395,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         ),
                         child: Icon(
                           _isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: _isFavorite ? Colors.red : const Color.fromARGB(255, 255, 255, 255),
+                          color: _isFavorite
+                              ? Colors.red
+                              : const Color.fromARGB(255, 255, 255, 255),
                           size: 24,
                         ),
                       ),
@@ -485,7 +508,10 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
 
                 // Info Cards combined in one box
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -500,15 +526,21 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                   child: Column(
                     children: [
                       ListTile(
-
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
                         leading: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF3F4F6),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(Icons.location_on, color: Color(0xFF1B2C4F), size: 20),
+                          child: const Icon(
+                            Icons.location_on,
+                            color: Color(0xFF1B2C4F),
+                            size: 20,
+                          ),
                         ),
                         title: Text(
                           _courtDetails['location'],
@@ -534,14 +566,21 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         endIndent: 16,
                       ),
                       ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
                         leading: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF3F4F6),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(Icons.access_time, color: Color(0xFF1B2C4F), size: 20),
+                          child: const Icon(
+                            Icons.access_time,
+                            color: Color(0xFF1B2C4F),
+                            size: 20,
+                          ),
                         ),
                         title: Text(
                           _courtDetails['opening_hours'],
@@ -567,14 +606,21 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         endIndent: 16,
                       ),
                       ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
                         leading: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF3F4F6),
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: const Icon(Icons.star, color: Color(0xFF1B2C4F), size: 20),
+                          child: const Icon(
+                            Icons.star,
+                            color: Color(0xFF1B2C4F),
+                            size: 20,
+                          ),
                         ),
                         title: const Text(
                           'Write a Review',
@@ -643,10 +689,22 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         scrollDirection: Axis.horizontal,
                         child: Row(
                           children: [
-                            _SportsCard(sport: "Football", imagePath: "assets/football.jpg"),
-                            _SportsCard(sport: "Basketball", imagePath: "assets/basket.jpg"),
-                            _SportsCard(sport: "Tennis", imagePath: "assets/tennis.jpg"),
-                            _SportsCard(sport: "Cricket", imagePath: "assets/crickett.jpg"),
+                            _SportsCard(
+                              sport: "Football",
+                              imagePath: "assets/football.jpg",
+                            ),
+                            _SportsCard(
+                              sport: "Basketball",
+                              imagePath: "assets/basket.jpg",
+                            ),
+                            _SportsCard(
+                              sport: "Tennis",
+                              imagePath: "assets/tennis.jpg",
+                            ),
+                            _SportsCard(
+                              sport: "Cricket",
+                              imagePath: "assets/crickett.jpg",
+                            ),
                             _SportsCard(
                               sport: "Badminton",
                               imagePath: "assets/badminton.jpg",

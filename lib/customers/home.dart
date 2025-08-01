@@ -15,7 +15,7 @@ class NoAnimationRoute<T> extends PageRoute<T> {
   NoAnimationRoute({
     required this.builder,
     super.settings,
-  
+
     this.maintainState = true,
   }) : super(fullscreenDialog: false);
 
@@ -44,7 +44,6 @@ class NoAnimationRoute<T> extends PageRoute<T> {
   ) {
     return builder(context);
   }
-
 
   @override
   bool get barrierDismissible => false;
@@ -179,9 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: FootballLoadingWidget()),
-      );
+      return const Scaffold(body: Center(child: FootballLoadingWidget()));
     }
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
@@ -822,9 +819,7 @@ class VenuesSection extends StatelessWidget {
                     left: index == 0 ? 8 : 12,
                     right: index == _sampleVenues.length - 1 ? 8 : 0,
                   ),
-                  child: VenueCard(
-                    venue: venue,
-                  ),
+                  child: VenueCard(venue: venue),
                 );
               },
             ),
@@ -838,10 +833,7 @@ class VenuesSection extends StatelessWidget {
 class VenueCard extends StatelessWidget {
   final VenueModel venue;
 
-  const VenueCard({
-    super.key,
-    required this.venue,
-  });
+  const VenueCard({super.key, required this.venue});
 
   @override
   Widget build(BuildContext context) {
@@ -926,7 +918,9 @@ class VenueCard extends StatelessWidget {
                       children: List.generate(5, (index) {
                         return Icon(
                           Icons.star,
-                          color: index < venue.rating ? Colors.amber : Colors.grey,
+                          color: index < venue.rating
+                              ? Colors.amber
+                              : Colors.grey,
                           size: 16,
                         );
                       }),

@@ -8,6 +8,7 @@ import 'messages.dart';
 
 /// Simplified History Screen with user-friendly design
 class HistoryScreen extends StatefulWidget {
+  // ignore: use_super_parameters
   const HistoryScreen({Key? key}) : super(key: key);
 
   @override
@@ -15,6 +16,7 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class HistoryScreenState extends State<HistoryScreen> {
+  // ignore: unused_field
   bool _isLoading = true;
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
@@ -44,7 +46,7 @@ class HistoryScreenState extends State<HistoryScreen> {
     _initializeDateList();
     _initializeMockData(); // Add mock data initialization
     _scrollController.addListener(_onScroll);
-    
+
     // Set loading to false since we're using mock data
     _isLoading = false;
   }
@@ -289,72 +291,72 @@ class HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  Future<void> _loadBookingHistory() async {
-    // try {
-    //   setState(() {
-    //     _isLoading = true;
-    //   });
+  // Future<void> _loadBookingHistory() async {
+  //   // try {
+  //   //   setState(() {
+  //   //     _isLoading = true;
+  //   //   });
 
-    //   // Get all facilities first
-    //   final facilities = await SupabaseService.getVendorFacilities();
-    //   final List<BookingHistoryItem> loadedHistory = [];
+  //   //   // Get all facilities first
+  //   //   final facilities = await SupabaseService.getVendorFacilities();
+  //   //   final List<BookingHistoryItem> loadedHistory = [];
 
-    //   // Get bookings from all facilities
-    //   for (final facility in facilities) {
-    //     final facilityBookings = await SupabaseService.searchBookings(
-    //       facilityId: facility['id'],
-    //       limit: 100, // Get recent bookings
-    //     );
+  //   //   // Get bookings from all facilities
+  //   //   for (final facility in facilities) {
+  //   //     final facilityBookings = await SupabaseService.searchBookings(
+  //   //       facilityId: facility['id'],
+  //   //       limit: 100, // Get recent bookings
+  //   //     );
 
-    //     // Convert booking data to BookingHistoryItem
-    //     for (final bookingData in facilityBookings) {
-    //       try {
-    //         final startTime = DateTime.parse(bookingData['start_time']);
-    //         final endTime = DateTime.parse(bookingData['end_time']);
-            
-    //         loadedHistory.add(
-    //           BookingHistoryItem(
-    //             id: bookingData['id'] ?? '',
-    //             customerName: bookingData['customer_name'] ?? 'Unknown Customer',
-    //             courtName: bookingData['court_name'] ?? 'Unknown Court',
-    //             courtType: bookingData['court_type'] ?? 'General',
-    //             date: DateTime.parse(bookingData['booking_date']),
-    //             startTime: DateFormat('h:mm a').format(startTime),
-    //             endTime: DateFormat('h:mm a').format(endTime),
-    //             duration: bookingData['duration'] ?? 60,
-    //             price: (bookingData['price'] ?? 0.0).toDouble(),
-    //             status: bookingData['status'] ?? 'confirmed',
-    //             customerPhone: bookingData['customer_phone'] ?? 'N/A',
-    //           ),
-    //         );
-    //       } catch (e) {
-    //         // Skip malformed booking data
-    //         print('Error parsing booking data: $e');
-    //         continue;
-    //       }
-    //     }
-    //   }
+  //   //     // Convert booking data to BookingHistoryItem
+  //   //     for (final bookingData in facilityBookings) {
+  //   //       try {
+  //   //         final startTime = DateTime.parse(bookingData['start_time']);
+  //   //         final endTime = DateTime.parse(bookingData['end_time']);
 
-    //   // Sort by date (newest first)
-    //   loadedHistory.sort((a, b) => b.date.compareTo(a.date));
+  //   //         loadedHistory.add(
+  //   //           BookingHistoryItem(
+  //   //             id: bookingData['id'] ?? '',
+  //   //             customerName: bookingData['customer_name'] ?? 'Unknown Customer',
+  //   //             courtName: bookingData['court_name'] ?? 'Unknown Court',
+  //   //             courtType: bookingData['court_type'] ?? 'General',
+  //   //             date: DateTime.parse(bookingData['booking_date']),
+  //   //             startTime: DateFormat('h:mm a').format(startTime),
+  //   //             endTime: DateFormat('h:mm a').format(endTime),
+  //   //             duration: bookingData['duration'] ?? 60,
+  //   //             price: (bookingData['price'] ?? 0.0).toDouble(),
+  //   //             status: bookingData['status'] ?? 'confirmed',
+  //   //             customerPhone: bookingData['customer_phone'] ?? 'N/A',
+  //   //           ),
+  //   //         );
+  //   //       } catch (e) {
+  //   //         // Skip malformed booking data
+  //   //         print('Error parsing booking data: $e');
+  //   //         continue;
+  //   //       }
+  //   //     }
+  //   //   }
 
-    //   if (mounted) {
-    //     setState(() {
-    //       bookingHistory = loadedHistory;
-    //       _isLoading = false;
-    //     });
-    //   }
-    // } catch (e) {
-    //   print('Error loading booking history: $e');
-    //   if (mounted) {
-    //     setState(() {
-    //       // Fall back to empty list on error
-    //       bookingHistory = [];
-    //       _isLoading = false;
-    //     });
-    //   }
-    // }
-  }
+  //   //   // Sort by date (newest first)
+  //   //   loadedHistory.sort((a, b) => b.date.compareTo(a.date));
+
+  //   //   if (mounted) {
+  //   //     setState(() {
+  //   //       bookingHistory = loadedHistory;
+  //   //       _isLoading = false;
+  //   //     });
+  //   //   }
+  //   // } catch (e) {
+  //   //   print('Error loading booking history: $e');
+  //   //   if (mounted) {
+  //   //     setState(() {
+  //   //       // Fall back to empty list on error
+  //   //       bookingHistory = [];
+  //   //       _isLoading = false;
+  //   //     });
+  //   //   }
+  //   // }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -396,7 +398,8 @@ class HistoryScreenState extends State<HistoryScreen> {
                   Navigator.pushReplacement(
                     context,
                     PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) => home.HomeScreen(),
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          home.HomeScreen(),
                       transitionDuration: Duration.zero,
                       reverseTransitionDuration: Duration.zero,
                     ),
@@ -429,7 +432,8 @@ class HistoryScreenState extends State<HistoryScreen> {
                 Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) => home.HomeScreen(),
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        home.HomeScreen(),
                     transitionDuration: Duration.zero,
                     reverseTransitionDuration: Duration.zero,
                   ),
@@ -442,7 +446,8 @@ class HistoryScreenState extends State<HistoryScreen> {
                 Navigator.pushReplacement(
                   context,
                   PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) => const MessagesScreen(),
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const MessagesScreen(),
                     transitionDuration: Duration.zero,
                     reverseTransitionDuration: Duration.zero,
                   ),
@@ -489,10 +494,7 @@ class HistoryScreenState extends State<HistoryScreen> {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: Colors.grey.shade200,
-          width: 1,
-        ),
+        border: Border.all(color: Colors.grey.shade200, width: 1),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -556,12 +558,16 @@ class HistoryScreenState extends State<HistoryScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Center(
-                          child: Icon(Icons.phone, size: 20, color: Colors.white),
+                          child: Icon(
+                            Icons.phone,
+                            size: 20,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                  Container(
+                  SizedBox(
                     width: 40,
                     height: 40,
                     child: GestureDetector(
@@ -572,7 +578,11 @@ class HistoryScreenState extends State<HistoryScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Center(
-                          child: Icon(Icons.info_outline, size: 20, color: Colors.white),
+                          child: Icon(
+                            Icons.info_outline,
+                            size: 20,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -607,7 +617,7 @@ class HistoryScreenState extends State<HistoryScreen> {
   void _makePhoneCall(String phoneNumber) {
     // Remove any formatting and ensure we have a valid number
     final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
-    
+
     // For now, show a snackbar. In a real app, you would use url_launcher
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -616,7 +626,7 @@ class HistoryScreenState extends State<HistoryScreen> {
         duration: Duration(seconds: 2),
       ),
     );
-    
+
     // Uncomment and add url_launcher dependency to actually make calls:
     // final url = 'tel:$cleanNumber';
     // if (await canLaunch(url)) {
@@ -668,29 +678,35 @@ class HistoryScreenState extends State<HistoryScreen> {
                     ),
                   ],
                 ),
-                
+
                 SizedBox(height: 20),
-                
+
                 // Customer Information
                 _buildDetailRow('Customer Name', booking.customerName),
                 _buildDetailRow('Phone Number', booking.customerPhone),
-                
+
                 SizedBox(height: 16),
-                
+
                 // Court Information
                 _buildDetailRow('Court Name', booking.courtName),
                 _buildDetailRow('Court Type', booking.courtType),
-                
+
                 SizedBox(height: 16),
-                
+
                 // Booking Information
-                _buildDetailRow('Date', DateFormat('EEEE, MMM d, yyyy').format(booking.date)),
-                _buildDetailRow('Time', '${booking.startTime} - ${booking.endTime}'),
+                _buildDetailRow(
+                  'Date',
+                  DateFormat('EEEE, MMM d, yyyy').format(booking.date),
+                ),
+                _buildDetailRow(
+                  'Time',
+                  '${booking.startTime} - ${booking.endTime}',
+                ),
                 _buildDetailRow('Duration', '${booking.duration} minutes'),
                 _buildDetailRow('Status', booking.status.toUpperCase()),
-                
+
                 SizedBox(height: 16),
-                
+
                 // Price Information
                 Container(
                   width: double.infinity,
@@ -704,10 +720,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                     children: [
                       Text(
                         'Total Amount',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: textSecondary,
-                        ),
+                        style: TextStyle(fontSize: 14, color: textSecondary),
                       ),
                       SizedBox(height: 4),
                       Text(
@@ -721,9 +734,9 @@ class HistoryScreenState extends State<HistoryScreen> {
                     ],
                   ),
                 ),
-                
+
                 SizedBox(height: 20),
-                
+
                 // Action buttons in popup
                 Row(
                   children: [
@@ -801,10 +814,10 @@ class HistoryScreenState extends State<HistoryScreen> {
 
   Widget _buildEmptyState() {
     final isToday = _isSameDay(selectedDate, DateTime.now());
-    final dateText = isToday 
-        ? 'today' 
+    final dateText = isToday
+        ? 'today'
         : DateFormat('MMM d, yyyy').format(selectedDate);
-    
+
     return Center(
       child: Padding(
         padding: EdgeInsets.all(32),
@@ -825,7 +838,9 @@ class HistoryScreenState extends State<HistoryScreen> {
             ),
             SizedBox(height: 24),
             Text(
-              bookingHistory.isEmpty ? 'No bookings yet' : 'No bookings for $dateText',
+              bookingHistory.isEmpty
+                  ? 'No bookings yet'
+                  : 'No bookings for $dateText',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -834,7 +849,7 @@ class HistoryScreenState extends State<HistoryScreen> {
             ),
             SizedBox(height: 8),
             Text(
-              bookingHistory.isEmpty 
+              bookingHistory.isEmpty
                   ? 'Your booking history will appear here'
                   : 'Try selecting a different date',
               style: TextStyle(fontSize: 14, color: textSecondary),
@@ -876,11 +891,11 @@ class HistoryScreenState extends State<HistoryScreen> {
         selectedDate = newSelectedDate;
         currentDateStartIndex = newStartIndex;
       });
-      
+
       // Save to DateProvider for sharing with other screens
       // final dateProvider = Provider.of<DateProvider>(context, listen: false);
       // dateProvider.setDate(newSelectedDate);
-      
+
       // No need to reload bookings - filtering will handle the display
     }
   }
@@ -1016,7 +1031,9 @@ class HistoryScreenState extends State<HistoryScreen> {
           ),
           const SizedBox(height: 25),
 
-          showCalendar ? _buildCalendarContentExpanded() : _buildDateAndBookingsContent(),
+          showCalendar
+              ? _buildCalendarContentExpanded()
+              : _buildDateAndBookingsContent(),
         ],
       ),
     );
@@ -1150,7 +1167,6 @@ class HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-
   /// Builds individual date circle for the scroll section
   Widget _buildDateCircle(int index) {
     final dateIndex = currentDateStartIndex + index;
@@ -1159,7 +1175,11 @@ class HistoryScreenState extends State<HistoryScreen> {
     final date = dateList[dateIndex];
     final isSelected = _isSameDay(date, selectedDate);
     final isToday = _isSameDay(date, DateTime.now());
-    final isPastDate = date.isBefore(DateTime.now().subtract(Duration(days: 0)).copyWith(hour: 0, minute: 0, second: 0, millisecond: 0));
+    final isPastDate = date.isBefore(
+      DateTime.now()
+          .subtract(Duration(days: 0))
+          .copyWith(hour: 0, minute: 0, second: 0, millisecond: 0),
+    );
 
     return GestureDetector(
       onTap: () {
@@ -1194,8 +1214,8 @@ class HistoryScreenState extends State<HistoryScreen> {
               color: isSelected
                   ? Colors.white
                   : isPastDate
-                      ? Colors.grey
-                      : textPrimary,
+                  ? Colors.grey
+                  : textPrimary,
             ),
           ),
         ),

@@ -70,7 +70,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
   String? selectedSport;
   DateTime selectedDate = DateTime.now(); // Changed from nullable
   int _currentFooterIndex = 0; // For footer navigation
-  
+
   // Date scroll and calendar state from history.dart
   bool showCalendar = false;
   late List<DateTime> dateList;
@@ -189,10 +189,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color(0xFFE5E7EB),
-              width: 1,
-            ),
+            border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
@@ -345,7 +342,9 @@ class _BookNowScreenState extends State<BookNowScreen> {
           ),
           const SizedBox(height: 25),
 
-          showCalendar ? _buildCalendarContentExpanded() : _buildDateAndBookingsContent(),
+          showCalendar
+              ? _buildCalendarContentExpanded()
+              : _buildDateAndBookingsContent(),
         ],
       ),
     );
@@ -487,7 +486,11 @@ class _BookNowScreenState extends State<BookNowScreen> {
     final date = dateList[dateIndex];
     final isSelected = _isSameDay(date, selectedDate);
     final isToday = _isSameDay(date, DateTime.now());
-    final isPastDate = date.isBefore(DateTime.now().subtract(Duration(days: 0)).copyWith(hour: 0, minute: 0, second: 0, millisecond: 0));
+    final isPastDate = date.isBefore(
+      DateTime.now()
+          .subtract(Duration(days: 0))
+          .copyWith(hour: 0, minute: 0, second: 0, millisecond: 0),
+    );
 
     return GestureDetector(
       onTap: () {
@@ -522,8 +525,8 @@ class _BookNowScreenState extends State<BookNowScreen> {
               color: isSelected
                   ? Colors.white
                   : isPastDate
-                      ? const Color(0xFF6B7280)
-                      : const Color(0xFF111827),
+                  ? const Color(0xFF6B7280)
+                  : const Color(0xFF111827),
             ),
           ),
         ),
@@ -570,23 +573,27 @@ class _BookNowScreenState extends State<BookNowScreen> {
       final date = DateTime(selectedDate.year, selectedDate.month, day);
       final isSelected = _isSameDay(date, selectedDate);
       final isToday = _isSameDay(date, DateTime.now());
-      final isPastDate = date.isBefore(DateTime.now().copyWith(hour: 0, minute: 0, second: 0, millisecond: 0));
+      final isPastDate = date.isBefore(
+        DateTime.now().copyWith(hour: 0, minute: 0, second: 0, millisecond: 0),
+      );
 
       dayWidgets.add(
         Expanded(
           child: GestureDetector(
-            onTap: isPastDate ? null : () {
-              _updateDateView(date);
-            },
+            onTap: isPastDate
+                ? null
+                : () {
+                    _updateDateView(date);
+                  },
             child: Container(
               height: 36,
               margin: const EdgeInsets.all(2),
               decoration: BoxDecoration(
-                color: isPastDate 
+                color: isPastDate
                     ? const Color(0xFFF3F4F6)
-                    : isSelected 
-                        ? const Color(0xFF1B2C4F) 
-                        : null,
+                    : isSelected
+                    ? const Color(0xFF1B2C4F)
+                    : null,
                 shape: BoxShape.circle,
                 border: isToday && !isSelected && !isPastDate
                     ? Border.all(color: const Color(0xFF1B2C4F), width: 2)
@@ -601,10 +608,10 @@ class _BookNowScreenState extends State<BookNowScreen> {
                     color: isPastDate
                         ? const Color(0xFFD1D5DB)
                         : isSelected
-                            ? Colors.white
-                            : isToday
-                                ? const Color(0xFF1B2C4F)
-                                : const Color(0xFF111827),
+                        ? Colors.white
+                        : isToday
+                        ? const Color(0xFF1B2C4F)
+                        : const Color(0xFF111827),
                   ),
                 ),
               ),
@@ -702,10 +709,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
         ),
         child: const Text(
           'Continue',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -726,8 +730,12 @@ class _BookNowScreenState extends State<BookNowScreen> {
     // Check if a future date is selected (not past date)
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final selectedDateOnly = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
-    
+    final selectedDateOnly = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
+
     if (selectedDateOnly.isBefore(today)) {
       _showValidationDialog(
         title: 'Invalid Date',
@@ -793,11 +801,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
                   color: primaryColor.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  icon,
-                  size: 32,
-                  color: primaryColor,
-                ),
+                child: Icon(icon, size: 32, color: primaryColor),
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.width < 400 ? 16 : 20,
@@ -839,7 +843,9 @@ class _BookNowScreenState extends State<BookNowScreen> {
                     elevation: 0,
                     padding: EdgeInsets.symmetric(
                       horizontal: 20,
-                      vertical: MediaQuery.of(context).size.width < 400 ? 12 : 14,
+                      vertical: MediaQuery.of(context).size.width < 400
+                          ? 12
+                          : 14,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -848,7 +854,9 @@ class _BookNowScreenState extends State<BookNowScreen> {
                   child: Text(
                     'OK',
                     style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 15,
+                      fontSize: MediaQuery.of(context).size.width < 400
+                          ? 14
+                          : 15,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -860,7 +868,6 @@ class _BookNowScreenState extends State<BookNowScreen> {
       ),
     );
   }
-
 }
 
 // TimeSlotSelectionScreen - New screen for time slot selection
@@ -877,7 +884,8 @@ class TimeSlotSelectionScreen extends StatefulWidget {
   });
 
   @override
-  State<TimeSlotSelectionScreen> createState() => _TimeSlotSelectionScreenState();
+  State<TimeSlotSelectionScreen> createState() =>
+      _TimeSlotSelectionScreenState();
 }
 
 class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
@@ -956,11 +964,7 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
         leading: Container(
           margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
           child: IconButton(
-            icon: const Icon(
-              Icons.chevron_left,
-              color: Colors.white,
-              size: 28,
-            ),
+            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
             onPressed: () {
               Navigator.of(context).pop();
             },
@@ -1023,7 +1027,10 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF1B2C4F).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
@@ -1195,61 +1202,61 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
       physics: const NeverScrollableScrollPhysics(),
       itemCount: (timeSlots.length / 4).ceil(),
       itemBuilder: (context, rowIndex) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildResponsiveTimeSlot(
-                    timeSlots[rowIndex * 4],
-                    slotWidth,
-                    slotHeight,
-                    fontSize,
-                    smallFontSize,
-                  ),
-                  SizedBox(width: smallSpacing),
-
-                  if (rowIndex * 4 + 1 < timeSlots.length)
-                    _buildResponsiveTimeSlot(
-                      timeSlots[rowIndex * 4 + 1],
-                      slotWidth,
-                      slotHeight,
-                      fontSize,
-                      smallFontSize,
-                    )
-                  else
-                    SizedBox(width: slotWidth),
-
-                  SizedBox(width: largeSpacing),
-
-                  if (rowIndex * 4 + 2 < timeSlots.length)
-                    _buildResponsiveTimeSlot(
-                      timeSlots[rowIndex * 4 + 2],
-                      slotWidth,
-                      slotHeight,
-                      fontSize,
-                      smallFontSize,
-                    )
-                  else
-                    SizedBox(width: slotWidth),
-
-                  SizedBox(width: smallSpacing),
-
-                  if (rowIndex * 4 + 3 < timeSlots.length)
-                    _buildResponsiveTimeSlot(
-                      timeSlots[rowIndex * 4 + 3],
-                      slotWidth,
-                      slotHeight,
-                      fontSize,
-                      smallFontSize,
-                    )
-                  else
-                    SizedBox(width: slotWidth),
-                ],
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildResponsiveTimeSlot(
+                timeSlots[rowIndex * 4],
+                slotWidth,
+                slotHeight,
+                fontSize,
+                smallFontSize,
               ),
-            );
-          },
+              SizedBox(width: smallSpacing),
+
+              if (rowIndex * 4 + 1 < timeSlots.length)
+                _buildResponsiveTimeSlot(
+                  timeSlots[rowIndex * 4 + 1],
+                  slotWidth,
+                  slotHeight,
+                  fontSize,
+                  smallFontSize,
+                )
+              else
+                SizedBox(width: slotWidth),
+
+              SizedBox(width: largeSpacing),
+
+              if (rowIndex * 4 + 2 < timeSlots.length)
+                _buildResponsiveTimeSlot(
+                  timeSlots[rowIndex * 4 + 2],
+                  slotWidth,
+                  slotHeight,
+                  fontSize,
+                  smallFontSize,
+                )
+              else
+                SizedBox(width: slotWidth),
+
+              SizedBox(width: smallSpacing),
+
+              if (rowIndex * 4 + 3 < timeSlots.length)
+                _buildResponsiveTimeSlot(
+                  timeSlots[rowIndex * 4 + 3],
+                  slotWidth,
+                  slotHeight,
+                  fontSize,
+                  smallFontSize,
+                )
+              else
+                SizedBox(width: slotWidth),
+            ],
+          ),
         );
+      },
+    );
   }
 
   Widget _buildResponsiveTimeSlot(
@@ -1438,9 +1445,13 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
       durationText = '$minutes min';
     }
 
-    final startTimeStr = DateFormat('h:mm a').format(_parseTimeString(actuallySelectedTimes.first));
+    final startTimeStr = DateFormat(
+      'h:mm a',
+    ).format(_parseTimeString(actuallySelectedTimes.first));
     final endTimeStr = DateFormat('h:mm a').format(
-      _parseTimeString(actuallySelectedTimes.last).add(const Duration(minutes: 30))
+      _parseTimeString(
+        actuallySelectedTimes.last,
+      ).add(const Duration(minutes: 30)),
     );
 
     return {
@@ -1504,10 +1515,7 @@ class VenueSelectionSection extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: const Color(0xFFE5E7EB),
-              width: 1,
-            ),
+            border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.08),
@@ -1534,7 +1542,9 @@ class VenueSelectionSection extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
                   child: Image.asset(
-                    _getCourtImage(venueData['sport']?.toString() ?? 'Football'),
+                    _getCourtImage(
+                      venueData['sport']?.toString() ?? 'Football',
+                    ),
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(

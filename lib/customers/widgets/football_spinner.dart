@@ -1,3 +1,5 @@
+// ignore_for_file: use_super_parameters
+
 import 'package:flutter/material.dart';
 
 class FootballSpinner extends StatefulWidget {
@@ -55,10 +57,8 @@ class _FootballSpinnerState extends State<FootballSpinner>
 class FootballLoadingWidget extends StatelessWidget {
   final Color? backgroundColor;
 
-  const FootballLoadingWidget({
-    Key? key,
-    this.backgroundColor,
-  }) : super(key: key);
+  const FootballLoadingWidget({Key? key, this.backgroundColor})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -66,9 +66,7 @@ class FootballLoadingWidget extends StatelessWidget {
       width: double.infinity,
       height: double.infinity,
       color: backgroundColor ?? const Color(0xFFF5F6FA),
-      child: const Center(
-        child: FootballSpinner(size: 60.0),
-      ),
+      child: const Center(child: FootballSpinner(size: 60.0)),
     );
   }
 }

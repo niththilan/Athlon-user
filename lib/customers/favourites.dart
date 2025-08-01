@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, avoid_print
 
 import 'package:flutter/material.dart';
 import 'footer.dart';
@@ -21,7 +21,7 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
-  int _currentIndex = 1; // Set to favorites tab index (1 in footer structure)
+  // Set to favorites tab index (1 in footer structure)
   late List<Map<String, dynamic>> _favoriteVenues;
 
   @override
@@ -33,12 +33,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   // Footer navigation to handle all tabs
   void _onTabSelected(int index) {
     print('Navigation selected: index $index'); // Debug output
-    
+
     // Just update the current index for UI state
     // Let the footer handle the actual navigation
-    setState(() {
-      _currentIndex = index;
-    });
+    setState(() {});
   }
 
   // Handle removing favorite
@@ -120,11 +118,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         leading: Container(
           margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
           child: IconButton(
-            icon: const Icon(
-              Icons.chevron_left,
-              color: Colors.white,
-              size: 28,
-            ),
+            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
             onPressed: () {
               Navigator.of(context).pop();
             },

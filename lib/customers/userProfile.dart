@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, file_names, avoid_print, use_build_context_synchronously
+// ignore_for_file: deprecated_member_use, file_names, avoid_print, use_build_context_synchronously, sized_box_for_whitespace, unnecessary_to_list_in_spreads
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

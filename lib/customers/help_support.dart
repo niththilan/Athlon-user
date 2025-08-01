@@ -270,149 +270,149 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
     );
   }
 
-  void _showRatingPopup() {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        int selectedRating = 0;
+  // void _showRatingPopup() {
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: true,
+  //     builder: (BuildContext context) {
+  //       int selectedRating = 0;
 
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // App icon
-                    Container(
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1B2C4F),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Icon(
-                        Icons.sports_tennis,
-                        color: Colors.white,
-                        size: 30,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+  //       return StatefulBuilder(
+  //         builder: (context, setState) {
+  //           return Dialog(
+  //             shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.circular(20),
+  //             ),
+  //             child: Container(
+  //               padding: const EdgeInsets.all(24),
+  //               decoration: BoxDecoration(
+  //                 color: Colors.white,
+  //                 borderRadius: BorderRadius.circular(20),
+  //               ),
+  //               child: Column(
+  //                 mainAxisSize: MainAxisSize.min,
+  //                 children: [
+  //                   // App icon
+  //                   Container(
+  //                     width: 60,
+  //                     height: 60,
+  //                     decoration: BoxDecoration(
+  //                       color: const Color(0xFF1B2C4F),
+  //                       borderRadius: BorderRadius.circular(12),
+  //                     ),
+  //                     child: const Icon(
+  //                       Icons.sports_tennis,
+  //                       color: Colors.white,
+  //                       size: 30,
+  //                     ),
+  //                   ),
+  //                   const SizedBox(height: 16),
 
-                    // Title
-                    const Text(
-                      "Rate Athlon",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1B2C4F),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
+  //                   // Title
+  //                   const Text(
+  //                     "Rate Athlon",
+  //                     style: TextStyle(
+  //                       fontSize: 20,
+  //                       fontWeight: FontWeight.bold,
+  //                       color: Color(0xFF1B2C4F),
+  //                     ),
+  //                   ),
+  //                   const SizedBox(height: 8),
 
-                    // Subtitle
-                    Text(
-                      "How would you rate your experience with our app?",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
+  //                   // Subtitle
+  //                   Text(
+  //                     "How would you rate your experience with our app?",
+  //                     textAlign: TextAlign.center,
+  //                     style: TextStyle(
+  //                       fontSize: 14,
+  //                       color: Colors.grey[600],
+  //                       height: 1.4,
+  //                     ),
+  //                   ),
+  //                   const SizedBox(height: 24),
 
-                    // Star rating
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(5, (index) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedRating = index + 1;
-                            });
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            child: Icon(
-                              selectedRating > index
-                                  ? Icons.star
-                                  : Icons.star_border,
-                              size: 36,
-                              color: selectedRating > index
-                                  ? Colors.amber
-                                  : Colors.grey[400],
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                    const SizedBox(height: 24),
+  //                   // Star rating
+  //                   Row(
+  //                     mainAxisAlignment: MainAxisAlignment.center,
+  //                     children: List.generate(5, (index) {
+  //                       return GestureDetector(
+  //                         onTap: () {
+  //                           setState(() {
+  //                             selectedRating = index + 1;
+  //                           });
+  //                         },
+  //                         child: Container(
+  //                           padding: const EdgeInsets.all(4),
+  //                           child: Icon(
+  //                             selectedRating > index
+  //                                 ? Icons.star
+  //                                 : Icons.star_border,
+  //                             size: 36,
+  //                             color: selectedRating > index
+  //                                 ? Colors.amber
+  //                                 : Colors.grey[400],
+  //                           ),
+  //                         ),
+  //                       );
+  //                     }),
+  //                   ),
+  //                   const SizedBox(height: 24),
 
-                    // Buttons
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: Text(
-                              "Not Now",
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: selectedRating > 0
-                                ? () {
-                                    Navigator.of(context).pop();
-                                    _showThankYouMessage(selectedRating);
-                                  }
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF1B2C4F),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              "Submit",
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
+  //                   // Buttons
+  //                   Row(
+  //                     children: [
+  //                       Expanded(
+  //                         child: TextButton(
+  //                           onPressed: () => Navigator.of(context).pop(),
+  //                           style: TextButton.styleFrom(
+  //                             padding: const EdgeInsets.symmetric(vertical: 12),
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(8),
+  //                             ),
+  //                           ),
+  //                           child: Text(
+  //                             "Not Now",
+  //                             style: TextStyle(
+  //                               color: Colors.grey[600],
+  //                               fontWeight: FontWeight.w500,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                       const SizedBox(width: 12),
+  //                       Expanded(
+  //                         child: ElevatedButton(
+  //                           onPressed: selectedRating > 0
+  //                               ? () {
+  //                                   Navigator.of(context).pop();
+  //                                   _showThankYouMessage(selectedRating);
+  //                                 }
+  //                               : null,
+  //                           style: ElevatedButton.styleFrom(
+  //                             backgroundColor: const Color(0xFF1B2C4F),
+  //                             foregroundColor: Colors.white,
+  //                             padding: const EdgeInsets.symmetric(vertical: 12),
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(8),
+  //                             ),
+  //                           ),
+  //                           child: const Text(
+  //                             "Submit",
+  //                             style: TextStyle(fontWeight: FontWeight.w600),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   void _showThankYouMessage(int rating) {
     ScaffoldMessenger.of(context).showSnackBar(

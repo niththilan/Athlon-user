@@ -1239,6 +1239,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w500),
             ),
           ),
+          // ignore: sized_box_for_whitespace
           Container(
             height: 36,
             child: ElevatedButton(

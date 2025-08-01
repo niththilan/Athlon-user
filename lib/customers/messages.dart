@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, prefer_const_constructors, use_build_context_synchronously, prefer_const_literals_to_create_immutables
+// ignore_for_file: deprecated_member_use, prefer_const_constructors, use_build_context_synchronously, prefer_const_literals_to_create_immutables, avoid_print
 
 import 'package:flutter/material.dart';
 import 'dart:async'; // Add Timer for debouncing
@@ -83,7 +83,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   List<ChatMessage> _filteredMessages = [];
   String _selectedCategory = 'All';
   bool _isSearching = false;
-  bool _isRefreshing = false;
+  //bool _isRefreshing = false;
   bool _isDisposed = false; // Track widget disposal state
   int _currentIndex = 3; // Add current index for footer
 
@@ -100,13 +100,23 @@ class _MessagesScreenState extends State<MessagesScreen> {
     _messages = [
       ChatMessage(
         name: 'John Doe',
-        lastMessage: 'Hi, I need help with booking a football court for tomorrow',
+        lastMessage:
+            'Hi, I need help with booking a football court for tomorrow',
         time: '2:30 PM',
         unreadCount: 2,
         avatarUrl: '',
         messages: [
-          Message(content: 'Hi, I need help with booking a football court for tomorrow', time: '2:30 PM', isSentByMe: false),
-          Message(content: 'What time do you prefer?', time: '2:35 PM', isSentByMe: true),
+          Message(
+            content:
+                'Hi, I need help with booking a football court for tomorrow',
+            time: '2:30 PM',
+            isSentByMe: false,
+          ),
+          Message(
+            content: 'What time do you prefer?',
+            time: '2:35 PM',
+            isSentByMe: true,
+          ),
         ],
       ),
       ChatMessage(
@@ -116,7 +126,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
         unreadCount: 1,
         avatarUrl: '',
         messages: [
-          Message(content: 'Is the court available this evening?', time: '1:45 PM', isSentByMe: false),
+          Message(
+            content: 'Is the court available this evening?',
+            time: '1:45 PM',
+            isSentByMe: false,
+          ),
         ],
         isPinned: true,
       ),
@@ -127,8 +141,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
         unreadCount: 0,
         avatarUrl: '',
         messages: [
-          Message(content: 'Thank you for the excellent service!', time: 'Yesterday', isSentByMe: false),
-          Message(content: 'Thank you! We appreciate your feedback.', time: 'Yesterday', isSentByMe: true),
+          Message(
+            content: 'Thank you for the excellent service!',
+            time: 'Yesterday',
+            isSentByMe: false,
+          ),
+          Message(
+            content: 'Thank you! We appreciate your feedback.',
+            time: 'Yesterday',
+            isSentByMe: true,
+          ),
         ],
       ),
       ChatMessage(
@@ -138,7 +160,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
         unreadCount: 3,
         avatarUrl: '',
         messages: [
-          Message(content: 'Can I reschedule my booking?', time: 'Monday', isSentByMe: false),
+          Message(
+            content: 'Can I reschedule my booking?',
+            time: 'Monday',
+            isSentByMe: false,
+          ),
         ],
       ),
       ChatMessage(
@@ -148,7 +174,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
         unreadCount: 1,
         avatarUrl: '',
         messages: [
-          Message(content: 'What are your rates for group bookings?', time: '12:15 PM', isSentByMe: false),
+          Message(
+            content: 'What are your rates for group bookings?',
+            time: '12:15 PM',
+            isSentByMe: false,
+          ),
         ],
       ),
       ChatMessage(
@@ -158,8 +188,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
         unreadCount: 0,
         avatarUrl: '',
         messages: [
-          Message(content: 'Great facility, will book again', time: 'Sunday', isSentByMe: false),
-          Message(content: 'Thank you for choosing us!', time: 'Sunday', isSentByMe: true),
+          Message(
+            content: 'Great facility, will book again',
+            time: 'Sunday',
+            isSentByMe: false,
+          ),
+          Message(
+            content: 'Thank you for choosing us!',
+            time: 'Sunday',
+            isSentByMe: true,
+          ),
         ],
         isArchived: true,
       ),
@@ -170,8 +208,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
         unreadCount: 0,
         avatarUrl: '',
         messages: [
-          Message(content: 'Is parking available at your venue?', time: 'Friday', isSentByMe: false),
-          Message(content: 'Yes, we have free parking available.', time: 'Friday', isSentByMe: true),
+          Message(
+            content: 'Is parking available at your venue?',
+            time: 'Friday',
+            isSentByMe: false,
+          ),
+          Message(
+            content: 'Yes, we have free parking available.',
+            time: 'Friday',
+            isSentByMe: true,
+          ),
         ],
         isArchived: true,
       ),
@@ -182,7 +228,11 @@ class _MessagesScreenState extends State<MessagesScreen> {
         unreadCount: 1,
         avatarUrl: '',
         messages: [
-          Message(content: 'Do you have equipment rental?', time: '11:30 AM', isSentByMe: false),
+          Message(
+            content: 'Do you have equipment rental?',
+            time: '11:30 AM',
+            isSentByMe: false,
+          ),
         ],
         isMuted: true,
       ),
@@ -193,8 +243,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
         unreadCount: 0,
         avatarUrl: '',
         messages: [
-          Message(content: 'Booking confirmed for 6 PM', time: 'Yesterday', isSentByMe: true),
-          Message(content: 'Perfect, see you then!', time: 'Yesterday', isSentByMe: false),
+          Message(
+            content: 'Booking confirmed for 6 PM',
+            time: 'Yesterday',
+            isSentByMe: true,
+          ),
+          Message(
+            content: 'Perfect, see you then!',
+            time: 'Yesterday',
+            isSentByMe: false,
+          ),
         ],
         isPinned: true,
       ),
@@ -205,8 +263,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
         unreadCount: 0,
         avatarUrl: '',
         messages: [
-          Message(content: 'Can I bring my own ball?', time: 'Thursday', isSentByMe: false),
-          Message(content: 'Of course! You can bring your own equipment.', time: 'Thursday', isSentByMe: true),
+          Message(
+            content: 'Can I bring my own ball?',
+            time: 'Thursday',
+            isSentByMe: false,
+          ),
+          Message(
+            content: 'Of course! You can bring your own equipment.',
+            time: 'Thursday',
+            isSentByMe: true,
+          ),
         ],
         isArchived: true,
       ),
@@ -294,40 +360,40 @@ class _MessagesScreenState extends State<MessagesScreen> {
   */
 
   // Helper method to format timestamp
-  String _formatTime(dynamic timestamp) {
-    if (timestamp == null) return 'Unknown';
+  // String _formatTime(dynamic timestamp) {
+  //   if (timestamp == null) return 'Unknown';
 
-    try {
-      DateTime dateTime;
-      if (timestamp is String) {
-        dateTime = DateTime.parse(timestamp);
-      } else {
-        dateTime = timestamp as DateTime;
-      }
+  //   try {
+  //     DateTime dateTime;
+  //     if (timestamp is String) {
+  //       dateTime = DateTime.parse(timestamp);
+  //     } else {
+  //       dateTime = timestamp as DateTime;
+  //     }
 
-      final now = DateTime.now();
-      final today = DateTime(now.year, now.month, now.day);
-      final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
+  //     final now = DateTime.now();
+  //     final today = DateTime(now.year, now.month, now.day);
+  //     final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
 
-      if (messageDate == today) {
-        // Today - show time
-        final hour = dateTime.hour > 12
-            ? dateTime.hour - 12
-            : (dateTime.hour == 0 ? 12 : dateTime.hour);
-        final minute = dateTime.minute.toString().padLeft(2, '0');
-        final period = dateTime.hour >= 12 ? 'PM' : 'AM';
-        return '$hour:$minute $period';
-      } else if (messageDate == today.subtract(Duration(days: 1))) {
-        // Yesterday
-        return 'Yesterday';
-      } else {
-        // Older dates
-        return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
-      }
-    } catch (e) {
-      return 'Unknown';
-    }
-  }
+  //     if (messageDate == today) {
+  //       // Today - show time
+  //       final hour = dateTime.hour > 12
+  //           ? dateTime.hour - 12
+  //           : (dateTime.hour == 0 ? 12 : dateTime.hour);
+  //       final minute = dateTime.minute.toString().padLeft(2, '0');
+  //       final period = dateTime.hour >= 12 ? 'PM' : 'AM';
+  //       return '$hour:$minute $period';
+  //     } else if (messageDate == today.subtract(Duration(days: 1))) {
+  //       // Yesterday
+  //       return 'Yesterday';
+  //     } else {
+  //       // Older dates
+  //       return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+  //     }
+  //   } catch (e) {
+  //     return 'Unknown';
+  //   }
+  // }
 
   // Add debounce for better performance
   void _filterMessages(String query) {
@@ -669,9 +735,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          'Chat with ${message.name} archived',
-        ),
+        content: Text('Chat with ${message.name} archived'),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -738,9 +802,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          'Chat with ${message.name} unarchived',
-        ),
+        content: Text('Chat with ${message.name} unarchived'),
         backgroundColor: Colors.blue,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -790,9 +852,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(
-                    'Chat with ${message.name} deleted',
-                  ),
+                  content: Text('Chat with ${message.name} deleted'),
                   backgroundColor: Colors.red,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
@@ -815,10 +875,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
               );
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text(
-              'Delete',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -845,10 +902,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 _isSearching
                     ? 'No results found'
                     : _selectedCategory == 'Archive'
-                        ? 'No archived messages'
-                        : _selectedCategory == 'Unread'
-                            ? 'No unread messages'
-                            : 'No customer messages yet',
+                    ? 'No archived messages'
+                    : _selectedCategory == 'Unread'
+                    ? 'No unread messages'
+                    : 'No customer messages yet',
                 style: const TextStyle(
                   fontSize: 20,
                   color: Color(0xFF2D3142),
@@ -862,10 +919,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   _isSearching
                       ? 'Try different keywords'
                       : _selectedCategory == 'Archive'
-                          ? 'Archived conversations will appear here.'
-                          : _selectedCategory == 'Unread'
-                              ? 'New messages from customers will appear here.'
-                              : 'When customers inquire, you will see their messages here.',
+                      ? 'Archived conversations will appear here.'
+                      : _selectedCategory == 'Unread'
+                      ? 'New messages from customers will appear here.'
+                      : 'When customers inquire, you will see their messages here.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
@@ -1104,9 +1161,7 @@ class ChatTile extends StatelessWidget {
                   message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
                   color: const Color(0xFF1B2C4F),
                 ),
-                title: Text(
-                  message.isPinned ? 'Unpin Chat' : 'Pin Chat',
-                ),
+                title: Text(message.isPinned ? 'Unpin Chat' : 'Pin Chat'),
                 onTap: () {
                   Navigator.pop(context);
                   onPin();
@@ -1120,7 +1175,9 @@ class ChatTile extends StatelessWidget {
                   color: const Color(0xFF1B2C4F),
                 ),
                 title: Text(
-                  message.isMuted ? 'Unmute Notifications' : 'Mute Notifications',
+                  message.isMuted
+                      ? 'Unmute Notifications'
+                      : 'Mute Notifications',
                 ),
                 onTap: () {
                   Navigator.pop(context);

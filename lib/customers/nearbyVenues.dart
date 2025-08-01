@@ -440,9 +440,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        body: Center(child: FootballLoadingWidget()),
-      );
+      return const Scaffold(body: Center(child: FootballLoadingWidget()));
     }
     // Count favorites for badge display
     // final int favoriteCount = _favoriteStatus.values
@@ -723,25 +721,35 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     final Map<String, dynamic> courtData = {
       'id': venue.id,
       'name': venue.title,
-      'type': venue.sports.isNotEmpty ? '${venue.sports.first} Court' : 'Sports Court',
+      'type': venue.sports.isNotEmpty
+          ? '${venue.sports.first} Court'
+          : 'Sports Court',
       'location': venue.location,
       'distance': '${venue.distance.toStringAsFixed(1)} km away',
       'rating': venue.rating,
       'total_reviews': (venue.rating * 50).round(),
-      'price_per_hour': double.tryParse(venue.ratePerHour.replaceAll(RegExp(r'[^\d.]'), '')) ?? 2500.0,
+      'price_per_hour':
+          double.tryParse(
+            venue.ratePerHour.replaceAll(RegExp(r'[^\d.]'), ''),
+          ) ??
+          2500.0,
       'opening_hours': 'Open Now',
-      'closing_time': venue.openingHours.contains('PM') ? 
-          'Closes at ${venue.openingHours.split(' - ').last}' : 
-          'Closes at 11:00 PM',
+      'closing_time': venue.openingHours.contains('PM')
+          ? 'Closes at ${venue.openingHours.split(' - ').last}'
+          : 'Closes at 11:00 PM',
       'phone': '+94 77 123 4567',
-      'email': 'info@${venue.title.toLowerCase().replaceAll(' ', '').replaceAll(RegExp(r'[^\w]'), '')}.lk',
-      'website': 'www.${venue.title.toLowerCase().replaceAll(' ', '').replaceAll(RegExp(r'[^\w]'), '')}.lk',
-      'description': 'Premium ${venue.sports.join(', ')} facility with state-of-the-art equipment and professional-grade surfaces.',
+      'email':
+          'info@${venue.title.toLowerCase().replaceAll(' ', '').replaceAll(RegExp(r'[^\w]'), '')}.lk',
+      'website':
+          'www.${venue.title.toLowerCase().replaceAll(' ', '').replaceAll(RegExp(r'[^\w]'), '')}.lk',
+      'description':
+          'Premium ${venue.sports.join(', ')} facility with state-of-the-art equipment and professional-grade surfaces.',
       'images': [
         venue.imageUrl,
         if (venue.sports.contains('Futsal') || venue.sports.contains('Cricket'))
           'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-        if (venue.sports.contains('Tennis') || venue.sports.contains('Badminton'))
+        if (venue.sports.contains('Tennis') ||
+            venue.sports.contains('Badminton'))
           'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
         if (venue.sports.contains('Swimming'))
           'https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
@@ -780,8 +788,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) =>
-                              CourtDetailScreen(courtData: courtData),
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  CourtDetailScreen(courtData: courtData),
                           transitionDuration: Duration.zero,
                           reverseTransitionDuration: Duration.zero,
                         ),
