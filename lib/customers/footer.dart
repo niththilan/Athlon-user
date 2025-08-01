@@ -20,6 +20,7 @@ class AppFooter extends StatelessWidget {
   Future<void> _navigateToFavorites(BuildContext context) async {
     try {
       // Show loading indicator
+      
       showDialog(
         context: context,
         barrierDismissible: false,
