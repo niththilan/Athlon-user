@@ -729,72 +729,13 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
       ),
 
       // Bottom Navigation Bar
-      bottomNavigationBar: Container(
-        height: 80 + MediaQuery.of(context).padding.bottom,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, -2),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildNavItem(Icons.home_outlined, 'Home', 0),
-              _buildNavItem(Icons.arrow_back_ios, '', 1),
-              _buildNavItem(Icons.arrow_forward_ios, '', 2),
-              _buildNavItem(Icons.chat_bubble_outline, 'Chat', 3),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    final isActive = _currentIndex == index;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _currentIndex = index;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: isActive ? const Color(0xFF050E22) : Colors.transparent,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                color: isActive ? Colors.white : const Color(0xFF050E22),
-                size: 20,
-              ),
-            ),
-            if (label.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: const Color(0xFF050E22),
-                  fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
-                ),
-              ),
-            ],
-          ],
-        ),
+      bottomNavigationBar: AppFooter(
+        currentIndex: _currentIndex,
+        onTabSelected: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
     );
   }

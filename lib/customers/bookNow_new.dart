@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'proceedToPayment.dart' as payment;
+import 'footer.dart';
 
 // TimeSlot and SlotStatus definitions
 class TimeSlot {
@@ -69,6 +70,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
   String? selectedSport;
   DateTime? selectedDate;
   bool isLoadingCalendar = false;
+  int _currentFooterIndex = 0; // For footer navigation
 
   final List<String> availableSports = [
     'Football',
@@ -130,7 +132,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
                   const SizedBox(height: 32),
                   _buildSportSelection(),
                   if (selectedSport != null) ...[
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 32),
                     if (isLoadingCalendar)
                       _buildLoadingIndicator()
                     else
@@ -141,6 +143,14 @@ class _BookNowScreenState extends State<BookNowScreen> {
             ),
           ),
         ],
+      ),
+      bottomNavigationBar: AppFooter(
+        currentIndex: _currentFooterIndex,
+        onTabSelected: (index) {
+          setState(() {
+            _currentFooterIndex = index;
+          });
+        },
       ),
     );
   }
@@ -336,7 +346,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
                 ),
               ),
               child: const Text(
-                'Continue to Time Selection',
+                'Continue',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
