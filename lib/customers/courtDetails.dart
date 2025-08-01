@@ -21,77 +21,11 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFF050E22),
           brightness: Brightness.light,
         ),
-        scaffoldBackgroundColor: const Color.fromARGB(255, 191, 190, 190), // Light gray background like in image
+        scaffoldBackgroundColor: const Color(0xFFF5F6F8), // Grey background
       ),
       home: const CourtDetailScreen(),
     );
   }
-}
-
-class DirectionsIconPainter extends CustomPainter {
-  final Color color;
-
-  DirectionsIconPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final diamondSize = size.width * 0.7;
-
-    // Draw diamond shape (outline style like in the image)
-    final path = Path();
-    path.moveTo(center.dx, center.dy - diamondSize / 2); // Top
-    path.lineTo(center.dx + diamondSize / 2, center.dy); // Right
-    path.lineTo(center.dx, center.dy + diamondSize / 2); // Bottom
-    path.lineTo(center.dx - diamondSize / 2, center.dy); // Left
-    path.close();
-
-    canvas.drawPath(path, paint);
-
-    // Draw inner dots pattern like in the image
-    final dotRadius = size.width * 0.06;
-    final dotPaint = Paint()
-      ..color = color == Colors.white ? const Color(0xFF050E22) : Colors.white
-      ..style = PaintingStyle.fill;
-
-    // Center dot
-    canvas.drawCircle(center, dotRadius, dotPaint);
-    
-    // Top dot
-    canvas.drawCircle(
-      Offset(center.dx, center.dy - diamondSize * 0.25),
-      dotRadius * 0.8,
-      dotPaint,
-    );
-    
-    // Bottom dot  
-    canvas.drawCircle(
-      Offset(center.dx, center.dy + diamondSize * 0.25),
-      dotRadius * 0.8,
-      dotPaint,
-    );
-
-    // Left dot
-    canvas.drawCircle(
-      Offset(center.dx - diamondSize * 0.25, center.dy),
-      dotRadius * 0.6,
-      dotPaint,
-    );
-
-    // Right dot
-    canvas.drawCircle(
-      Offset(center.dx + diamondSize * 0.25, center.dy),
-      dotRadius * 0.6,
-      dotPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // VenueModel class for similar venues
@@ -119,6 +53,18 @@ class VenueModel {
   });
 }
 
+class SportItem {
+  final String name;
+  final String imageUrl;
+  final double rating;
+
+  SportItem({
+    required this.name,
+    required this.imageUrl,
+    required this.rating,
+  });
+}
+
 class CourtDetailScreen extends StatefulWidget {
   final Map<String, dynamic>? courtData;
 
@@ -132,54 +78,61 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   bool _isFavorite = false;
   int _currentImageIndex = 0;
   int _currentIndex = 0; // For footer navigation
+  bool _showLocationEdit = false;
+  bool _showTimeEdit = false;
+  bool _showReviewEdit = false;
 
   // Mock court data
   late Map<String, dynamic> _courtDetails;
 
-  // Similar venues data from nearbyVenues.dart
-  final List<VenueModel> _similarVenues = [
-    VenueModel(
-      id: '1',
-      title: "CR7 FUTSAL & INDOOR CRICKET",
-      location: "23 Mile Post Ave, Colombo 00300",
-      rating: 4.75,
-      distance: 1.2,
-      imageUrl:
-          "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Futsal", "Cricket", "Indoor"],
-      openingHours: "6:00 AM - 11:00 PM",
-      ratePerHour: "Rs. 3,000",
+  // Sports data with names and ratings
+  final List<SportItem> _sportsItems = [
+    SportItem(
+      name: "Football",
+      imageUrl: "https://images.unsplash.com/photo-1553778263-73a83bab9b0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
+      rating: 4.8,
     ),
-    VenueModel(
-      id: '2',
-      title: "ARK SPORTS - INDOOR CRICKET & FUTSAL",
-      location: "141/A, Wattala 11300",
-      rating: 4.23,
-      distance: 3.5,
-      imageUrl:
-          "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Futsal", "Cricket", "Indoor"],
-      openingHours: "7:00 AM - 10:00 PM",
-      ratePerHour: "Rs. 2,500",
+    SportItem(
+      name: "Cricket",
+      imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
+      rating: 4.6,
     ),
-    VenueModel(
-      id: '3',
-      title: "CHAMPION'S ARENA",
-      location: "45 Sports Complex Road, Rajagiriya 10100",
-      rating: 4.89,
-      distance: 0.8,
-      imageUrl:
-          "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Badminton", "Tennis", "Squash", "Outdoor"],
-      openingHours: "6:00 AM - 10:00 PM",
-      ratePerHour: "Rs. 2,000",
+    SportItem(
+      name: "Basketball",
+      imageUrl: "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80",
+      rating: 4.7,
+    ),
+    SportItem(
+      name: "Tennis",
+      imageUrl: "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      rating: 4.5,
+    ),
+    SportItem(
+      name: "Badminton",
+      imageUrl: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      rating: 4.9,
     ),
   ];
 
   @override
   void initState() {
     super.initState();
-    _initializeCourtData();
+    _initializeCourtData(); // <-- Ensure this is called first
+    _startSlideshow();
+  }
+
+  void _startSlideshow() {
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        final images = _courtDetails['images'];
+        if (images is List && images.isNotEmpty) {
+          setState(() {
+            _currentImageIndex = (_currentImageIndex + 1) % images.length;
+          });
+        }
+        _startSlideshow();
+      }
+    });
   }
 
   void _initializeCourtData() {
@@ -206,11 +159,6 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
             'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
           ],
           'sports_available': ['Football', 'Cricket', 'Basketball'],
-          'sport_images': [
-            'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
-            'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
-            'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80',
-          ],
         };
   }
 
@@ -220,26 +168,16 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     });
   }
 
-  Widget _buildDirectionsIcon({Color color = Colors.white, double size = 20}) {
-    return Container(
-      width: size,
-      height: size,
-      child: CustomPaint(
-        painter: DirectionsIconPainter(color: color),
-      ),
-    );
-  }
-
-  Widget _buildActionButton(String text, dynamic icon, Color backgroundColor, Color textColor, VoidCallback onPressed) {
+  Widget _buildActionButton(String text, IconData icon, Color backgroundColor, Color textColor, VoidCallback onPressed) {
     return Expanded(
       child: Container(
         height: 60,
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(12),
-          boxShadow: backgroundColor == const Color(0xFFFFFFFF) ? [
+          boxShadow: backgroundColor == Colors.white ? [
             const BoxShadow(
-              color: Color(0xFFE5E7EB), // Solid shadow color, no opacity
+              color: Color(0xFFE5E7EB),
               blurRadius: 8,
               offset: Offset(0, 2),
             ),
@@ -253,12 +191,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if (icon is IconData)
-                  Icon(icon, color: textColor, size: 20)
-                else if (icon is Widget)
-                  icon
-                else
-                  _buildDirectionsIcon(color: textColor, size: 20),
+                Icon(icon, color: textColor, size: 20),
                 const SizedBox(height: 4),
                 Text(
                   text,
@@ -276,101 +209,93 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     );
   }
 
-  Widget _buildOverlayIcon(IconData icon, VoidCallback onTap, {Color? backgroundColor, Color? iconColor}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          color: backgroundColor ?? Colors.white.withOpacity(0.9),
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Icon(
-          icon,
-          color: iconColor ?? Colors.black87,
-          size: 18,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoCard(IconData icon, String title, String subtitle, {VoidCallback? onTap, bool showDivider = true}) {
+  Widget _buildInfoCard(IconData icon, String title, String subtitle, {VoidCallback? onTap, bool showDivider = true, bool showEdit = false, VoidCallback? onEdit}) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white, // Pure white for info cards
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: Column(
-        children: [
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onTap,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 32,
-                      height: 32,
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF1F3F5),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: const Color(0xFF050E22),
+                    size: 20,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF050E22),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (showEdit && onEdit != null)
+                  GestureDetector(
+                    onTap: onEdit,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF1F3F5),
+                        color: const Color(0xFF050E22),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Icon(
-                        icon,
-                        color: const Color.fromARGB(255, 0, 0, 0),
-                        size: 18,
+                      child: const Icon(
+                        Icons.edit,
+                        color: Colors.white,
+                        size: 16,
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Color.fromARGB(255, 0, 0, 0),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            subtitle,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF6B7280), // More subtle gray to match image
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Icon(
-                      Icons.chevron_right,
-                      color: Color.fromARGB(255, 0, 0, 0), // Solid dark navy for chevrons
-                      size: 20,
-                    ),
-                  ],
-                ),
-              ),
+                  )
+                else
+                  Icon(
+                    showEdit ? Icons.keyboard_arrow_down : Icons.chevron_right,
+                    color: const Color(0xFF050E22),
+                    size: 24,
+                  ),
+              ],
             ),
           ),
-          if (showDivider)
-            Container(
-              margin: const EdgeInsets.only(left: 68),
-              height: 1,
-              color: const Color(0xFFE5E7EB), // Subtle but visible divider
-            ),
-        ],
+        ),
       ),
     );
   }
@@ -378,7 +303,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6F8), // Light gray background like in image
+      backgroundColor: const Color(0xFFF5F6F8),
       body: CustomScrollView(
         slivers: [
           // Top Image Carousel
@@ -404,7 +329,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
-                            color: const Color(0xFFFFFFFF),
+                            color: Colors.white,
                             child: Center(
                               child: CircularProgressIndicator(
                                 value: loadingProgress.expectedTotalBytes != null
@@ -418,7 +343,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            color: const Color.fromARGB(255, 143, 133, 133),
+                            color: Colors.white,
                             child: const Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -434,7 +359,29 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     },
                   ),
                   
-                  
+                  // Top overlay notification badge
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 12,
+                    right: 16,
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: Text(
+                          '2',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
 
                   // Bottom indicators
                   Positioned(
@@ -466,186 +413,328 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
 
           // Content Section
           SliverToBoxAdapter(
-            child: Container(
-              color: const Color.fromARGB(255, 237, 237, 237), // Pure white content section for contrast
-              margin: const EdgeInsets.symmetric(horizontal: 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title and Rating Section
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child:                               Text(
-                                _courtDetails['name'],
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title and Rating Section
+                Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _courtDetails['name'],
+                              style: const TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF050E22),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              ...List.generate(5, (index) {
+                                return Icon(
+                                  Icons.star,
+                                  size: 16,
+                                  color: index < _courtDetails['rating'].floor()
+                                      ? const Color(0xFFFBBF24)
+                                      : const Color(0xFFE5E7EB),
+                                );
+                              }),
+                              const SizedBox(width: 6),
+                              Text(
+                                _courtDetails['rating'].toString(),
                                 style: const TextStyle(
-                                  fontSize: 24,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w600,
-                                  color: Color(0xFF050E22), // Solid dark navy
+                                  color: Color(0xFF050E22),
                                 ),
                               ),
-                            ),
-                            Row(
-                              children: [
-                                ...List.generate(5, (index) {
-                                  return Icon(
-                                    Icons.star,
-                                    size: 16,
-                                    color: index < _courtDetails['rating'].floor()
-                                        ? const Color(0xFFFBBF24)
-                                        : const Color(0xFFE5E7EB),
-                                  );
-                                }),
-                                const SizedBox(width: 6),
-                                Text(
-                                  _courtDetails['rating'].toString(),
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF050E22), // Solid dark navy
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        
-                        // Action Buttons
-                        Row(
-                          children: [
-                            _buildActionButton(
-                              'Directions',
-                              _buildDirectionsIcon(color: Colors.white, size: 20),
-                              const Color(0xFF050E22),
-                              Colors.white,
-                              () {},
-                            ),
-                            const SizedBox(width: 12),
-                            _buildActionButton(
-                              'Call',
-                              Icons.phone,
-                              const Color(0xFFFFFFFF), // Pure white, no opacity
-                              const Color(0xFF050E22),
-                              () {},
-                            ),
-                            const SizedBox(width: 12),
-                            _buildActionButton(
-                              'Share',
-                              Icons.share,
-                              const Color(0xFFFFFFFF), // Pure white, no opacity
-                              const Color(0xFF050E22),
-                              () {},
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      
+                      // Action Buttons
+                      Row(
+                        children: [
+                          _buildActionButton(
+                            'Directions',
+                            Icons.directions, // Using default direction icon
+                            const Color(0xFF050E22),
+                            Colors.white,
+                            () {},
+                          ),
+                          const SizedBox(width: 12),
+                          _buildActionButton(
+                            'Call',
+                            Icons.phone,
+                            Colors.white,
+                            const Color(0xFF050E22),
+                            () {},
+                          ),
+                          const SizedBox(width: 12),
+                          _buildActionButton(
+                            'Share',
+                            Icons.share,
+                            Colors.white,
+                            const Color(0xFF050E22),
+                            () {},
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
+                ),
 
-                  // ...existing code...
+                const SizedBox(height: 8),
 
-Container(
-  margin: const EdgeInsets.symmetric(horizontal: 20), // Add margin on both sides
-  decoration: BoxDecoration(
-    color: Colors.white, // Box background
-    borderRadius: BorderRadius.circular(12),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.04),
-        blurRadius: 8,
-        offset: const Offset(0, 2),
-      ),
-    ],
-  ),
-  child: Column(
-    children: [
-      const SizedBox(height: 5),
-
-      // Info Cards
-      _buildInfoCard(
-        Icons.location_on,
-        _courtDetails['location'],
-        _courtDetails['distance'],
-      ),
-      _buildInfoCard(
-        Icons.access_time,
-        _courtDetails['opening_hours'],
-        _courtDetails['closing_time'],
-      ),
-      _buildInfoCard(
-        Icons.star,
-        'Write a Review',
-        'Share your experience',
-        showDivider: false,
-      ),
-    ],
-  ),
-),
-
-
-
-                  const SizedBox(height: 32),
-
-                  // Available Sports Section
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Available Sports',
-                          style: TextStyle(
-                            fontSize: 18,
+                // Info Cards combined in one box
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.location_on, color: Color(0xFF050E22)),
+                        title: Text(
+                          _courtDetails['location'],
+                          style: const TextStyle(
+                            fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF050E22), // Solid dark navy
+                            color: Color(0xFF050E22),
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: List.generate(
-                            _courtDetails['sport_images'].length,
-                            (index) => Expanded(
-                              child: Container(
-                                margin: EdgeInsets.only(
-                                  right: index < _courtDetails['sport_images'].length - 1 ? 8 : 0,
-                                ),
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: const Color(0xFFFFFFFF), // Pure white for sport images
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.network(
-                                    _courtDetails['sport_images'][index],
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        color: const Color(0xFFFFFFFF),
-                                        child: const Center(
-                                          child: Icon(Icons.sports, color: Color(0xFF050E22)),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
+                        subtitle: Text(
+                          _courtDetails['distance'],
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
                           ),
                         ),
-                      ],
-                    ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.edit, color: Color(0xFF050E22), size: 20),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Edit location pressed')),
+                            );
+                          },
+                        ),
+                      ),
+                      const Divider(
+                        color: Color(0xFFE5E7EB),
+                        thickness: 1,
+                        height: 0,
+                        indent: 16,
+                        endIndent: 16,
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.access_time, color: Color(0xFF050E22)),
+                        title: Text(
+                          _courtDetails['opening_hours'],
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF050E22),
+                          ),
+                        ),
+                        subtitle: Text(
+                          _courtDetails['closing_time'],
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.edit, color: Color(0xFF050E22), size: 20),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Edit time pressed')),
+                            );
+                          },
+                        ),
+                      ),
+                      const Divider(
+                        color: Color(0xFFE5E7EB),
+                        thickness: 1,
+                        height: 0,
+                        indent: 16,
+                        endIndent: 16,
+                      ),
+                      ListTile(
+                        leading: const Icon(Icons.star, color: Color(0xFF050E22)),
+                        title: const Text(
+                          'Write a Review',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF050E22),
+                          ),
+                        ),
+                        subtitle: const Text(
+                          'Share your experience',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.edit, color: Color(0xFF050E22), size: 20),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Edit review pressed')),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
+                ),
 
-                  const SizedBox(height: 100), // Space for bottom nav
-                ],
-              ),
+                const SizedBox(height: 24),
+
+                // Available Sports Section
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Available Sports',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF050E22),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: 140,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: _sportsItems.length,
+                          separatorBuilder: (context, index) => const SizedBox(width: 12),
+                          itemBuilder: (context, index) {
+                            final sport = _sportsItems[index];
+                            return Container(
+                              width: 120,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: const Color(0xFFF8F9FA),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                      child: Image.network(
+                                        sport.imageUrl,
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            color: const Color(0xFFF8F9FA),
+                                            child: const Center(
+                                              child: Icon(Icons.sports, color: Color(0xFF050E22)),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            sport.name,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF050E22),
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              const Icon(
+                                                Icons.star,
+                                                size: 12,
+                                                color: Color(0xFFFBBF24),
+                                              ),
+                                              const SizedBox(width: 2),
+                                              Text(
+                                                sport.rating.toString(),
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  color: Color(0xFF6B7280),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 100), // Space for bottom nav
+              ],
             ),
           ),
         ],
@@ -655,7 +744,7 @@ Container(
       bottomNavigationBar: Container(
         height: 80 + MediaQuery.of(context).padding.bottom,
         decoration: BoxDecoration(
-          color: Colors.white, // Pure white navigation background
+          color: Colors.white,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -701,7 +790,7 @@ Container(
               ),
               child: Icon(
                 icon,
-                color: isActive ? Colors.white : const Color(0xFF050E22), // Solid dark navy for inactive
+                color: isActive ? Colors.white : const Color(0xFF050E22),
                 size: 20,
               ),
             ),
@@ -711,7 +800,7 @@ Container(
                 label,
                 style: TextStyle(
                   fontSize: 11,
-                  color: isActive ? const Color(0xFF050E22) : const Color(0xFF050E22), // Solid dark navy
+                  color: const Color(0xFF050E22),
                   fontWeight: isActive ? FontWeight.w500 : FontWeight.normal,
                 ),
               ),
