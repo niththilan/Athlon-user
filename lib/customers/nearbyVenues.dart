@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 //import 'bookNow.dart';
 import 'filter_screen.dart';
 import 'bookNow_new.dart';
+import 'widgets/football_spinner.dart';
 
 void main() {
   runApp(const MyApp());
@@ -263,6 +264,8 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     ),
   ];
 
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -279,6 +282,15 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
 
     // Load search history
     _loadSearchHistory();
+
+    // Simulate loading delay
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
   }
 
   @override
@@ -427,6 +439,11 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: FootballLoadingWidget()),
+      );
+    }
     // Count favorites for badge display
     // final int favoriteCount = _favoriteStatus.values
     //     .where((isFavorite) => isFavorite == true)

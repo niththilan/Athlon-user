@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'userProfile.dart';
 import 'nearbyVenues.dart';
-
+import 'widgets/football_spinner.dart';
 import 'availableSports.dart'; // Add this import
 import 'courtDetails.dart'; // Add this import
 
@@ -45,20 +45,21 @@ class NoAnimationRoute<T> extends PageRoute<T> {
     return builder(context);
   }
 
+
   @override
   bool get barrierDismissible => false;
 }
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Remove the _isLoading check from here
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -77,7 +78,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: HomeScreen(),
+      home: const HomeScreen(),
     );
   }
 }
@@ -91,6 +92,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Simulate loading for 1 second
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
+  }
 
   void _onTabSelected(int index) {
     setState(() {
@@ -163,6 +178,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: FootballLoadingWidget()),
+      );
+    }
     final textTheme = Theme.of(context).textTheme;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
@@ -1070,4 +1090,3 @@ final List<VenueModel> _sampleVenues = [
     ratePerHour: "Rs. 800",
   ),
 ];
-  
