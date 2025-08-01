@@ -68,9 +68,14 @@ class BookNowScreen extends StatefulWidget {
 
 class _BookNowScreenState extends State<BookNowScreen> {
   String? selectedSport;
-  DateTime? selectedDate;
+  DateTime selectedDate = DateTime.now(); // Changed from nullable
   bool isLoadingCalendar = false;
   int _currentFooterIndex = 0; // For footer navigation
+  
+  // Date scroll and calendar state from history.dart
+  bool showCalendar = false;
+  late List<DateTime> dateList;
+  int currentDateStartIndex = 5; // Place the current date in the middle
 
   final List<String> availableSports = [
     'Football',
@@ -80,6 +85,21 @@ class _BookNowScreenState extends State<BookNowScreen> {
     'Cricket',
     'Table Tennis',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeDateList();
+  }
+
+  void _initializeDateList() {
+    dateList = [];
+    final today = DateTime.now();
+    // Include past, current, and future dates, with today centered
+    for (int i = -7; i <= 30; i++) {
+      dateList.add(today.add(Duration(days: i)));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -303,23 +323,8 @@ class _BookNowScreenState extends State<BookNowScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: const Color(0xFFE5E7EB),
-              width: 1,
-            ),
-          ),
-          child: Column(
-            children: [
-              _buildCalendarContent(),
-            ],
-          ),
-        ),
-        if (selectedDate != null) ...[
+        _buildCalendarContent(),
+        if (selectedSport != null) ...[
           const SizedBox(height: 16),
           SizedBox(
             width: double.infinity,
@@ -332,7 +337,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
                     builder: (context) => TimeSlotSelectionScreen(
                       venue: widget.venue,
                       sport: selectedSport!,
-                      selectedDate: selectedDate!,
+                      selectedDate: selectedDate,
                     ),
                   ),
                 );
@@ -359,55 +364,94 @@ class _BookNowScreenState extends State<BookNowScreen> {
     );
   }
 
+  /// Builds the date scroll and calendar content section (using history.dart layout)
   Widget _buildCalendarContent() {
-    final now = DateTime.now();
-    final currentMonth = selectedDate ?? now;
-    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header row with View Calendar button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              // View Calendar button
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    showCalendar = !showCalendar;
+                  });
+                },
+                child: Text(
+                  showCalendar ? 'Hide Calendar' : 'View Calendar',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF1B2C4F),
+                    decoration: showCalendar ? TextDecoration.underline : null,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 25),
+
+          showCalendar ? _buildCalendarContentExpanded() : _buildDateAndBookingsContent(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalendarContentExpanded() {
     return Column(
       children: [
+        // Calendar header
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
               onPressed: () {
-                setState(() {
-                  final newDate = DateTime(currentMonth.year, currentMonth.month - 1, 1);
-                  // Only allow going back to current month or later
-                  if (newDate.year > now.year || 
-                      (newDate.year == now.year && newDate.month >= now.month)) {
-                    selectedDate = newDate;
-                  }
-                });
+                final newDate = DateTime(
+                  selectedDate.year,
+                  selectedDate.month - 1,
+                );
+                _updateDateView(newDate);
               },
-              icon: const Icon(
-                Icons.chevron_left,
-                color: Color(0xFF1B2C4F),
-                size: 24,
-              ),
+              icon: const Icon(Icons.chevron_left, color: Color(0xFF1B2C4F)),
             ),
             Text(
-              DateFormat('MMMM yyyy').format(currentMonth),
+              DateFormat('MMMM yyyy').format(selectedDate),
               style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF2D3142),
+                color: Color(0xFF111827),
               ),
             ),
             IconButton(
               onPressed: () {
-                setState(() {
-                  selectedDate = DateTime(currentMonth.year, currentMonth.month + 1, 1);
-                });
+                final newDate = DateTime(
+                  selectedDate.year,
+                  selectedDate.month + 1,
+                );
+                _updateDateView(newDate);
               },
-              icon: const Icon(
-                Icons.chevron_right,
-                color: Color(0xFF1B2C4F),
-                size: 24,
-              ),
+              icon: const Icon(Icons.chevron_right, color: Color(0xFF1B2C4F)),
             ),
           ],
         ),
         const SizedBox(height: 16),
+        // Week headers
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(
@@ -431,96 +475,224 @@ class _BookNowScreenState extends State<BookNowScreen> {
           ),
         ),
         const SizedBox(height: 12),
+        // Calendar grid
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: _buildCalendarGrid(currentMonth),
+          child: _buildCalendarGrid(),
         ),
       ],
     );
   }
 
-  Widget _buildCalendarGrid(DateTime currentMonth) {
-    final now = DateTime.now();
-    final firstDayOfMonth = DateTime(currentMonth.year, currentMonth.month, 1);
-    final lastDayOfMonth = DateTime(currentMonth.year, currentMonth.month + 1, 0);
+  Widget _buildDateAndBookingsContent() {
+    return Column(
+      children: [
+        // Date navigation
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (currentDateStartIndex > 0) {
+                    currentDateStartIndex--;
+                    selectedDate = dateList[currentDateStartIndex + 2];
+                  }
+                });
+              },
+              child: const Icon(
+                Icons.chevron_left,
+                color: Color(0xFF1B2C4F),
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  for (int i = 0; i < 5; i++)
+                    Flexible(child: _buildDateCircle(i)),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (currentDateStartIndex + 5 < dateList.length) {
+                    currentDateStartIndex++;
+                    selectedDate = dateList[currentDateStartIndex + 2];
+                  }
+                });
+              },
+              child: const Icon(
+                Icons.chevron_right,
+                color: Color(0xFF1B2C4F),
+                size: 20,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 28),
+        Divider(color: Colors.grey[300], height: 1),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  /// Builds individual date circle for the scroll section
+  Widget _buildDateCircle(int index) {
+    final dateIndex = currentDateStartIndex + index;
+    if (dateIndex >= dateList.length) return const SizedBox();
+
+    final date = dateList[dateIndex];
+    final isSelected = _isSameDay(date, selectedDate);
+    final isToday = _isSameDay(date, DateTime.now());
+    final isPastDate = date.isBefore(DateTime.now().subtract(Duration(days: 0)).copyWith(hour: 0, minute: 0, second: 0, millisecond: 0));
+
+    return GestureDetector(
+      onTap: () {
+        _updateDateView(date);
+      },
+      child: Container(
+        constraints: const BoxConstraints(minWidth: 48, maxWidth: 64),
+        width: isSelected ? 60 : 48,
+        height: isSelected ? 60 : 48,
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[200],
+          shape: BoxShape.circle,
+          border: isToday && !isSelected
+              ? Border.all(color: const Color(0xFF1B2C4F), width: 2)
+              : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: const Color(0xFF1B2C4F).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Center(
+          child: Text(
+            DateFormat('d').format(date),
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: isSelected
+                  ? Colors.white
+                  : isPastDate
+                      ? const Color(0xFF6B7280)
+                      : const Color(0xFF111827),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Updates the date view to the selected date
+  void _updateDateView(DateTime newSelectedDate) {
+    final selectedIndex = dateList.indexWhere(
+      (date) => _isSameDay(date, newSelectedDate),
+    );
+    if (selectedIndex != -1) {
+      final newStartIndex = (selectedIndex - 2).clamp(0, dateList.length - 5);
+      setState(() {
+        selectedDate = newSelectedDate;
+        currentDateStartIndex = newStartIndex;
+      });
+    }
+  }
+
+  /// Builds the calendar grid with proper layout
+  Widget _buildCalendarGrid() {
+    final firstDayOfMonth = DateTime(selectedDate.year, selectedDate.month, 1);
+    final lastDayOfMonth = DateTime(
+      selectedDate.year,
+      selectedDate.month + 1,
+      0,
+    );
     final firstDayWeekday = firstDayOfMonth.weekday % 7;
     final daysInMonth = lastDayOfMonth.day;
 
     List<Widget> dayWidgets = [];
 
-    // Add empty spaces for days before the first day of the month
+    // Add empty cells for days before the first day of the month
     for (int i = 0; i < firstDayWeekday; i++) {
-      dayWidgets.add(const Expanded(child: SizedBox(height: 40)));
+      dayWidgets.add(
+        Expanded(child: Container(height: 36, margin: const EdgeInsets.all(2))),
+      );
     }
 
-    // Add days of the month
+    // Add day cells
     for (int day = 1; day <= daysInMonth; day++) {
-      final date = DateTime(currentMonth.year, currentMonth.month, day);
-      final isSelected = selectedDate != null && _isSameDay(date, selectedDate!);
-      final isToday = _isSameDay(date, now);
-      final isPastDate = date.isBefore(DateTime(now.year, now.month, now.day));
+      final date = DateTime(selectedDate.year, selectedDate.month, day);
+      final isSelected = _isSameDay(date, selectedDate);
+      final isToday = _isSameDay(date, DateTime.now());
+      final isPastDate = date.isBefore(DateTime.now().copyWith(hour: 0, minute: 0, second: 0, millisecond: 0));
 
       dayWidgets.add(
-        Expanded(            child: GestureDetector(
-              onTap: isPastDate ? null : () {
-                setState(() {
-                  selectedDate = date;
-                });
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                height: 40,
-                margin: const EdgeInsets.all(2),
-                decoration: BoxDecoration(
-                  color: isPastDate 
-                      ? const Color(0xFFF3F4F6)
-                      : isSelected 
-                          ? const Color(0xFF1B2C4F) 
-                          : null,
-                  borderRadius: BorderRadius.circular(35),
-                  border: isToday && !isSelected && !isPastDate
-                      ? Border.all(color: const Color(0xFF1B2C4F), width: 2)
-                      : null,
-                  boxShadow: isSelected ? [
-                    BoxShadow(
-                      color: const Color(0xFF1B2C4F).withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ] : null,
-                ),
-                child: Center(
-                  child: Text(
-                    '$day',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: isSelected || isToday ? FontWeight.w700 : FontWeight.w500,
-                      color: isPastDate
-                          ? const Color(0xFFD1D5DB)
-                          : isSelected
-                              ? Colors.white
-                              : isToday
-                                  ? const Color(0xFF1B2C4F)
-                                  : const Color(0xFF374151),
-                    ),
+        Expanded(
+          child: GestureDetector(
+            onTap: isPastDate ? null : () {
+              _updateDateView(date);
+            },
+            child: Container(
+              height: 36,
+              margin: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: isPastDate 
+                    ? const Color(0xFFF3F4F6)
+                    : isSelected 
+                        ? const Color(0xFF1B2C4F) 
+                        : null,
+                shape: BoxShape.circle,
+                border: isToday && !isSelected && !isPastDate
+                    ? Border.all(color: const Color(0xFF1B2C4F), width: 2)
+                    : null,
+              ),
+              child: Center(
+                child: Text(
+                  '$day',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                    color: isPastDate
+                        ? const Color(0xFFD1D5DB)
+                        : isSelected
+                            ? Colors.white
+                            : isToday
+                                ? const Color(0xFF1B2C4F)
+                                : const Color(0xFF111827),
                   ),
                 ),
               ),
             ),
+          ),
         ),
       );
     }
 
-    // Create rows of 7 days each
+    // Build grid with 7 columns and proper spacing
     List<Widget> rows = [];
     for (int i = 0; i < dayWidgets.length; i += 7) {
       final weekDays = dayWidgets.skip(i).take(7).toList();
+
+      // Ensure we always have 7 items in each row
       while (weekDays.length < 7) {
-        weekDays.add(const Expanded(child: SizedBox(height: 40)));
+        weekDays.add(
+          Expanded(
+            child: Container(height: 36, margin: const EdgeInsets.all(2)),
+          ),
+        );
       }
 
       rows.add(Row(children: weekDays));
+
+      // Add spacing between rows except for the last row
       if (i + 7 < dayWidgets.length) {
         rows.add(const SizedBox(height: 4));
       }
