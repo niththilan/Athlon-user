@@ -67,9 +67,8 @@ class BookNowScreen extends StatefulWidget {
 
 class _BookNowScreenState extends State<BookNowScreen> {
   String? selectedSport;
-  bool isLoading = false;
   DateTime? selectedDate;
-  bool showCalendar = false;
+  bool isLoadingCalendar = false;
 
   final List<String> availableSports = [
     'Football',
@@ -78,13 +77,12 @@ class _BookNowScreenState extends State<BookNowScreen> {
     'Badminton',
     'Cricket',
     'Table Tennis',
-    'Swimming',
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFBFCFD),
       extendBodyBehindAppBar: false,
       appBar: AppBar(
         backgroundColor: const Color(0xFF1B2C4F),
@@ -120,23 +118,22 @@ class _BookNowScreenState extends State<BookNowScreen> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(
-                top: 8.0,
-                left: 16.0,
-                right: 16.0,
-                bottom: 16.0,
+                top: 24.0,
+                left: 20.0,
+                right: 20.0,
+                bottom: 32.0,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
                   VenueSelectionSection(venue: widget.venue),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 32),
                   _buildSportSelection(),
                   if (selectedSport != null) ...[
-                    const SizedBox(height: 20),
-                    if (isLoading)
-                      _buildLoadingSection()
-                    else if (showCalendar)
+                    const SizedBox(height: 8),
+                    if (isLoadingCalendar)
+                      _buildLoadingIndicator()
+                    else
                       _buildCalendarSection(),
                   ],
                 ],
@@ -149,109 +146,131 @@ class _BookNowScreenState extends State<BookNowScreen> {
   }
 
   Widget _buildSportSelection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Select Your Sport',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF374151),
+            letterSpacing: 0.1,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Select Your Sport',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF1B2C4F),
-            ),
+        ),
+        const SizedBox(height: 12),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 3.2,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
           ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: availableSports.map((sport) {
-              final isSelected = selectedSport == sport;
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedSport = sport;
-                    isLoading = true;
-                    showCalendar = false;
-                  });
-                  _simulateLoading();
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey.shade300,
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        _getSportIcon(sport),
-                        size: 18,
-                        color: isSelected ? Colors.white : const Color(0xFF1B2C4F),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        sport,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: isSelected ? Colors.white : const Color(0xFF1B2C4F),
-                        ),
-                      ),
-                    ],
+          itemCount: availableSports.length,
+          itemBuilder: (context, index) {
+            final sport = availableSports[index];
+            final isSelected = selectedSport == sport;
+            
+            return GestureDetector(
+              onTap: () async {
+                setState(() {
+                  selectedSport = sport;
+                  isLoadingCalendar = true;
+                });
+                
+                // Simulate loading delay
+                await Future.delayed(const Duration(milliseconds: 800));
+                
+                setState(() {
+                  isLoadingCalendar = false;
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: isSelected 
+                      ? const Color(0xFF1B2C4F) 
+                      : Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isSelected 
+                        ? const Color(0xFF1B2C4F) 
+                        : const Color(0xFFE5E7EB),
+                    width: 1,
                   ),
                 ),
-              );
-            }).toList(),
-          ),
-        ],
-      ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          _getSportIcon(sport),
+                          size: 14,
+                          color: isSelected 
+                              ? Colors.white 
+                              : const Color(0xFF6B7280),
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            sport,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                              color: isSelected 
+                                  ? Colors.white 
+                                  : const Color(0xFF374151),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _getSportPrice(sport),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: isSelected 
+                            ? Colors.white 
+                            : const Color(0xFF6B7280),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 
-  Widget _buildLoadingSection() {
+  Widget _buildLoadingIndicator() {
     return Container(
-      padding: const EdgeInsets.all(40),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      height: 400,
+      width: double.infinity,
       child: const Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1B2C4F)),
+              strokeWidth: 3,
             ),
             SizedBox(height: 16),
             Text(
-              'Loading available dates...',
+              'Loading calendar...',
               style: TextStyle(
-                fontSize: 14,
                 color: Color(0xFF666666),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -261,70 +280,72 @@ class _BookNowScreenState extends State<BookNowScreen> {
   }
 
   Widget _buildCalendarSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Select Date',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF374151),
+            letterSpacing: 0.1,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Select Date',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF1B2C4F),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: const Color(0xFFE5E7EB),
+              width: 1,
             ),
           ),
-          const SizedBox(height: 20),
-          _buildCalendarContent(),
-          if (selectedDate != null) ...[
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TimeSlotSelectionScreen(
-                        venue: widget.venue,
-                        sport: selectedSport!,
-                        selectedDate: selectedDate!,
-                      ),
+          child: Column(
+            children: [
+              _buildCalendarContent(),
+            ],
+          ),
+        ),
+        if (selectedDate != null) ...[
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            height: 44,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TimeSlotSelectionScreen(
+                      venue: widget.venue,
+                      sport: selectedSport!,
+                      selectedDate: selectedDate!,
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1B2C4F),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
                   ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF1B2C4F),
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Text(
-                  'Next',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+              ),
+              child: const Text(
+                'Continue to Time Selection',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-          ],
+          ),
         ],
-      ),
+      ],
     );
   }
 
@@ -340,13 +361,19 @@ class _BookNowScreenState extends State<BookNowScreen> {
             IconButton(
               onPressed: () {
                 setState(() {
-                  final newDate = DateTime(currentMonth.year, currentMonth.month - 1);
-                  if (newDate.month >= now.month && newDate.year >= now.year) {
+                  final newDate = DateTime(currentMonth.year, currentMonth.month - 1, 1);
+                  // Only allow going back to current month or later
+                  if (newDate.year > now.year || 
+                      (newDate.year == now.year && newDate.month >= now.month)) {
                     selectedDate = newDate;
                   }
                 });
               },
-              icon: const Icon(Icons.chevron_left, color: Color(0xFF1B2C4F)),
+              icon: const Icon(
+                Icons.chevron_left,
+                color: Color(0xFF1B2C4F),
+                size: 24,
+              ),
             ),
             Text(
               DateFormat('MMMM yyyy').format(currentMonth),
@@ -359,10 +386,14 @@ class _BookNowScreenState extends State<BookNowScreen> {
             IconButton(
               onPressed: () {
                 setState(() {
-                  selectedDate = DateTime(currentMonth.year, currentMonth.month + 1);
+                  selectedDate = DateTime(currentMonth.year, currentMonth.month + 1, 1);
                 });
               },
-              icon: const Icon(Icons.chevron_right, color: Color(0xFF1B2C4F)),
+              icon: const Icon(
+                Icons.chevron_right,
+                color: Color(0xFF1B2C4F),
+                size: 24,
+              ),
             ),
           ],
         ),
@@ -410,7 +441,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
 
     // Add empty spaces for days before the first day of the month
     for (int i = 0; i < firstDayWeekday; i++) {
-      dayWidgets.add(const Expanded(child: SizedBox(height: 36)));
+      dayWidgets.add(const Expanded(child: SizedBox(height: 40)));
     }
 
     // Add days of the month
@@ -421,45 +452,52 @@ class _BookNowScreenState extends State<BookNowScreen> {
       final isPastDate = date.isBefore(DateTime(now.year, now.month, now.day));
 
       dayWidgets.add(
-        Expanded(
-          child: GestureDetector(
-            onTap: isPastDate ? null : () {
-              setState(() {
-                selectedDate = date;
-              });
-            },
-            child: Container(
-              height: 36,
-              margin: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: isPastDate 
-                    ? Colors.grey.shade200
-                    : isSelected 
-                        ? const Color(0xFF1B2C4F) 
-                        : null,
-                shape: BoxShape.circle,
-                border: isToday && !isSelected && !isPastDate
-                    ? Border.all(color: const Color(0xFF1B2C4F), width: 2)
-                    : null,
-              ),
-              child: Center(
-                child: Text(
-                  '$day',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                    color: isPastDate
-                        ? Colors.grey.shade400
-                        : isSelected
-                            ? Colors.white
-                            : isToday
-                                ? const Color(0xFF1B2C4F)
-                                : const Color(0xFF2D3142),
+        Expanded(            child: GestureDetector(
+              onTap: isPastDate ? null : () {
+                setState(() {
+                  selectedDate = date;
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                height: 40,
+                margin: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  color: isPastDate 
+                      ? const Color(0xFFF3F4F6)
+                      : isSelected 
+                          ? const Color(0xFF1B2C4F) 
+                          : null,
+                  borderRadius: BorderRadius.circular(35),
+                  border: isToday && !isSelected && !isPastDate
+                      ? Border.all(color: const Color(0xFF1B2C4F), width: 2)
+                      : null,
+                  boxShadow: isSelected ? [
+                    BoxShadow(
+                      color: const Color(0xFF1B2C4F).withOpacity(0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ] : null,
+                ),
+                child: Center(
+                  child: Text(
+                    '$day',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: isSelected || isToday ? FontWeight.w700 : FontWeight.w500,
+                      color: isPastDate
+                          ? const Color(0xFFD1D5DB)
+                          : isSelected
+                              ? Colors.white
+                              : isToday
+                                  ? const Color(0xFF1B2C4F)
+                                  : const Color(0xFF374151),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
         ),
       );
     }
@@ -469,7 +507,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
     for (int i = 0; i < dayWidgets.length; i += 7) {
       final weekDays = dayWidgets.skip(i).take(7).toList();
       while (weekDays.length < 7) {
-        weekDays.add(const Expanded(child: SizedBox(height: 36)));
+        weekDays.add(const Expanded(child: SizedBox(height: 40)));
       }
 
       rows.add(Row(children: weekDays));
@@ -497,8 +535,6 @@ class _BookNowScreenState extends State<BookNowScreen> {
         return Icons.sports_tennis;
       case 'badminton':
         return Icons.sports_tennis;
-      case 'swimming':
-        return Icons.pool;
       case 'cricket':
         return Icons.sports_cricket;
       case 'baseball':
@@ -510,16 +546,25 @@ class _BookNowScreenState extends State<BookNowScreen> {
     }
   }
 
-  void _simulateLoading() {
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-          showCalendar = true;
-        });
-      }
-    });
+  String _getSportPrice(String sport) {
+    switch (sport.toLowerCase()) {
+      case 'football':
+        return 'Rs. 700/hr';
+      case 'basketball':
+        return 'Rs. 650/hr';
+      case 'tennis':
+        return 'Rs. 800/hr';
+      case 'badminton':
+        return 'Rs. 600/hr';
+      case 'cricket':
+        return 'Rs. 750/hr';
+      case 'table tennis':
+        return 'Rs. 500/hr';
+      default:
+        return 'Rs. 700/hr';
+    }
   }
+
 }
 
 // TimeSlotSelectionScreen - New screen for time slot selection
@@ -1222,184 +1267,144 @@ class VenueSelectionSection extends StatelessWidget {
           'distance': '2.5 km',
         };
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Selected Venue',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF374151),
+            letterSpacing: 0.1,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                'Selected Venue',
-                style: Theme.of(context).textTheme.titleMedium,
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: const Color(0xFFE5E7EB),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
               ),
-              const SizedBox(width: 8),
+            ],
+          ),
+          child: Row(
+            children: [
               Container(
-                padding: const EdgeInsets.all(4),
+                height: 100,
+                width: 100,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1B2C4F).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
-                child: const Icon(
-                  Icons.check_circle,
-                  color: Color(0xFF1B2C4F),
-                  size: 14,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    _getCourtImage(venueData['sport']?.toString() ?? 'Football'),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          _getSportIcon(
+                            venueData['sport']?.toString() ?? 'Football',
+                          ),
+                          color: const Color(0xFF1B2C4F),
+                          size: 32,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      venueData['title']?.toString() ?? 'Venue',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF111827),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 14,
+                          color: Color(0xFF9CA3AF),
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            venueData['location']?.toString() ?? 'Location',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF6B7280),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Icon(
+                          Icons.star_rounded,
+                          size: 14,
+                          color: Color(0xFFF59E0B),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${venueData['rating'] ?? 4.8}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF374151),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        _buildAmenityTag(
+                          _getSportFormat(
+                            venueData['sport']?.toString() ?? 'Football',
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildAmenityTag('Indoor'),
+                        const SizedBox(width: 8),
+                        _buildAmenityTag('Parking'),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  const Color(0xFF1B2C4F).withOpacity(0.05),
-                  const Color(0xFF1B2C4F).withOpacity(0.15),
-                ],
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  height: 60,
-                  width: 60,
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1B2C4F).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      _getSportIcon(
-                        venueData['sport']?.toString() ?? 'Football',
-                      ),
-                      color: const Color(0xFF1B2C4F),
-                      size: 20,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              venueData['title']?.toString() ?? 'Venue',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1B2C4F),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1B2C4F),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              venueData['rate_per_hour']?.toString() ??
-                                  'Rs. 700/hr',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.location_on,
-                            size: 14,
-                            color: Colors.grey.shade600,
-                          ),
-                          const SizedBox(width: 4),
-                          Expanded(
-                            child: Text(
-                              venueData['location']?.toString() ?? 'Location',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Icon(
-                            Icons.star,
-                            size: 14,
-                            color: Colors.amber.shade700,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${venueData['rating'] ?? 4.8}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey.shade700,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          _buildAmenityTag(
-                            _getSportFormat(
-                              venueData['sport']?.toString() ?? 'Football',
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          _buildAmenityTag('Indoor'),
-                          const SizedBox(width: 8),
-                          _buildAmenityTag('Parking'),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -1413,8 +1418,6 @@ class VenueSelectionSection extends StatelessWidget {
         return Icons.sports_tennis;
       case 'badminton':
         return Icons.sports_tennis;
-      case 'swimming':
-        return Icons.pool;
       case 'cricket':
         return Icons.sports_cricket;
       case 'baseball':
@@ -1423,6 +1426,25 @@ class VenueSelectionSection extends StatelessWidget {
         return Icons.table_bar;
       default:
         return Icons.sports_soccer;
+    }
+  }
+
+  String _getCourtImage(String sport) {
+    switch (sport.toLowerCase()) {
+      case 'football':
+        return 'assets/football.jpg';
+      case 'basketball':
+        return 'assets/basket.jpg';
+      case 'tennis':
+        return 'assets/tennis.jpg';
+      case 'badminton':
+        return 'assets/badminton.jpg';
+      case 'cricket':
+        return 'assets/cricket.jpg';
+      case 'table tennis':
+        return 'assets/tabletennis.jpg';
+      default:
+        return 'assets/football.jpg';
     }
   }
 
@@ -1447,16 +1469,16 @@ class VenueSelectionSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
+        color: const Color(0xFFF9FAFB),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
       ),
       child: Text(
         text,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w500,
-          color: Colors.grey.shade700,
+          color: Color(0xFF6B7280),
         ),
       ),
     );
