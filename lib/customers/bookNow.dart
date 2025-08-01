@@ -633,12 +633,10 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 2),
                   _buildBookingInfo(),
                   const SizedBox(height: 20),
                   _buildSlotsSection(),
-                  const SizedBox(height: 20),
-                  const NumberOfPlayersSection(),
                   const SizedBox(height: 20),
                   const PricingSummarySection(),
                 ],
@@ -1458,161 +1456,6 @@ class VenueSelectionSection extends StatelessWidget {
           fontWeight: FontWeight.w500,
           color: Colors.grey.shade700,
         ),
-      ),
-    );
-  }
-}
-
-// Number of Players Section as separate component
-class NumberOfPlayersSection extends StatefulWidget {
-  const NumberOfPlayersSection({super.key});
-
-  @override
-  State<NumberOfPlayersSection> createState() => _NumberOfPlayersSectionState();
-}
-
-class _NumberOfPlayersSectionState extends State<NumberOfPlayersSection> {
-  int _numberOfPlayers = 1;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Number of Players',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1B2C4F).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.sports_soccer,
-                    color: Color(0xFF1B2C4F),
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                const Expanded(
-                  child: Text(
-                    'Players',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF1B2C4F),
-                    ),
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Material(
-                        color: Colors.transparent,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          bottomLeft: Radius.circular(12),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              if (_numberOfPlayers > 1) _numberOfPlayers--;
-                            });
-                          },
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            bottomLeft: Radius.circular(12),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            child: const Icon(
-                              Icons.remove,
-                              size: 18,
-                              color: Color(0xFF1B2C4F),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          '$_numberOfPlayers',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1B2C4F),
-                          ),
-                        ),
-                      ),
-                      Material(
-                        color: Colors.transparent,
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(12),
-                          bottomRight: Radius.circular(12),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              if (_numberOfPlayers < 10) _numberOfPlayers++;
-                            });
-                          },
-                          borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(12),
-                            bottomRight: Radius.circular(12),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            child: const Icon(
-                              Icons.add,
-                              size: 18,
-                              color: Color(0xFF1B2C4F),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

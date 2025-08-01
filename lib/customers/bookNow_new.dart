@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'proceedToPayment.dart' as payment;
+// import 'proceedToPayment.dart' as payment;
 import 'footer.dart';
 
 // TimeSlot and SlotStatus definitions
@@ -693,8 +693,6 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
                   const SizedBox(height: 20),
                   _buildSlotsSection(),
                   const SizedBox(height: 20),
-                  const NumberOfPlayersSection(),
-                  const SizedBox(height: 20),
                   const PricingSummarySection(),
                 ],
               ),
@@ -975,17 +973,13 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
       slotHeight = 43.3;
     }
 
-    return SizedBox(
-      height: 300,
-      child: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        child: ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: (timeSlots.length / 4).ceil(),
-          itemBuilder: (context, rowIndex) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: (timeSlots.length / 4).ceil(),
+      itemBuilder: (context, rowIndex) {
             return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.only(bottom: 6),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -1038,9 +1032,7 @@ class _TimeSlotSelectionScreenState extends State<TimeSlotSelectionScreen> {
               ),
             );
           },
-        ),
-      ),
-    );
+        );
   }
 
   Widget _buildResponsiveTimeSlot(
@@ -1495,161 +1487,6 @@ class VenueSelectionSection extends StatelessWidget {
   }
 }
 
-// Number of Players Section as separate component
-class NumberOfPlayersSection extends StatefulWidget {
-  const NumberOfPlayersSection({super.key});
-
-  @override
-  State<NumberOfPlayersSection> createState() => _NumberOfPlayersSectionState();
-}
-
-class _NumberOfPlayersSectionState extends State<NumberOfPlayersSection> {
-  int _numberOfPlayers = 1;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Number of Players',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.grey.shade200, width: 1),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1B2C4F).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.sports_soccer,
-                    color: Color(0xFF1B2C4F),
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                const Expanded(
-                  child: Text(
-                    'Players',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF1B2C4F),
-                    ),
-                  ),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Material(
-                        color: Colors.transparent,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          bottomLeft: Radius.circular(12),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              if (_numberOfPlayers > 1) _numberOfPlayers--;
-                            });
-                          },
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            bottomLeft: Radius.circular(12),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            child: const Icon(
-                              Icons.remove,
-                              size: 18,
-                              color: Color(0xFF1B2C4F),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Text(
-                          '$_numberOfPlayers',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1B2C4F),
-                          ),
-                        ),
-                      ),
-                      Material(
-                        color: Colors.transparent,
-                        borderRadius: const BorderRadius.only(
-                          topRight: Radius.circular(12),
-                          bottomRight: Radius.circular(12),
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            setState(() {
-                              if (_numberOfPlayers < 10) _numberOfPlayers++;
-                            });
-                          },
-                          borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(12),
-                            bottomRight: Radius.circular(12),
-                          ),
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            child: const Icon(
-                              Icons.add,
-                              size: 18,
-                              color: Color(0xFF1B2C4F),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class PricingSummarySection extends StatelessWidget {
   const PricingSummarySection({super.key});
 
@@ -1683,15 +1520,15 @@ class PricingSummarySection extends StatelessWidget {
             height: 56,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const payment.InvoiceScreen(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   PageRouteBuilder(
+                //     pageBuilder: (context, animation, secondaryAnimation) =>
+                //         const payment.InvoiceScreen(),
+                //     transitionDuration: Duration.zero,
+                //     reverseTransitionDuration: Duration.zero,
+                //   ),
+                // );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1B2C4F),
@@ -1704,17 +1541,10 @@ class PricingSummarySection extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Icon(Icons.payment, size: 18),
-                  ),
+                  const Icon(Icons.phone, size: 18),
                   const SizedBox(width: 10),
                   const Text(
-                    'Continue to Payment',
+                    'Call to reserve your slot',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 14,
