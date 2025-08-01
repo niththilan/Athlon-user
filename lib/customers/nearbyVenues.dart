@@ -4,6 +4,7 @@ import 'package:athlon_user/customers/footer.dart';
 import 'package:flutter/material.dart';
 //import 'bookNow.dart';
 import 'filter_screen.dart';
+import 'bookNow_new.dart';
 
 void main() {
   runApp(const MyApp());
@@ -702,6 +703,39 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
 
   // UPDATED VENUE CARD WITH PROPER NAVIGATION
   Widget _buildVenueCard(VenueModel venue, bool isFavorite) {
+    final Map<String, dynamic> courtData = {
+      'id': venue.id,
+      'name': venue.title,
+      'type': venue.sports.isNotEmpty ? '${venue.sports.first} Court' : 'Sports Court',
+      'location': venue.location,
+      'distance': '${venue.distance.toStringAsFixed(1)} km away',
+      'rating': venue.rating,
+      'total_reviews': (venue.rating * 50).round(),
+      'price_per_hour': double.tryParse(venue.ratePerHour.replaceAll(RegExp(r'[^\d.]'), '')) ?? 2500.0,
+      'opening_hours': 'Open Now',
+      'closing_time': venue.openingHours.contains('PM') ? 
+          'Closes at ${venue.openingHours.split(' - ').last}' : 
+          'Closes at 11:00 PM',
+      'phone': '+94 77 123 4567',
+      'email': 'info@${venue.title.toLowerCase().replaceAll(' ', '').replaceAll(RegExp(r'[^\w]'), '')}.lk',
+      'website': 'www.${venue.title.toLowerCase().replaceAll(' ', '').replaceAll(RegExp(r'[^\w]'), '')}.lk',
+      'description': 'Premium ${venue.sports.join(', ')} facility with state-of-the-art equipment and professional-grade surfaces.',
+      'images': [
+        venue.imageUrl,
+        if (venue.sports.contains('Futsal') || venue.sports.contains('Cricket'))
+          'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+        if (venue.sports.contains('Tennis') || venue.sports.contains('Badminton'))
+          'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+        if (venue.sports.contains('Swimming'))
+          'https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+        if (venue.sports.contains('Basketball'))
+          'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+        if (venue.sports.contains('Golf'))
+          'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      ],
+      'sports_available': venue.sports,
+    };
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
       decoration: BoxDecoration(
@@ -723,30 +757,44 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
               // Image with favorite button
               Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12),
-                    ),
-                    child: Container(
-                      height: 160,
-                      width: double.infinity,
-                      color: Colors.grey[200],
-                      child: Image.network(
-                        venue.imageUrl,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[100],
-                            child: const Center(
-                              child: Icon(
-                                Icons.image_not_supported,
-                                size: 40,
-                                color: Colors.grey,
+                  GestureDetector(
+                    onTap: () {
+                      // Navigate to CourtDetailScreen when image is tapped
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation, secondaryAnimation) =>
+                              CourtDetailScreen(courtData: courtData),
+                          transitionDuration: Duration.zero,
+                          reverseTransitionDuration: Duration.zero,
+                        ),
+                      );
+                    },
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
+                      child: Container(
+                        height: 160,
+                        width: double.infinity,
+                        color: Colors.grey[200],
+                        child: Image.network(
+                          venue.imageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              color: Colors.grey[100],
+                              child: const Center(
+                                child: Icon(
+                                  Icons.image_not_supported,
+                                  size: 40,
+                                  color: Colors.grey,
+                                ),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),
@@ -931,55 +979,17 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
             ],
           ),
 
-          // Book Now button positioned in bottom-right corner - UPDATED WITH VENUE DATA
+          // Book Now button positioned in bottom-right corner - navigates to BookNowScreen
           Positioned(
             bottom: 10,
             right: 14,
             child: ElevatedButton(
               onPressed: () {
-                // Convert VenueModel to courtData format expected by CourtDetailScreen
-                final Map<String, dynamic> courtData = {
-                  'id': venue.id,
-                  'name': venue.title,
-                  'type': venue.sports.isNotEmpty ? '${venue.sports.first} Court' : 'Sports Court',
-                  'location': venue.location,
-                  'distance': '${venue.distance.toStringAsFixed(1)} km away',
-                  'rating': venue.rating,
-                  'total_reviews': (venue.rating * 50).round(), // Estimated reviews based on rating
-                  'price_per_hour': double.tryParse(venue.ratePerHour.replaceAll(RegExp(r'[^\d.]'), '')) ?? 2500.0,
-                  'opening_hours': 'Open Now',
-                  'closing_time': venue.openingHours.contains('PM') ? 
-                      'Closes at ${venue.openingHours.split(' - ').last}' : 
-                      'Closes at 11:00 PM',
-                  'phone': '+94 77 123 4567', // Default phone
-                  'email': 'info@${venue.title.toLowerCase().replaceAll(' ', '').replaceAll(RegExp(r'[^\w]'), '')}.lk',
-                  'website': 'www.${venue.title.toLowerCase().replaceAll(' ', '').replaceAll(RegExp(r'[^\w]'), '')}.lk',
-                  'description': 'Premium ${venue.sports.join(', ')} facility with state-of-the-art equipment and professional-grade surfaces.',
-                  'images': [
-                    venue.imageUrl,
-                    // Add some related images based on sports type
-                    if (venue.sports.contains('Futsal') || venue.sports.contains('Cricket'))
-                      'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-                    if (venue.sports.contains('Tennis') || venue.sports.contains('Badminton'))
-                      'https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-                    if (venue.sports.contains('Swimming'))
-                      'https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-                    if (venue.sports.contains('Basketball'))
-                      'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-                    if (venue.sports.contains('Golf'))
-                      'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
-                  ],
-                  'sports_available': venue.sports,
-                };
-
-                // Navigate to CourtDetailScreen with specific venue data
+                // Navigate directly to BookNowScreen with venue data
                 Navigator.push(
                   context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        CourtDetailScreen(courtData: courtData),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
+                  MaterialPageRoute(
+                    builder: (context) => BookNowScreen(venue: courtData),
                   ),
                 );
               },
