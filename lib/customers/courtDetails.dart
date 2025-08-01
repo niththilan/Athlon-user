@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'footer.dart';
 import 'bookNow_new.dart'; // Import BookNow.dart
+import 'widgets/football_spinner.dart';
 
 void main() {
   runApp(const MyApp());
@@ -81,7 +82,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   bool _isFavorite = false;
   int _currentImageIndex = 0;
   int _currentIndex = 0; // For footer navigation
-
+  bool _isLoading = true;
 
   // Mock court data
   late Map<String, dynamic> _courtDetails;
@@ -91,6 +92,13 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     super.initState();
     _initializeCourtData();
     _startSlideshow();
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    });
   }
 
   void _startSlideshow() {
@@ -264,6 +272,11 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Scaffold(
+        body: Center(child: FootballLoadingWidget()),
+      );
+    }
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8),
       body: CustomScrollView(
