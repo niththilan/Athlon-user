@@ -90,7 +90,47 @@ class _MessagesScreenState extends State<MessagesScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialize with some mock data for testing
+    _initializeMockData();
     // _loadConversationsFromDatabase();
+  }
+
+  // Add mock data for testing categories
+  void _initializeMockData() {
+    _messages = [
+      ChatMessage(
+        name: 'John Doe',
+        lastMessage: 'Hi, I need help with booking',
+        time: '2:30 PM',
+        unreadCount: 2,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'Hi, I need help with booking', time: '2:30 PM', isSentByMe: false),
+        ],
+      ),
+      ChatMessage(
+        name: 'Jane Smith',
+        lastMessage: 'Thank you for the service',
+        time: 'Yesterday',
+        unreadCount: 0,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'Thank you for the service', time: 'Yesterday', isSentByMe: false),
+        ],
+      ),
+      ChatMessage(
+        name: 'Mike Johnson',
+        lastMessage: 'When are you available?',
+        time: 'Monday',
+        unreadCount: 1,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'When are you available?', time: 'Monday', isSentByMe: false),
+        ],
+        isArchived: true,
+      ),
+    ];
+    _filteredMessages = _filterMessagesByCategory(_selectedCategory);
   }
 
   // Load conversations from database instead of mock data
@@ -255,19 +295,31 @@ class _MessagesScreenState extends State<MessagesScreen> {
     return filtered;
   }
 
-  /*
+  // Add localization fallback method
+  String _getLocalizedCategory(String category) {
+    switch (category) {
+      case 'All':
+        return 'All';
+      case 'Unread':
+        return 'Unread';
+      case 'Archive':
+        return 'Archive';
+      default:
+        return category;
+    }
+  }
+
   void _filterByCategory(String category) {
     if (_isDisposed) return;
 
     // Map localized strings to internal keys
     String internalCategory;
-    final localizations = AppLocalizations.of(context)!;
 
-    if (category == localizations.all) {
+    if (category == 'All') {
       internalCategory = 'All';
-    } else if (category == localizations.unread) {
+    } else if (category == 'Unread') {
       internalCategory = 'Unread';
-    } else if (category == localizations.archive) {
+    } else if (category == 'Archive') {
       internalCategory = 'Archive';
     } else {
       internalCategory = category; // fallback
@@ -278,7 +330,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(internalCategory);
     });
   }
-  */
 
   @override
   Widget build(BuildContext context) {
@@ -328,7 +379,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         child: Column(
           children: [
             _buildSearchBar(),
-            // _buildMessageCategories(),
+            _buildMessageCategories(),
             Expanded(
               child: _filteredMessages.isEmpty
                   ? _buildEmptyState()
@@ -408,7 +459,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
     );
   }
 
-  /*
   Widget _buildMessageCategories() {
     return Container(
       height: 40,
@@ -419,24 +469,22 @@ class _MessagesScreenState extends State<MessagesScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           _buildCategoryChip(
-            AppLocalizations.of(context)!.all,
+            _getLocalizedCategory('All'),
             _selectedCategory == 'All',
           ),
           _buildCategoryChip(
-            AppLocalizations.of(context)!.unread,
+            _getLocalizedCategory('Unread'),
             _selectedCategory == 'Unread',
           ),
           _buildCategoryChip(
-            AppLocalizations.of(context)!.archive,
+            _getLocalizedCategory('Archive'),
             _selectedCategory == 'Archive',
           ),
         ],
       ),
     );
   }
-  */
 
-  /*
   Widget _buildCategoryChip(String label, bool isSelected) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
@@ -476,7 +524,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
       ),
     );
   }
-  */
 
   Widget _buildMessageList() {
     return ListView.builder(
@@ -539,18 +586,17 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
 
-    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.archived}',
+          'Chat with ${message.name} archived',
         ),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
-          label: AppLocalizations.of(context)!.undo,
+          label: 'Undo',
           textColor: Colors.white,
           onPressed: () {
             setState(() {
@@ -561,7 +607,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
     );
-    */
   }
 
   void _pinMessage(ChatMessage message) {
@@ -570,20 +615,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
 
-    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           message.isPinned
-              ? '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.pinned}'
-              : '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.unpinned}',
+              ? 'Chat with ${message.name} pinned'
+              : 'Chat with ${message.name} unpinned',
         ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 2),
       ),
     );
-    */
   }
 
   void _muteMessage(ChatMessage message) {
@@ -592,20 +635,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
 
-    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           message.isMuted
-              ? '${AppLocalizations.of(context)!.notificationsMuted} ${message.name}'
-              : '${AppLocalizations.of(context)!.notificationsUnmuted} ${message.name}',
+              ? 'Notifications muted for ${message.name}'
+              : 'Notifications unmuted for ${message.name}',
         ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 2),
       ),
     );
-    */
   }
 
   void _unarchiveMessage(ChatMessage message) {
@@ -614,18 +655,17 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
 
-    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.unarchived}',
+          'Chat with ${message.name} unarchived',
         ),
         backgroundColor: Colors.blue,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
-          label: AppLocalizations.of(context)!.undo,
+          label: 'Undo',
           textColor: Colors.white,
           onPressed: () {
             setState(() {
@@ -636,7 +676,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
     );
-    */
   }
 
   void _deleteMessage(ChatMessage message) {
@@ -647,18 +686,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
           children: [
             const Icon(Icons.delete_outline, color: Colors.red),
             const SizedBox(width: 8),
-            // Text(AppLocalizations.of(context)!.deleteChat),
             Text('Delete Chat'),
           ],
         ),
         content: Text(
-          // '${AppLocalizations.of(context)!.deleteChatConfirmation} ${message.name}?',
           'Are you sure you want to delete chat with ${message.name}?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            // child: Text(AppLocalizations.of(context)!.cancel),
             child: Text('Cancel'),
           ),
           ElevatedButton(
@@ -671,11 +707,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 );
               });
 
-              /*
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.deleted}',
+                    'Chat with ${message.name} deleted',
                   ),
                   backgroundColor: Colors.red,
                   behavior: SnackBarBehavior.floating,
@@ -684,7 +719,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   ),
                   duration: const Duration(seconds: 3),
                   action: SnackBarAction(
-                    label: AppLocalizations.of(context)!.undo,
+                    label: 'Undo',
                     textColor: Colors.white,
                     onPressed: () {
                       setState(() {
@@ -697,13 +732,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   ),
                 ),
               );
-              */
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            // child: Text(
-            //   AppLocalizations.of(context)!.delete,
-            //   style: const TextStyle(color: Colors.white),
-            // ),
             child: const Text(
               'Delete',
               style: TextStyle(color: Colors.white),
@@ -732,10 +762,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
               const SizedBox(height: 24),
               Text(
                 _isSearching
-                    // ? AppLocalizations.of(context)!.noResultsFound
-                    // : AppLocalizations.of(context)!.noCustomerMessagesYet,
                     ? 'No results found'
-                    : 'No customer messages yet',
+                    : _selectedCategory == 'Archive'
+                        ? 'No archived messages'
+                        : _selectedCategory == 'Unread'
+                            ? 'No unread messages'
+                            : 'No customer messages yet',
                 style: const TextStyle(
                   fontSize: 20,
                   color: Color(0xFF2D3142),
@@ -747,10 +779,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Text(
                   _isSearching
-                      // ? AppLocalizations.of(context)!.tryDifferentKeywords
-                      // : AppLocalizations.of(context)!.whenCustomersInquire,
                       ? 'Try different keywords'
-                      : 'When customers inquire, you will see their messages here.',
+                      : _selectedCategory == 'Archive'
+                          ? 'Archived conversations will appear here.'
+                          : _selectedCategory == 'Unread'
+                              ? 'New messages from customers will appear here.'
+                              : 'When customers inquire, you will see their messages here.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
@@ -758,7 +792,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   ),
                 ),
               ),
-              if (!_isSearching) ...[
+              if (!_isSearching && _selectedCategory == 'All') ...[
                 const SizedBox(height: 24),
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -781,7 +815,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          // AppLocalizations.of(context)!.tipRespondQuickly,
                           'Tip: Respond quickly to increase your chances of booking.',
                           style: const TextStyle(
                             color: Color(0xFF1B2C4F),
