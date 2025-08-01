@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'dart:async'; // Add Timer for debouncing
+import './footer.dart';
+import 'home.dart'; // Add this import
 
 void main() {
   runApp(
@@ -83,11 +85,133 @@ class _MessagesScreenState extends State<MessagesScreen> {
   bool _isSearching = false;
   bool _isRefreshing = false;
   bool _isDisposed = false; // Track widget disposal state
+  int _currentIndex = 3; // Add current index for footer
 
   @override
   void initState() {
     super.initState();
+    // Initialize with some mock data for testing
+    _initializeMockData();
     // _loadConversationsFromDatabase();
+  }
+
+  // Add mock data for testing categories
+  void _initializeMockData() {
+    _messages = [
+      ChatMessage(
+        name: 'John Doe',
+        lastMessage: 'Hi, I need help with booking a football court for tomorrow',
+        time: '2:30 PM',
+        unreadCount: 2,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'Hi, I need help with booking a football court for tomorrow', time: '2:30 PM', isSentByMe: false),
+          Message(content: 'What time do you prefer?', time: '2:35 PM', isSentByMe: true),
+        ],
+      ),
+      ChatMessage(
+        name: 'Sarah Wilson',
+        lastMessage: 'Is the court available this evening?',
+        time: '1:45 PM',
+        unreadCount: 1,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'Is the court available this evening?', time: '1:45 PM', isSentByMe: false),
+        ],
+        isPinned: true,
+      ),
+      ChatMessage(
+        name: 'Mike Johnson',
+        lastMessage: 'Thank you for the excellent service!',
+        time: 'Yesterday',
+        unreadCount: 0,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'Thank you for the excellent service!', time: 'Yesterday', isSentByMe: false),
+          Message(content: 'Thank you! We appreciate your feedback.', time: 'Yesterday', isSentByMe: true),
+        ],
+      ),
+      ChatMessage(
+        name: 'Emma Davis',
+        lastMessage: 'Can I reschedule my booking?',
+        time: 'Monday',
+        unreadCount: 3,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'Can I reschedule my booking?', time: 'Monday', isSentByMe: false),
+        ],
+      ),
+      ChatMessage(
+        name: 'Alex Thompson',
+        lastMessage: 'What are your rates for group bookings?',
+        time: '12:15 PM',
+        unreadCount: 1,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'What are your rates for group bookings?', time: '12:15 PM', isSentByMe: false),
+        ],
+      ),
+      ChatMessage(
+        name: 'Lisa Brown',
+        lastMessage: 'Great facility, will book again',
+        time: 'Sunday',
+        unreadCount: 0,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'Great facility, will book again', time: 'Sunday', isSentByMe: false),
+          Message(content: 'Thank you for choosing us!', time: 'Sunday', isSentByMe: true),
+        ],
+        isArchived: true,
+      ),
+      ChatMessage(
+        name: 'David Miller',
+        lastMessage: 'Is parking available at your venue?',
+        time: 'Friday',
+        unreadCount: 0,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'Is parking available at your venue?', time: 'Friday', isSentByMe: false),
+          Message(content: 'Yes, we have free parking available.', time: 'Friday', isSentByMe: true),
+        ],
+        isArchived: true,
+      ),
+      ChatMessage(
+        name: 'Jessica Taylor',
+        lastMessage: 'Do you have equipment rental?',
+        time: '11:30 AM',
+        unreadCount: 1,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'Do you have equipment rental?', time: '11:30 AM', isSentByMe: false),
+        ],
+        isMuted: true,
+      ),
+      ChatMessage(
+        name: 'Robert Anderson',
+        lastMessage: 'Booking confirmed for 6 PM',
+        time: 'Yesterday',
+        unreadCount: 0,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'Booking confirmed for 6 PM', time: 'Yesterday', isSentByMe: true),
+          Message(content: 'Perfect, see you then!', time: 'Yesterday', isSentByMe: false),
+        ],
+        isPinned: true,
+      ),
+      ChatMessage(
+        name: 'Maria Garcia',
+        lastMessage: 'Can I bring my own ball?',
+        time: 'Thursday',
+        unreadCount: 0,
+        avatarUrl: '',
+        messages: [
+          Message(content: 'Can I bring my own ball?', time: 'Thursday', isSentByMe: false),
+          Message(content: 'Of course! You can bring your own equipment.', time: 'Thursday', isSentByMe: true),
+        ],
+        isArchived: true,
+      ),
+    ];
+    _filteredMessages = _filterMessagesByCategory(_selectedCategory);
   }
 
   // Load conversations from database instead of mock data
@@ -252,19 +376,31 @@ class _MessagesScreenState extends State<MessagesScreen> {
     return filtered;
   }
 
-  /*
+  // Add localization fallback method
+  String _getLocalizedCategory(String category) {
+    switch (category) {
+      case 'All':
+        return 'All';
+      case 'Unread':
+        return 'Unread';
+      case 'Archive':
+        return 'Archive';
+      default:
+        return category;
+    }
+  }
+
   void _filterByCategory(String category) {
     if (_isDisposed) return;
 
     // Map localized strings to internal keys
     String internalCategory;
-    final localizations = AppLocalizations.of(context)!;
 
-    if (category == localizations.all) {
+    if (category == 'All') {
       internalCategory = 'All';
-    } else if (category == localizations.unread) {
+    } else if (category == 'Unread') {
       internalCategory = 'Unread';
-    } else if (category == localizations.archive) {
+    } else if (category == 'Archive') {
       internalCategory = 'Archive';
     } else {
       internalCategory = category; // fallback
@@ -275,7 +411,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(internalCategory);
     });
   }
-  */
 
   @override
   Widget build(BuildContext context) {
@@ -296,17 +431,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
           child: IconButton(
             icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
             onPressed: () {
-              /*
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              } else {
-                // If there's no previous route, navigate to home screen (index 0)
-                NavigationService.navigateToScreen(0);
-              }
-              */
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              }
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const HomeScreen(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              );
             },
           ),
         ),
@@ -327,7 +460,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
         child: Column(
           children: [
             _buildSearchBar(),
-            // _buildMessageCategories(),
+            _buildMessageCategories(),
             Expanded(
               child: _filteredMessages.isEmpty
                   ? _buildEmptyState()
@@ -336,7 +469,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ],
         ),
       ),
-      // bottomNavigationBar: UnifiedAppFooter(currentIndex: 2),
+      bottomNavigationBar: AppFooter(
+        currentIndex: _currentIndex,
+        onTabSelected: (int index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
     );
   }
 
@@ -400,7 +540,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
     );
   }
 
-  /*
   Widget _buildMessageCategories() {
     return Container(
       height: 40,
@@ -411,24 +550,22 @@ class _MessagesScreenState extends State<MessagesScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
           _buildCategoryChip(
-            AppLocalizations.of(context)!.all,
+            _getLocalizedCategory('All'),
             _selectedCategory == 'All',
           ),
           _buildCategoryChip(
-            AppLocalizations.of(context)!.unread,
+            _getLocalizedCategory('Unread'),
             _selectedCategory == 'Unread',
           ),
           _buildCategoryChip(
-            AppLocalizations.of(context)!.archive,
+            _getLocalizedCategory('Archive'),
             _selectedCategory == 'Archive',
           ),
         ],
       ),
     );
   }
-  */
 
-  /*
   Widget _buildCategoryChip(String label, bool isSelected) {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
@@ -468,7 +605,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
       ),
     );
   }
-  */
 
   Widget _buildMessageList() {
     return ListView.builder(
@@ -531,18 +667,17 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
 
-    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.archived}',
+          'Chat with ${message.name} archived',
         ),
         backgroundColor: Colors.green,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
-          label: AppLocalizations.of(context)!.undo,
+          label: 'Undo',
           textColor: Colors.white,
           onPressed: () {
             setState(() {
@@ -553,7 +688,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
     );
-    */
   }
 
   void _pinMessage(ChatMessage message) {
@@ -562,20 +696,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
 
-    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           message.isPinned
-              ? '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.pinned}'
-              : '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.unpinned}',
+              ? 'Chat with ${message.name} pinned'
+              : 'Chat with ${message.name} unpinned',
         ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 2),
       ),
     );
-    */
   }
 
   void _muteMessage(ChatMessage message) {
@@ -584,20 +716,18 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
 
-    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           message.isMuted
-              ? '${AppLocalizations.of(context)!.notificationsMuted} ${message.name}'
-              : '${AppLocalizations.of(context)!.notificationsUnmuted} ${message.name}',
+              ? 'Notifications muted for ${message.name}'
+              : 'Notifications unmuted for ${message.name}',
         ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 2),
       ),
     );
-    */
   }
 
   void _unarchiveMessage(ChatMessage message) {
@@ -606,18 +736,17 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
 
-    /*
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.unarchived}',
+          'Chat with ${message.name} unarchived',
         ),
         backgroundColor: Colors.blue,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
-          label: AppLocalizations.of(context)!.undo,
+          label: 'Undo',
           textColor: Colors.white,
           onPressed: () {
             setState(() {
@@ -628,7 +757,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
     );
-    */
   }
 
   void _deleteMessage(ChatMessage message) {
@@ -639,18 +767,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
           children: [
             const Icon(Icons.delete_outline, color: Colors.red),
             const SizedBox(width: 8),
-            // Text(AppLocalizations.of(context)!.deleteChat),
             Text('Delete Chat'),
           ],
         ),
         content: Text(
-          // '${AppLocalizations.of(context)!.deleteChatConfirmation} ${message.name}?',
           'Are you sure you want to delete chat with ${message.name}?',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            // child: Text(AppLocalizations.of(context)!.cancel),
             child: Text('Cancel'),
           ),
           ElevatedButton(
@@ -663,11 +788,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 );
               });
 
-              /*
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    '${AppLocalizations.of(context)!.chatWith} ${message.name} ${AppLocalizations.of(context)!.deleted}',
+                    'Chat with ${message.name} deleted',
                   ),
                   backgroundColor: Colors.red,
                   behavior: SnackBarBehavior.floating,
@@ -676,7 +800,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   ),
                   duration: const Duration(seconds: 3),
                   action: SnackBarAction(
-                    label: AppLocalizations.of(context)!.undo,
+                    label: 'Undo',
                     textColor: Colors.white,
                     onPressed: () {
                       setState(() {
@@ -689,13 +813,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   ),
                 ),
               );
-              */
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            // child: Text(
-            //   AppLocalizations.of(context)!.delete,
-            //   style: const TextStyle(color: Colors.white),
-            // ),
             child: const Text(
               'Delete',
               style: TextStyle(color: Colors.white),
@@ -724,10 +843,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
               const SizedBox(height: 24),
               Text(
                 _isSearching
-                    // ? AppLocalizations.of(context)!.noResultsFound
-                    // : AppLocalizations.of(context)!.noCustomerMessagesYet,
                     ? 'No results found'
-                    : 'No customer messages yet',
+                    : _selectedCategory == 'Archive'
+                        ? 'No archived messages'
+                        : _selectedCategory == 'Unread'
+                            ? 'No unread messages'
+                            : 'No customer messages yet',
                 style: const TextStyle(
                   fontSize: 20,
                   color: Color(0xFF2D3142),
@@ -739,10 +860,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Text(
                   _isSearching
-                      // ? AppLocalizations.of(context)!.tryDifferentKeywords
-                      // : AppLocalizations.of(context)!.whenCustomersInquire,
                       ? 'Try different keywords'
-                      : 'When customers inquire, you will see their messages here.',
+                      : _selectedCategory == 'Archive'
+                          ? 'Archived conversations will appear here.'
+                          : _selectedCategory == 'Unread'
+                              ? 'New messages from customers will appear here.'
+                              : 'When customers inquire, you will see their messages here.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
@@ -750,7 +873,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                   ),
                 ),
               ),
-              if (!_isSearching) ...[
+              if (!_isSearching && _selectedCategory == 'All') ...[
                 const SizedBox(height: 24),
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -773,7 +896,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          // AppLocalizations.of(context)!.tipRespondQuickly,
                           'Tip: Respond quickly to increase your chances of booking.',
                           style: const TextStyle(
                             color: Color(0xFF1B2C4F),
@@ -1158,10 +1280,20 @@ class _ChatScreenState extends State<ChatScreen> {
       elevation: 2,
       toolbarHeight: 50,
       leading: Container(
-        margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
+        margin: const EdgeInsets.fromLTRB(8, 3, 0, 8),
         child: IconButton(
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const HomeScreen(),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
+          },
         ),
       ),
       title: Row(
@@ -1526,9 +1658,9 @@ class _ChatScreenState extends State<ChatScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      */
 
       _messageController.text = messageContent;
+      */
     }
   }
 

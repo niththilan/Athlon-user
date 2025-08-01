@@ -41,13 +41,11 @@ class HistoryScreenState extends State<HistoryScreen> {
   void initState() {
     super.initState();
     _initializeDateList();
-    // _loadBookingHistory();
+    _initializeMockData(); // Add mock data initialization
     _scrollController.addListener(_onScroll);
     
-    // Initialize from DateProvider after the frame is built
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   _initializeFromDateProvider();
-    // });
+    // Set loading to false since we're using mock data
+    _isLoading = false;
   }
 
   void _initializeDateList() {
@@ -59,13 +57,221 @@ class HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  void _initializeFromDateProvider() {
-    // final dateProvider = Provider.of<DateProvider>(context, listen: false);
-    // if (dateProvider.selectedDate != null) {
-    //   _updateDateView(dateProvider.selectedDate!);
-    // }
-  }
+  // Add mock data for testing
+  void _initializeMockData() {
+    final now = DateTime.now();
+    bookingHistory = [
+      // Today's bookings
+      BookingHistoryItem(
+        id: '1',
+        customerName: 'John Smith',
+        courtName: 'Football Court A',
+        courtType: 'Football',
+        date: now,
+        startTime: '6:00 PM',
+        endTime: '7:00 PM',
+        duration: 60,
+        price: 2500.0,
+        status: 'confirmed',
+        customerPhone: '+94 77 123 4567',
+      ),
+      BookingHistoryItem(
+        id: '2',
+        customerName: 'Sarah Johnson',
+        courtName: 'Basketball Court B',
+        courtType: 'Basketball',
+        date: now,
+        startTime: '4:00 PM',
+        endTime: '5:30 PM',
+        duration: 90,
+        price: 3000.0,
+        status: 'confirmed',
+        customerPhone: '+94 71 987 6543',
+      ),
+      BookingHistoryItem(
+        id: '3',
+        customerName: 'Mike Wilson',
+        courtName: 'Tennis Court 1',
+        courtType: 'Tennis',
+        date: now,
+        startTime: '8:00 PM',
+        endTime: '9:00 PM',
+        duration: 60,
+        price: 2000.0,
+        status: 'completed',
+        customerPhone: '+94 76 555 7890',
+      ),
 
+      // Yesterday's bookings
+      BookingHistoryItem(
+        id: '4',
+        customerName: 'Emma Davis',
+        courtName: 'Football Court B',
+        courtType: 'Football',
+        date: now.subtract(Duration(days: 1)),
+        startTime: '5:00 PM',
+        endTime: '6:30 PM',
+        duration: 90,
+        price: 3500.0,
+        status: 'completed',
+        customerPhone: '+94 75 444 3210',
+      ),
+      BookingHistoryItem(
+        id: '5',
+        customerName: 'Alex Thompson',
+        courtName: 'Badminton Court A',
+        courtType: 'Badminton',
+        date: now.subtract(Duration(days: 1)),
+        startTime: '7:00 PM',
+        endTime: '8:00 PM',
+        duration: 60,
+        price: 1500.0,
+        status: 'completed',
+        customerPhone: '+94 77 888 9999',
+      ),
+      BookingHistoryItem(
+        id: '6',
+        customerName: 'Lisa Brown',
+        courtName: 'Football Court A',
+        courtType: 'Football',
+        date: now.subtract(Duration(days: 1)),
+        startTime: '3:00 PM',
+        endTime: '4:00 PM',
+        duration: 60,
+        price: 2500.0,
+        status: 'cancelled',
+        customerPhone: '+94 70 222 1111',
+      ),
+
+      // Two days ago
+      BookingHistoryItem(
+        id: '7',
+        customerName: 'David Miller',
+        courtName: 'Tennis Court 2',
+        courtType: 'Tennis',
+        date: now.subtract(Duration(days: 2)),
+        startTime: '6:30 PM',
+        endTime: '7:30 PM',
+        duration: 60,
+        price: 2000.0,
+        status: 'completed',
+        customerPhone: '+94 72 333 4444',
+      ),
+      BookingHistoryItem(
+        id: '8',
+        customerName: 'Jessica Taylor',
+        courtName: 'Basketball Court A',
+        courtType: 'Basketball',
+        date: now.subtract(Duration(days: 2)),
+        startTime: '8:00 PM',
+        endTime: '9:30 PM',
+        duration: 90,
+        price: 3000.0,
+        status: 'completed',
+        customerPhone: '+94 78 666 7777',
+      ),
+
+      // Three days ago
+      BookingHistoryItem(
+        id: '9',
+        customerName: 'Robert Anderson',
+        courtName: 'Football Court C',
+        courtType: 'Football',
+        date: now.subtract(Duration(days: 3)),
+        startTime: '4:30 PM',
+        endTime: '6:00 PM',
+        duration: 90,
+        price: 3500.0,
+        status: 'completed',
+        customerPhone: '+94 74 111 2222',
+      ),
+      BookingHistoryItem(
+        id: '10',
+        customerName: 'Maria Garcia',
+        courtName: 'Volleyball Court A',
+        courtType: 'Volleyball',
+        date: now.subtract(Duration(days: 3)),
+        startTime: '7:00 PM',
+        endTime: '8:30 PM',
+        duration: 90,
+        price: 2800.0,
+        status: 'completed',
+        customerPhone: '+94 73 555 6666',
+      ),
+
+      // A week ago
+      BookingHistoryItem(
+        id: '11',
+        customerName: 'Kevin Lee',
+        courtName: 'Badminton Court B',
+        courtType: 'Badminton',
+        date: now.subtract(Duration(days: 7)),
+        startTime: '5:30 PM',
+        endTime: '6:30 PM',
+        duration: 60,
+        price: 1500.0,
+        status: 'completed',
+        customerPhone: '+94 76 777 8888',
+      ),
+      BookingHistoryItem(
+        id: '12',
+        customerName: 'Amy Chen',
+        courtName: 'Tennis Court 1',
+        courtType: 'Tennis',
+        date: now.subtract(Duration(days: 7)),
+        startTime: '6:00 PM',
+        endTime: '7:00 PM',
+        duration: 60,
+        price: 2000.0,
+        status: 'completed',
+        customerPhone: '+94 71 999 0000',
+      ),
+
+      // Future bookings
+      BookingHistoryItem(
+        id: '13',
+        customerName: 'Tom Wilson',
+        courtName: 'Football Court A',
+        courtType: 'Football',
+        date: now.add(Duration(days: 1)),
+        startTime: '5:00 PM',
+        endTime: '6:00 PM',
+        duration: 60,
+        price: 2500.0,
+        status: 'confirmed',
+        customerPhone: '+94 77 444 5555',
+      ),
+      BookingHistoryItem(
+        id: '14',
+        customerName: 'Rachel Green',
+        courtName: 'Basketball Court B',
+        courtType: 'Basketball',
+        date: now.add(Duration(days: 2)),
+        startTime: '7:00 PM',
+        endTime: '8:30 PM',
+        duration: 90,
+        price: 3000.0,
+        status: 'confirmed',
+        customerPhone: '+94 75 666 7777',
+      ),
+      BookingHistoryItem(
+        id: '15',
+        customerName: 'Mark Johnson',
+        courtName: 'Tennis Court 2',
+        courtType: 'Tennis',
+        date: now.add(Duration(days: 3)),
+        startTime: '6:30 PM',
+        endTime: '7:30 PM',
+        duration: 60,
+        price: 2000.0,
+        status: 'pending',
+        customerPhone: '+94 72 888 9999',
+      ),
+    ];
+
+    // Initialize some cash collected bookings
+    cashCollectedBookings.addAll(['4', '5', '7', '8', '9', '10', '11', '12']);
+  }
 
   @override
   void dispose() {
