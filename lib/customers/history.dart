@@ -25,13 +25,13 @@ class HistoryScreenState extends State<HistoryScreen> {
   int currentDateStartIndex = 5; // Place the current date in the middle
 
   List<BookingHistoryItem> bookingHistory = [];
-  Set<String> cashCollectedBookings = {};
 
   // Simplified color scheme
   static const Color primaryColor = Color(0xFF1B2C4F);
   static const Color backgroundColor = Color(0xFFF8F9FA);
   static const Color cardColor = Colors.white;
   static const Color successColor = Color(0xFF10B981);
+  static const Color darkGreenColor = Color(0xFF065F46); // Added dark green
   static const Color errorColor = Color(0xFFEF4444);
   static const Color warningColor = Color(0xFFF59E0B);
   static const Color textPrimary = Color(0xFF111827);
@@ -268,9 +268,6 @@ class HistoryScreenState extends State<HistoryScreen> {
         customerPhone: '+94 72 888 9999',
       ),
     ];
-
-    // Initialize some cash collected bookings
-    cashCollectedBookings.addAll(['4', '5', '7', '8', '9', '10', '11', '12']);
   }
 
   @override
@@ -471,8 +468,6 @@ class HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildSimpleBookingCard(BookingHistoryItem booking) {
-    final isCollected = cashCollectedBookings.contains(booking.id);
-    
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(16),
@@ -480,62 +475,56 @@ class HistoryScreenState extends State<HistoryScreen> {
         color: cardColor,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: (booking.status.toLowerCase() == 'confirmed' && isCollected) 
-              ? successColor 
-              : Colors.grey.shade200,
-          width: (booking.status.toLowerCase() == 'confirmed' && isCollected) ? 2 : 1,
+          color: Colors.grey.shade200,
+          width: 1,
         ),
       ),
-      child: Row(
+      child: Column(
         children: [
-          // Left side - main info
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  booking.customerName,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: textPrimary,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  booking.courtName,
-                  style: TextStyle(fontSize: 14, color: textSecondary),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  '${DateFormat('MMM d').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
-                  style: TextStyle(fontSize: 13, color: textSecondary),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Phone: ${booking.customerPhone}',
-                  style: TextStyle(fontSize: 12, color: textSecondary),
-                ),
-              ],
-            ),
-          ),
-
-          // Right side - price and status
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          Row(
             children: [
-              Text(
-                'LKR ${booking.price.toStringAsFixed(0)}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: primaryColor,
+              // Left side - main info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      booking.customerName,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      booking.courtName,
+                      style: TextStyle(fontSize: 14, color: textSecondary),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      '${DateFormat('MMM d').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
+                      style: TextStyle(fontSize: 13, color: textSecondary),
+                    ),
+                  ],
                 ),
               ),
-              SizedBox(height: 4),
-              booking.status.toLowerCase() == 'confirmed' 
-                  ? _buildCashCollectionCheckbox(booking)
-                  : Container(
+
+              // Right side - price and status
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'LKR ${booking.price.toStringAsFixed(0)}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  if (booking.status.toLowerCase() != 'confirmed')
+                    Container(
                       padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
                         color: _getStatusColor(booking.status),
@@ -550,7 +539,270 @@ class HistoryScreenState extends State<HistoryScreen> {
                         ),
                       ),
                     ),
+                ],
+              ),
             ],
+          ),
+          
+          // Action buttons row
+          SizedBox(height: 12),
+          Row(
+            children: [
+              // Call button
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _makePhoneCall(booking.customerPhone),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: darkGreenColor, // Changed to dark green
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.phone, size: 16, color: Colors.white),
+                        SizedBox(width: 6),
+                        Text(
+                          'Call',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              
+              SizedBox(width: 8),
+              
+              // Details button
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _showBookingDetails(booking),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 8),
+                    decoration: BoxDecoration(
+                      color: primaryColor,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.info_outline, size: 16, color: Colors.white),
+                        SizedBox(width: 6),
+                        Text(
+                          'Details',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _makePhoneCall(String phoneNumber) {
+    // Remove any formatting and ensure we have a valid number
+    final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
+    
+    // For now, show a snackbar. In a real app, you would use url_launcher
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Calling $cleanNumber...'),
+        backgroundColor: darkGreenColor, // Changed to dark green
+        duration: Duration(seconds: 2),
+      ),
+    );
+    
+    // Uncomment and add url_launcher dependency to actually make calls:
+    // final url = 'tel:$cleanNumber';
+    // if (await canLaunch(url)) {
+    //   await launch(url);
+    // }
+  }
+
+  void _showBookingDetails(BookingHistoryItem booking) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header with close button
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Booking Details',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: textPrimary,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Container(
+                        padding: EdgeInsets.all(4),
+                        child: Icon(
+                          Icons.close,
+                          size: 24,
+                          color: textSecondary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                
+                SizedBox(height: 20),
+                
+                // Customer Information
+                _buildDetailRow('Customer Name', booking.customerName),
+                _buildDetailRow('Phone Number', booking.customerPhone),
+                
+                SizedBox(height: 16),
+                
+                // Court Information
+                _buildDetailRow('Court Name', booking.courtName),
+                _buildDetailRow('Court Type', booking.courtType),
+                
+                SizedBox(height: 16),
+                
+                // Booking Information
+                _buildDetailRow('Date', DateFormat('EEEE, MMM d, yyyy').format(booking.date)),
+                _buildDetailRow('Time', '${booking.startTime} - ${booking.endTime}'),
+                _buildDetailRow('Duration', '${booking.duration} minutes'),
+                _buildDetailRow('Status', booking.status.toUpperCase()),
+                
+                SizedBox(height: 16),
+                
+                // Price Information
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Total Amount',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: textSecondary,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'LKR ${booking.price.toStringAsFixed(0)}',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                
+                SizedBox(height: 20),
+                
+                // Action buttons in popup
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          _makePhoneCall(booking.customerPhone);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: darkGreenColor, // Changed to dark green
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.phone, size: 18, color: Colors.white),
+                              SizedBox(width: 8),
+                              Text(
+                                'Call Court',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: textSecondary,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
+            ),
           ),
         ],
       ),
@@ -599,55 +851,6 @@ class HistoryScreenState extends State<HistoryScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildCashCollectionCheckbox(BookingHistoryItem booking) {
-    final isCollected = cashCollectedBookings.contains(booking.id);
-    
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          if (isCollected) {
-            cashCollectedBookings.remove(booking.id);
-          } else {
-            cashCollectedBookings.add(booking.id);
-          }
-        });
-      },
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 16,
-            height: 16,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(
-                color: isCollected ? successColor : textSecondary,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(3),
-            ),
-            child: isCollected
-                ? Icon(
-                    Icons.check,
-                    size: 12,
-                    color: successColor,
-                  )
-                : null,
-          ),
-          SizedBox(width: 6),
-          Text(
-            'Cash Collected',
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              color: textSecondary,
-            ),
-          ),
-        ],
       ),
     );
   }
