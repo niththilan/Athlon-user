@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'bookNow.dart'; // Import the bookNow.dart file
+import 'bookNow_new.dart'; // Import the bookNow.dart file
 
 void main() {
   runApp(const MyApp());
