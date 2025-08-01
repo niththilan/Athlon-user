@@ -1,967 +1,815 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, curly_braces_in_flow_control_structures, prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'footer.dart';
+import 'package:intl/intl.dart';
+import '../customers/footer.dart';
+// import 'widgets/football_spinner.dart';
+// import '../services/supabase_service.dart';
+// import 'package:provider/provider.dart';
+// import '../providers/date_provider.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1B2C4F),
-          brightness: Brightness.light,
-          background: const Color.fromARGB(255, 34, 51, 117),
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF5F6FA),
-      ),
-      home: const BookingHistoryScreen(),
-    );
-  }
-}
-
-class BookingHistoryScreen extends StatefulWidget {
-  const BookingHistoryScreen({super.key});
+/// Simplified History Screen with user-friendly design
+class HistoryScreen extends StatefulWidget {
+  const HistoryScreen({Key? key}) : super(key: key);
 
   @override
-  State<BookingHistoryScreen> createState() => _BookingHistoryScreenState();
+  HistoryScreenState createState() => HistoryScreenState();
 }
 
-class _BookingHistoryScreenState extends State<BookingHistoryScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  // ignore: unused_field
-  int _currentIndex = 3;
+class HistoryScreenState extends State<HistoryScreen> {
+  bool _isLoading = true;
+  final ScrollController _scrollController = ScrollController();
+  bool _isScrolled = false;
 
-  // Add state variables to track bookings
-  late List<Map<String, dynamic>> _upcomingBookings;
-  late List<Map<String, dynamic>> _pastBookings;
+  // Date scroll and calendar state
+  DateTime selectedDate = DateTime.now();
+  bool showCalendar = false;
+  late List<DateTime> dateList;
+  int currentDateStartIndex = 5; // Place the current date in the middle
+
+  List<BookingHistoryItem> bookingHistory = [];
+  Set<String> cashCollectedBookings = {};
+
+  // Simplified color scheme
+  static const Color primaryColor = Color(0xFF1B2C4F);
+  static const Color backgroundColor = Color(0xFFF8F9FA);
+  static const Color cardColor = Colors.white;
+  static const Color successColor = Color(0xFF10B981);
+  static const Color errorColor = Color(0xFFEF4444);
+  static const Color warningColor = Color(0xFFF59E0B);
+  static const Color textPrimary = Color(0xFF111827);
+  static const Color textSecondary = Color(0xFF6B7280);
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-
-    // Initialize booking lists
-    _upcomingBookings = [
-      {
-        'sport': 'Badminton',
-        'venue': 'CR7 Futsal & Indoor Sports',
-        'date': 'March 21, 2025',
-        'time': '07:00 PM - 09:00 PM',
-        'participants': 4,
-        'totalSlots': 6,
-        'status': 'Confirmed',
-        'icon': Icons.sports_tennis,
-      },
-      {
-        'sport': 'Football',
-        'venue': 'Downtown Sports Center',
-        'date': 'March 25, 2025',
-        'time': '06:30 PM - 08:30 PM',
-        'participants': 8,
-        'totalSlots': 10,
-        'status': 'Pending',
-        'icon': Icons.sports_soccer,
-      },
-      {
-        'sport': 'Cricket',
-        'venue': 'Ark Sports - Indoor Cricket',
-        'date': 'March 30, 2025',
-        'time': '10:00 AM - 12:00 PM',
-        'participants': 6,
-        'totalSlots': 11,
-        'status': 'Confirmed',
-        'icon': Icons.sports_cricket,
-      },
-    ];
-
-    _pastBookings = [
-      {
-        'sport': 'Tennis',
-        'venue': 'University Stadium',
-        'date': 'March 14, 2025',
-        'time': '04:00 PM - 06:00 PM',
-        'participants': 2,
-        'totalSlots': 2,
-        'status': 'Completed',
-        'icon': Icons.sports_tennis,
-      },
-      {
-        'sport': 'Basketball',
-        'venue': 'Community Center',
-        'date': 'March 10, 2025',
-        'time': '07:00 PM - 09:00 PM',
-        'participants': 8,
-        'totalSlots': 10,
-        'status': 'Completed',
-        'icon': Icons.sports_basketball,
-      },
-      {
-        'sport': 'Volleyball',
-        'venue': 'Sports Club Alpha',
-        'date': 'March 5, 2025',
-        'time': '05:30 PM - 07:30 PM',
-        'participants': 10,
-        'totalSlots': 12,
-        'status': 'Canceled',
-        'icon': Icons.sports_volleyball,
-      },
-      {
-        'sport': 'Table Tennis',
-        'venue': 'Downtown Sports Center',
-        'date': 'February 28, 2025',
-        'time': '06:00 PM - 07:00 PM',
-        'participants': 2,
-        'totalSlots': 4,
-        'status': 'Completed',
-        'icon': Icons.table_bar,
-      },
-    ];
+    _initializeDateList();
+    // _loadBookingHistory();
+    _scrollController.addListener(_onScroll);
+    
+    // Initialize from DateProvider after the frame is built
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _initializeFromDateProvider();
+    // });
   }
 
-  // Add a method to cancel a booking
-  void _cancelBooking(int index) {
-    setState(() {
-      // Remove the booking from upcoming list
-      _upcomingBookings.removeAt(index);
-    });
+  void _initializeDateList() {
+    dateList = [];
+    final today = DateTime.now();
+    // Include past, current, and future dates, with today centered
+    for (int i = -7; i <= 30; i++) {
+      dateList.add(today.add(Duration(days: i)));
+    }
   }
+
+  void _initializeFromDateProvider() {
+    // final dateProvider = Provider.of<DateProvider>(context, listen: false);
+    // if (dateProvider.selectedDate != null) {
+    //   _updateDateView(dateProvider.selectedDate!);
+    // }
+  }
+
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
-  void _onTabSelected(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-
-    if (index == 0) {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const HomeScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
-    } else if (index == 1) {
-      Navigator.pushReplacement(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const SearchScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+  void _onScroll() {
+    if (_scrollController.offset > 10 && !_isScrolled) {
+      setState(() {
+        _isScrolled = true;
+      });
+    } else if (_scrollController.offset <= 10 && _isScrolled) {
+      setState(() {
+        _isScrolled = false;
+      });
     }
+  }
+
+  Future<void> _loadBookingHistory() async {
+    // try {
+    //   setState(() {
+    //     _isLoading = true;
+    //   });
+
+    //   // Get all facilities first
+    //   final facilities = await SupabaseService.getVendorFacilities();
+    //   final List<BookingHistoryItem> loadedHistory = [];
+
+    //   // Get bookings from all facilities
+    //   for (final facility in facilities) {
+    //     final facilityBookings = await SupabaseService.searchBookings(
+    //       facilityId: facility['id'],
+    //       limit: 100, // Get recent bookings
+    //     );
+
+    //     // Convert booking data to BookingHistoryItem
+    //     for (final bookingData in facilityBookings) {
+    //       try {
+    //         final startTime = DateTime.parse(bookingData['start_time']);
+    //         final endTime = DateTime.parse(bookingData['end_time']);
+            
+    //         loadedHistory.add(
+    //           BookingHistoryItem(
+    //             id: bookingData['id'] ?? '',
+    //             customerName: bookingData['customer_name'] ?? 'Unknown Customer',
+    //             courtName: bookingData['court_name'] ?? 'Unknown Court',
+    //             courtType: bookingData['court_type'] ?? 'General',
+    //             date: DateTime.parse(bookingData['booking_date']),
+    //             startTime: DateFormat('h:mm a').format(startTime),
+    //             endTime: DateFormat('h:mm a').format(endTime),
+    //             duration: bookingData['duration'] ?? 60,
+    //             price: (bookingData['price'] ?? 0.0).toDouble(),
+    //             status: bookingData['status'] ?? 'confirmed',
+    //             customerPhone: bookingData['customer_phone'] ?? 'N/A',
+    //           ),
+    //         );
+    //       } catch (e) {
+    //         // Skip malformed booking data
+    //         print('Error parsing booking data: $e');
+    //         continue;
+    //       }
+    //     }
+    //   }
+
+    //   // Sort by date (newest first)
+    //   loadedHistory.sort((a, b) => b.date.compareTo(a.date));
+
+    //   if (mounted) {
+    //     setState(() {
+    //       bookingHistory = loadedHistory;
+    //       _isLoading = false;
+    //     });
+    //   }
+    // } catch (e) {
+    //   print('Error loading booking history: $e');
+    //   if (mounted) {
+    //     setState(() {
+    //       // Fall back to empty list on error
+    //       bookingHistory = [];
+    //       _isLoading = false;
+    //     });
+    //   }
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
+    // if (_isLoading) {
+    //   return const Scaffold(body: Center(child: FootballLoadingWidget()));
+    // }
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1B2C4F),
-        elevation: 0,
-        toolbarHeight: 50.0,
-        title: const Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-          ), // Add left padding to match other screens
-          child: Text(
-            "Booking History",
-            style: TextStyle(
-              fontSize: 18, // Increased to match other screens
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Poppins',
-              color: Colors.white,
+      backgroundColor: backgroundColor,
+      body: CustomScrollView(
+        controller: _scrollController,
+        slivers: [
+          SliverAppBar(
+            elevation: _isScrolled ? 4 : 0,
+            toolbarHeight: 50,
+            floating: false,
+            pinned: true,
+            backgroundColor: primaryColor,
+            centerTitle: false,
+            title: const Text(
+              "Booking Details",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Poppins',
+                color: Colors.white,
+              ),
+            ),
+            leading: Container(
+              margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
+              child: IconButton(
+                icon: const Icon(
+                  Icons.chevron_left,
+                  color: Colors.white,
+                  size: 28,
+                ),
+                onPressed: () => Navigator.pop(context),
+                tooltip: 'Back',
+              ),
             ),
           ),
-        ),
-        centerTitle: false,
-        automaticallyImplyLeading: false, // Prevent default back button
-        leadingWidth: 56, // Adjusted for the back button
 
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white.withOpacity(0.7),
-          labelStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Poppins',
+          SliverToBoxAdapter(
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                _buildCalendarContent(),
+                const SizedBox(height: 16),
+                _buildHistoryContent(),
+              ],
+            ),
           ),
-          tabs: const [
-            Tab(text: 'Upcoming'),
-            Tab(text: 'Past'),
-          ],
-        ),
-      ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [_buildUpcomingBookings(), _buildPastBookings()],
+        ],
       ),
       bottomNavigationBar: AppFooter(
         currentIndex: 2,
-        onTabSelected: _onTabSelected,
+        onTabSelected: (int index) {
+          // No-op or you can add logic if needed
+        },
       ),
     );
   }
 
-  Widget _buildUpcomingBookings() {
-    return _buildBookingsList(_upcomingBookings, true);
+  Widget _buildHistoryContent() {
+    if (filteredBookings.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return _buildBookingList();
   }
 
-  Widget _buildPastBookings() {
-    return _buildBookingsList(_pastBookings, false);
+  List<BookingHistoryItem> get filteredBookings {
+    return bookingHistory.where((booking) {
+      return _isSameDay(booking.date, selectedDate);
+    }).toList();
   }
 
-  Widget _buildBookingsList(
-    List<Map<String, dynamic>> bookings,
-    bool isUpcoming,
-  ) {
-    return bookings.isEmpty
-        ? Center(
+  Widget _buildBookingList() {
+    final filtered = filteredBookings;
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.all(16),
+      itemCount: filtered.length,
+      itemBuilder: (context, index) {
+        return _buildSimpleBookingCard(filtered[index]);
+      },
+    );
+  }
+
+  Widget _buildSimpleBookingCard(BookingHistoryItem booking) {
+    final isCollected = cashCollectedBookings.contains(booking.id);
+    
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: (booking.status.toLowerCase() == 'confirmed' && isCollected) 
+              ? successColor 
+              : Colors.grey.shade200,
+          width: (booking.status.toLowerCase() == 'confirmed' && isCollected) ? 2 : 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          // Left side - main info
+          Expanded(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.event_busy, size: 80, color: Colors.grey[400]),
-                const SizedBox(height: 16),
                 Text(
-                  isUpcoming ? 'No upcoming bookings' : 'No past bookings',
+                  booking.customerName,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
                   ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  booking.courtName,
+                  style: TextStyle(fontSize: 14, color: textSecondary),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  '${DateFormat('MMM d').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
+                  style: TextStyle(fontSize: 13, color: textSecondary),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Phone: ${booking.customerPhone}',
+                  style: TextStyle(fontSize: 12, color: textSecondary),
                 ),
               ],
             ),
-          )
-        : ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: bookings.length,
-            itemBuilder: (context, index) {
-              final booking = bookings[index];
-              return BookingCard(
-                sport: booking['sport'] as String,
-                venue: booking['venue'] as String,
-                date: booking['date'] as String,
-                time: booking['time'] as String,
-                participants: booking['participants'] as int,
-                totalSlots: booking['totalSlots'] as int,
-                status: booking['status'] as String,
-                icon: booking['icon'] as IconData,
-                isUpcoming: isUpcoming,
-                index: index, // Add index parameter
-                onCancel: isUpcoming
-                    ? _cancelBooking
-                    : null, // Pass cancel function
-              );
-            },
-          );
+          ),
+
+          // Right side - price and status
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                'LKR ${booking.price.toStringAsFixed(0)}',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                ),
+              ),
+              SizedBox(height: 4),
+              booking.status.toLowerCase() == 'confirmed' 
+                  ? _buildCashCollectionCheckbox(booking)
+                  : Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(booking.status),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        booking.status.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
-}
 
-class BookingCard extends StatelessWidget {
-  final String sport;
-  final String venue;
-  final String date;
-  final String time;
-  final int participants;
-  final int totalSlots;
-  final String status;
-  final IconData icon;
-  final bool isUpcoming;
-  final int index;
-  final Function(int)? onCancel;
+  Widget _buildEmptyState() {
+    final isToday = _isSameDay(selectedDate, DateTime.now());
+    final dateText = isToday 
+        ? 'today' 
+        : DateFormat('MMM d, yyyy').format(selectedDate);
+    
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.calendar_today_outlined,
+                size: 48,
+                color: primaryColor,
+              ),
+            ),
+            SizedBox(height: 24),
+            Text(
+              bookingHistory.isEmpty ? 'No bookings yet' : 'No bookings for $dateText',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: textPrimary,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              bookingHistory.isEmpty 
+                  ? 'Your booking history will appear here'
+                  : 'Try selecting a different date',
+              style: TextStyle(fontSize: 14, color: textSecondary),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-  const BookingCard({
-    super.key,
-    required this.sport,
-    required this.venue,
-    required this.date,
-    required this.time,
-    required this.participants,
-    required this.totalSlots,
-    required this.status,
-    required this.icon,
-    required this.isUpcoming,
-    required this.index,
-    this.onCancel,
-  });
+  Widget _buildCashCollectionCheckbox(BookingHistoryItem booking) {
+    final isCollected = cashCollectedBookings.contains(booking.id);
+    
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          if (isCollected) {
+            cashCollectedBookings.remove(booking.id);
+          } else {
+            cashCollectedBookings.add(booking.id);
+          }
+        });
+      },
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 16,
+            height: 16,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(
+                color: isCollected ? successColor : textSecondary,
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(3),
+            ),
+            child: isCollected
+                ? Icon(
+                    Icons.check,
+                    size: 12,
+                    color: successColor,
+                  )
+                : null,
+          ),
+          SizedBox(width: 6),
+          Text(
+            'Cash Collected',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+              color: textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-  Color _getStatusColor() {
-    switch (status) {
-      case 'Confirmed':
-        return Colors.green;
-      case 'Pending':
-        return Colors.orange;
-      case 'Canceled':
-        return Colors.red;
-      case 'Completed':
-        return const Color(0xFF1B2C4F);
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return successColor;
+      case 'cancelled':
+        return errorColor;
+      case 'pending':
+        return warningColor;
       default:
-        return Colors.grey;
+        return textSecondary;
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  /// Helper method to check if two dates are the same day
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
+  }
+
+  /// Updates the date view to the selected date
+  void _updateDateView(DateTime newSelectedDate) {
+    final selectedIndex = dateList.indexWhere(
+      (date) => _isSameDay(date, newSelectedDate),
+    );
+    if (selectedIndex != -1) {
+      final newStartIndex = (selectedIndex - 2).clamp(0, dateList.length - 5);
+      setState(() {
+        selectedDate = newSelectedDate;
+        currentDateStartIndex = newStartIndex;
+      });
+      
+      // Save to DateProvider for sharing with other screens
+      // final dateProvider = Provider.of<DateProvider>(context, listen: false);
+      // dateProvider.setDate(newSelectedDate);
+      
+      // No need to reload bookings - filtering will handle the display
+    }
+  }
+
+  /// Builds the calendar grid with proper layout
+  Widget _buildCalendarGrid() {
+    final firstDayOfMonth = DateTime(selectedDate.year, selectedDate.month, 1);
+    final lastDayOfMonth = DateTime(
+      selectedDate.year,
+      selectedDate.month + 1,
+      0,
+    );
+    final firstDayWeekday = firstDayOfMonth.weekday % 7;
+    final daysInMonth = lastDayOfMonth.day;
+
+    List<Widget> dayWidgets = [];
+
+    // Add empty cells for days before the first day of the month
+    for (int i = 0; i < firstDayWeekday; i++) {
+      dayWidgets.add(
+        Expanded(child: Container(height: 36, margin: const EdgeInsets.all(2))),
+      );
+    }
+
+    // Add day cells
+    for (int day = 1; day <= daysInMonth; day++) {
+      final date = DateTime(selectedDate.year, selectedDate.month, day);
+      final isSelected = _isSameDay(date, selectedDate);
+      final isToday = _isSameDay(date, DateTime.now());
+
+      dayWidgets.add(
+        Expanded(
+          child: GestureDetector(
+            onTap: () {
+              _updateDateView(date);
+            },
+            child: Container(
+              height: 36,
+              margin: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: isSelected ? primaryColor : null,
+                shape: BoxShape.circle,
+                border: isToday && !isSelected
+                    ? Border.all(color: primaryColor, width: 2)
+                    : null,
+              ),
+              child: Center(
+                child: Text(
+                  '$day',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                    color: isSelected
+                        ? Colors.white
+                        : isToday
+                        ? primaryColor
+                        : textPrimary,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    // Build grid with 7 columns and proper spacing
+    List<Widget> rows = [];
+    for (int i = 0; i < dayWidgets.length; i += 7) {
+      final weekDays = dayWidgets.skip(i).take(7).toList();
+
+      // Ensure we always have 7 items in each row
+      while (weekDays.length < 7) {
+        weekDays.add(
+          Expanded(
+            child: Container(height: 36, margin: const EdgeInsets.all(2)),
+          ),
+        );
+      }
+
+      rows.add(Row(children: weekDays));
+
+      // Add spacing between rows except for the last row
+      if (i + 7 < dayWidgets.length) {
+        rows.add(const SizedBox(height: 4));
+      }
+    }
+
+    return Column(mainAxisSize: MainAxisSize.min, children: rows);
+  }
+
+  /// Builds the date scroll and calendar content section (using bookings layout)
+  Widget _buildCalendarContent() {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 50, // Slightly reduced width from 55
-                  height: 50, // Slightly reduced height from 55
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(
-                      255,
-                      147,
-                      173,
-                      234,
-                    ).withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    icon,
-                    size: 28, // Slightly reduced size from 30
-                    color: const Color(0xFF1B2C4F),
-                  ),
-                ),
-                const SizedBox(width: 12), // Slightly reduced from 16
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              sport,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF2D3142),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ), // Reduced horizontal padding from 10
-                            decoration: BoxDecoration(
-                              color: _getStatusColor().withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Text(
-                              status,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: _getStatusColor(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        venue,
-                        overflow:
-                            TextOverflow.ellipsis, // Add overflow handling
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                      ),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 12, // Reduced from 16
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize
-                                .min, // Important to prevent expansion
-                            children: [
-                              Icon(
-                                Icons.calendar_today,
-                                size: 14,
-                                color: Colors.grey[600],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                date,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize
-                                .min, // Important to prevent expansion
-                            children: [
-                              Icon(
-                                Icons.access_time,
-                                size: 14,
-                                color: Colors.grey[600],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                time,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 10,
-            ), // Reduced from 16,12
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(16),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisSize:
-                      MainAxisSize.min, // Important to prevent expansion
-                  children: [
-                    const Icon(
-                      Icons.people,
-                      size: 16,
-                      color: Color(0xFF1B2C4F),
-                    ),
-                    const SizedBox(width: 4), // Reduced from 6
-                    Text(
-                      '$participants/$totalSlots slots filled',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Color(0xFF2D3142),
-                      ),
-                    ),
-                  ],
-                ),
-                if (isUpcoming)
-                  Row(
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BookingDetailsScreen(
-                                sport: sport,
-                                venue: venue,
-                                date: date,
-                                time: time,
-                                participants: participants,
-                                totalSlots: totalSlots,
-                                status: status,
-                                icon: icon,
-                                isUpcoming: isUpcoming,
-                                index: index,
-                                onCancel:
-                                    onCancel, // Pass the onCancel callback
-                              ),
-                            ),
-                          );
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: const Color(0xFF1B2C4F),
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                        ),
-                        child: const Text('Details'),
-                      ),
-                      if (status != 'Canceled')
-                        OutlinedButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: const Text('Cancel Booking'),
-                                  content: const Text(
-                                    'Are you sure you want to cancel this booking?',
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text('No'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        // Call the cancel function with the booking index
-                                        if (onCancel != null) {
-                                          onCancel!(index);
-                                        }
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Booking canceled'),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                      },
-                                      style: TextButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        backgroundColor: Colors.red,
-                                      ),
-                                      child: const Text('Yes, Cancel'),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.red,
-                            side: const BorderSide(color: Colors.red),
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                          ),
-                          child: const Text('Cancel'),
-                        ),
-                    ],
-                  )
-                else
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BookingDetailsScreen(
-                            sport: sport,
-                            venue: venue,
-                            date: date,
-                            time: time,
-                            participants: participants,
-                            totalSlots: totalSlots,
-                            status: status,
-                            icon: icon,
-                            isUpcoming: isUpcoming,
-                            index: index,
-                            onCancel: onCancel, // Pass the onCancel callback
-                          ),
-                        ),
-                      );
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: const Color(0xFF1B2C4F),
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                    ),
-                    child: const Text('View Details'),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class BookingDetailsScreen extends StatelessWidget {
-  final String sport;
-  final String venue;
-  final String date;
-  final String time;
-  final int participants;
-  final int totalSlots;
-  final String status;
-  final IconData icon;
-  final bool isUpcoming;
-  final int index;
-  final Function(int)? onCancel;
-
-  const BookingDetailsScreen({
-    super.key,
-    required this.sport,
-    required this.venue,
-    required this.date,
-    required this.time,
-    required this.participants,
-    required this.totalSlots,
-    required this.status,
-    required this.icon,
-    required this.isUpcoming,
-    required this.index,
-    this.onCancel,
-  });
-
-  Color _getStatusColor() {
-    switch (status) {
-      case 'Confirmed':
-        return Colors.green;
-      case 'Pending':
-        return Colors.orange;
-      case 'Canceled':
-        return Colors.red;
-      case 'Completed':
-        return const Color(0xFF1B2C4F);
-      default:
-        return Colors.grey;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1B2C4F),
-        elevation: 0,
-        title: const Text(
-          "Booking Details",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header card with basic info
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(
-                            255,
-                            147,
-                            173,
-                            234,
-                          ).withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          icon,
-                          size: 32,
-                          color: const Color(0xFF1B2C4F),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              sport,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF2D3142),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              venue,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _getStatusColor().withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          status,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: _getStatusColor(),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Details section
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Booking Information",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2D3142),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Date & Time
-                  _buildDetailRow(Icons.calendar_today, "Date", date),
-                  const SizedBox(height: 16),
-                  _buildDetailRow(Icons.access_time, "Time", time),
-                  const SizedBox(height: 16),
-                  _buildDetailRow(
-                    Icons.people,
-                    "Participants",
-                    "$participants out of $totalSlots slots filled",
-                  ),
-
-                  const SizedBox(height: 24),
-                  const Text(
-                    "Additional Information",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF2D3142),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailRow(
-                    Icons.event_note,
-                    "Booking Type",
-                    "Regular Booking",
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailRow(
-                    Icons.access_time,
-                    "Booking Made On",
-                    "March 15, 2025",
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // Action buttons for upcoming bookings
-            if (isUpcoming && status != 'Canceled')
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: const Text('Cancel Booking'),
-                          content: const Text(
-                            'Are you sure you want to cancel this booking?',
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('No'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context); // Close dialog
-                                // Call the cancel function with the booking index
-                                if (onCancel != null) {
-                                  onCancel!(index);
-                                }
-                                Navigator.pop(
-                                  context,
-                                ); // Go back to previous screen
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Booking canceled'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              },
-                              style: TextButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                backgroundColor: Colors.red,
-                              ),
-                              child: const Text('Yes, Cancel'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text('Cancel Booking'),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(IconData icon, String title, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 18, color: const Color(0xFF1B2C4F)),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // Header row with View Calendar button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text(
-                title,
-                style: TextStyle(fontSize: 13, color: Colors.grey[600]),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF2D3142),
+              // View Calendar button
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    showCalendar = !showCalendar;
+                  });
+                },
+                child: Text(
+                  showCalendar ? 'Hide Calendar' : 'View Calendar',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: primaryColor,
+                    decoration: showCalendar ? TextDecoration.underline : null,
+                  ),
                 ),
               ),
             ],
           ),
+          const SizedBox(height: 25),
+
+          showCalendar ? _buildCalendarContentExpanded() : _buildDateAndBookingsContent(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCalendarContentExpanded() {
+    return Column(
+      children: [
+        // Calendar header
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              onPressed: () {
+                final newDate = DateTime(
+                  selectedDate.year,
+                  selectedDate.month - 1,
+                );
+                _updateDateView(newDate);
+              },
+              icon: const Icon(Icons.chevron_left, color: primaryColor),
+            ),
+            Text(
+              DateFormat('MMMM yyyy').format(selectedDate),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: textPrimary,
+              ),
+            ),
+            IconButton(
+              onPressed: () {
+                final newDate = DateTime(
+                  selectedDate.year,
+                  selectedDate.month + 1,
+                );
+                _updateDateView(newDate);
+              },
+              icon: const Icon(Icons.chevron_right, color: primaryColor),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        // Week headers
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+                .map(
+                  (day) => Expanded(
+                    child: Center(
+                      child: Text(
+                        day,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+        const SizedBox(height: 12),
+        // Calendar grid
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: _buildCalendarGrid(),
         ),
       ],
     );
   }
-}
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const BookingHistoryScreen(),
+  Widget _buildDateAndBookingsContent() {
+    return Column(
+      children: [
+        // Date navigation
+        Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (currentDateStartIndex > 0) {
+                    currentDateStartIndex--;
+                    selectedDate = dateList[currentDateStartIndex + 2];
+                  }
+                });
+              },
+              child: const Icon(
+                Icons.chevron_left,
+                color: primaryColor,
+                size: 20,
               ),
-            );
-          },
-          child: const Text('Go to Booking History'),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  for (int i = 0; i < 5; i++)
+                    Flexible(child: _buildDateCircle(i)),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (currentDateStartIndex + 5 < dateList.length) {
+                    currentDateStartIndex++;
+                    selectedDate = dateList[currentDateStartIndex + 2];
+                  }
+                });
+              },
+              child: const Icon(
+                Icons.chevron_right,
+                color: primaryColor,
+                size: 20,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 28),
+        Divider(color: Colors.grey[300], height: 1),
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+
+  /// Builds individual date circle for the scroll section
+  Widget _buildDateCircle(int index) {
+    final dateIndex = currentDateStartIndex + index;
+    if (dateIndex >= dateList.length) return const SizedBox();
+
+    final date = dateList[dateIndex];
+    final isSelected = _isSameDay(date, selectedDate);
+    final isToday = _isSameDay(date, DateTime.now());
+    final isPastDate = date.isBefore(DateTime.now().subtract(Duration(days: 0)).copyWith(hour: 0, minute: 0, second: 0, millisecond: 0));
+
+    return GestureDetector(
+      onTap: () {
+        _updateDateView(date);
+      },
+      child: Container(
+        constraints: const BoxConstraints(minWidth: 48, maxWidth: 64),
+        width: isSelected ? 60 : 48,
+        height: isSelected ? 60 : 48,
+        decoration: BoxDecoration(
+          color: isSelected ? primaryColor : Colors.grey[200],
+          shape: BoxShape.circle,
+          border: isToday && !isSelected
+              ? Border.all(color: primaryColor, width: 2)
+              : null,
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: primaryColor.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
+        ),
+        child: Center(
+          child: Text(
+            DateFormat('d').format(date),
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: isSelected
+                  ? Colors.white
+                  : isPastDate
+                      ? Colors.grey
+                      : textPrimary,
+            ),
+          ),
         ),
       ),
     );
   }
 }
 
-class SearchScreen extends StatelessWidget {
-  const SearchScreen({super.key});
+/// Simplified data model for booking history items
+class BookingHistoryItem {
+  final String id;
+  final String customerName;
+  final String courtName;
+  final String courtType;
+  final DateTime date;
+  final String startTime;
+  final String endTime;
+  final int duration;
+  final double price;
+  final String status;
+  final String customerPhone;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Search')),
-      body: const Center(child: Text('Search Screen')),
-    );
-  }
+  BookingHistoryItem({
+    required this.id,
+    required this.customerName,
+    required this.courtName,
+    required this.courtType,
+    required this.date,
+    required this.startTime,
+    required this.endTime,
+    required this.duration,
+    required this.price,
+    required this.status,
+    required this.customerPhone,
+  });
 }

@@ -1,4 +1,3 @@
-
 // ignore_for_file: deprecated_member_use, file_names
 
 import 'package:flutter/material.dart';
@@ -138,7 +137,7 @@ class AppFooter extends StatelessWidget {
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        const BookingHistoryScreen(),
+                        const HistoryScreen(),
                     transitionDuration: Duration.zero,
                     reverseTransitionDuration: Duration.zero,
                   ),
