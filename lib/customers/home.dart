@@ -15,6 +15,7 @@ class NoAnimationRoute<T> extends PageRoute<T> {
   NoAnimationRoute({
     required this.builder,
     super.settings,
+  
     this.maintainState = true,
   }) : super(fullscreenDialog: false);
 

@@ -264,6 +264,61 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     );
   }
 
+  // Book Now Button Widget
+  Widget _buildBookNowButton() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: const Color(0xFF1B2C4F), // Primary color
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF1B2C4F).withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () {
+              // Navigate to BookNow screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BookNowScreen(),
+                ),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  
+                  const SizedBox(width: 10),
+                  Text(
+                    'Book Now - Rs. ${_courtDetails['price_per_hour'].toStringAsFixed(0)}/hr',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -348,7 +403,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         child: const Icon(
                           Icons.arrow_back_ios,
                           color: Color(0xFF1B2C4F),
-                          size: 20,
+                          size: 16,
                         ),
                       ),
                     ),
@@ -594,7 +649,12 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: 5),
+
+                // Book Now Button (moved above Available Sports)
+                _buildBookNowButton(),
+
+                const SizedBox(height: 5),
 
                 // Available Sports Section
                 Container(
@@ -721,6 +781,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                   ),
                 ),
 
+                const SizedBox(height: 24),
+
+                // ...existing code...
                 const SizedBox(height: 100), // Space for bottom nav
               ],
             ),
