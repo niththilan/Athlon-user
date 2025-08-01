@@ -359,25 +359,30 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     },
                   ),
                   
-                  // Top overlay notification badge
+                  // Top overlay heart icon for favorite
                   Positioned(
                     top: MediaQuery.of(context).padding.top + 12,
                     right: 16,
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '2',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
+                    child: GestureDetector(
+                      onTap: _toggleFavorite,
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.8),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.08),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          _isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: _isFavorite ? Colors.red : const Color(0xFF050E22),
+                          size: 24,
                         ),
                       ),
                     ),
@@ -646,81 +651,93 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                           color: Color(0xFF050E22),
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _courtDetails['name'],
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF6B7280),
+                        ),
+                      ),
                       const SizedBox(height: 16),
                       SizedBox(
-                        height: 140,
+                        height: 150, // Reduced from 160 to 150 to prevent overflow
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
                           itemCount: _sportsItems.length,
-                          separatorBuilder: (context, index) => const SizedBox(width: 12),
+                          separatorBuilder: (context, index) => const SizedBox(width: 16),
                           itemBuilder: (context, index) {
                             final sport = _sportsItems[index];
                             return Container(
-                              width: 120,
+                              width: 140,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(16),
                                 color: const Color(0xFFF8F9FA),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.04),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               ),
                               child: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(
-                                    flex: 3,
-                                    child: ClipRRect(
-                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
-                                      child: Image.network(
-                                        sport.imageUrl,
-                                        fit: BoxFit.cover,
-                                        width: double.infinity,
-                                        errorBuilder: (context, error, stackTrace) {
-                                          return Container(
-                                            color: const Color(0xFFF8F9FA),
-                                            child: const Center(
-                                              child: Icon(Icons.sports, color: Color(0xFF050E22)),
-                                            ),
-                                          );
-                                        },
-                                      ),
+                                  ClipRRect(
+                                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                                    child: Image.network(
+                                      sport.imageUrl,
+                                      height: 90, // Reduced from 100 to 90
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) {
+                                        return Container(
+                                          height: 90,
+                                          color: const Color(0xFFF8F9FA),
+                                          child: const Center(
+                                            child: Icon(Icons.sports, color: Color(0xFF050E22)),
+                                          ),
+                                        );
+                                      },
                                     ),
                                   ),
-                                  Expanded(
-                                    flex: 2,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            sport.name,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: Color(0xFF050E22),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8), // Reduced from 10 to 8
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          sport.name,
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w600,
+                                            color: Color(0xFF050E22),
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            const Icon(
+                                              Icons.star,
+                                              size: 13,
+                                              color: Color(0xFFFBBF24),
                                             ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              const Icon(
-                                                Icons.star,
-                                                size: 12,
-                                                color: Color(0xFFFBBF24),
+                                            const SizedBox(width: 2),
+                                            Text(
+                                              sport.rating.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                color: Color(0xFF6B7280),
                                               ),
-                                              const SizedBox(width: 2),
-                                              Text(
-                                                sport.rating.toString(),
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Color(0xFF6B7280),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
