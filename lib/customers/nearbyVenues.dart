@@ -3,6 +3,7 @@ import 'package:athlon_user/customers/courtDetails.dart';
 import 'package:athlon_user/customers/footer.dart';
 import 'package:flutter/material.dart';
 //import 'bookNow.dart';
+import 'filter_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -449,11 +450,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
         leading: Container(
           margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
           child: IconButton(
-            icon: const Icon(
-              Icons.chevron_left,
-              color: Colors.white,
-              size: 28,
-            ),
+            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
             onPressed: () => Navigator.pop(context),
             tooltip: 'Back',
           ),
@@ -569,7 +566,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       color: Color(0xFF1B2C4F),
                     ),
                     label: Text(
-                      _activeFilter != 'All' 
+                      _activeFilter != 'All'
                           ? '$_sortingMode | $_activeFilter'
                           : _sortingMode,
                       style: const TextStyle(
@@ -591,7 +588,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       ),
                     ),
                     onPressed: () {
-                      _showSortingOptions(context);
+                      _navigateToFilterScreen(context);
                     },
                   ),
                 ],
@@ -621,31 +618,27 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   // Search bar method - matches home page style
   Widget _buildSearchBar() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1B2C4F).withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
+            color: const Color(0xFF1B2C4F).withOpacity(0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(2),
-              child: const Icon(
-                Icons.search_rounded,
-                color: Color(0xFF1B2C4F),
-                size: 24,
-              ),
+            const Icon(
+              Icons.search_outlined, // outlined version
+              color: Color(0xFF1B2C4F),
+              size: 22,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: TextField(
                 controller: _searchController,
@@ -658,8 +651,18 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                     fontWeight: FontWeight.w400,
                   ),
                   border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
+                  isCollapsed: true,
                 ),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF1B2C4F),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
+                },
                 onSubmitted: (value) {
                   if (value.trim().isNotEmpty) {
                     _addToSearchHistory(value);
@@ -681,6 +684,8 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                     _searchQuery = '';
                   });
                 },
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
           ],
         ),
@@ -826,7 +831,10 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                     bottom: 12,
                     left: 12,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.black.withOpacity(0.7),
                         borderRadius: BorderRadius.circular(12),
@@ -861,9 +869,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    
+
                     const SizedBox(height: 4),
-                    
+
                     // Location
                     Row(
                       children: [
@@ -886,15 +894,18 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 12),
-                    
+
                     // Rating and Price
                     Row(
                       children: [
                         // Rating
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.orange.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4),
@@ -919,9 +930,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             ],
                           ),
                         ),
-                        
+
                         const SizedBox(width: 8),
-                        
+
                         // Price
                         Text(
                           venue.ratePerHour,
@@ -933,16 +944,19 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                         ),
                       ],
                     ),
-                    
+
                     const SizedBox(height: 8),
-                    
+
                     // Sports tags (simplified)
                     Wrap(
                       spacing: 4,
                       runSpacing: 4,
                       children: venue.sports.take(3).map((sport) {
                         return Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFF1B2C4F).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(4),
@@ -963,7 +977,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
               ),
             ],
           ),
-          
+
           // Book Now button positioned in bottom-right corner
           Positioned(
             bottom: 10,
@@ -994,16 +1008,36 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
               ),
               child: const Text(
                 'Book Now',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  // Navigate to filter screen
+  void _navigateToFilterScreen(BuildContext context) async {
+    final result = await Navigator.push<Map<String, dynamic>>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FilterScreen(
+          currentSortingMode: _sortingMode,
+          currentActiveFilter: _activeFilter,
+          currentDistanceRadius: _distanceRadius,
+          filterOptions: _filterOptionsWithIcons,
+        ),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _sortingMode = result['sortingMode'] ?? _sortingMode;
+        _activeFilter = result['activeFilter'] ?? _activeFilter;
+        _distanceRadius = result['distanceRadius'] ?? _distanceRadius;
+      });
+    }
   }
 
   void _showSortingOptions(BuildContext context) {
@@ -1078,10 +1112,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             },
                           ),
                         ),
-                        const Text(
-                          "20 km",
-                          style: TextStyle(fontSize: 14),
-                        ),
+                        const Text("20 km", style: TextStyle(fontSize: 14)),
                       ],
                     ),
                     // Sorting Options
@@ -1130,7 +1161,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       ),
                     ),
                     const SizedBox(height: 8),
-                    
+
                     // Sports Filter Chips in a Wrap
                     Wrap(
                       spacing: 8.0,
@@ -1142,17 +1173,21 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             sport,
                             style: TextStyle(
                               fontSize: 12,
-                              color: isSelected ? Colors.white : const Color(0xFF1B2C4F),
-                              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                              color: isSelected
+                                  ? Colors.white
+                                  : const Color(0xFF1B2C4F),
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
                             ),
                           ),
-                          backgroundColor: isSelected 
-                              ? const Color(0xFF1B2C4F) 
+                          backgroundColor: isSelected
+                              ? const Color(0xFF1B2C4F)
                               : Colors.grey[100],
                           selectedColor: const Color(0xFF1B2C4F),
                           side: BorderSide(
-                            color: isSelected 
-                                ? const Color(0xFF1B2C4F) 
+                            color: isSelected
+                                ? const Color(0xFF1B2C4F)
                                 : Colors.grey[300]!,
                           ),
                           selected: isSelected,
@@ -1166,8 +1201,8 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             });
                           },
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8, 
-                            vertical: 4
+                            horizontal: 8,
+                            vertical: 4,
                           ),
                         );
                       }).toList(),
@@ -1246,7 +1281,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                         ),
                       ),
                     ),
-                    
+
                     // Add safe area padding at bottom for devices with notches
                     SizedBox(height: MediaQuery.of(context).padding.bottom),
                   ],
@@ -1299,10 +1334,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                   ),
                   Text(
                     description,
-                    style: TextStyle(
-                      color: Colors.grey[600], 
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
                   ),
                 ],
               ),
