@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'dart:async'; // Add Timer for debouncing
+import './footer.dart';
+import 'home.dart'; // Add this import
 
 void main() {
   runApp(
@@ -83,6 +85,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
   bool _isSearching = false;
   bool _isRefreshing = false;
   bool _isDisposed = false; // Track widget disposal state
+  int _currentIndex = 3; // Add current index for footer
 
   @override
   void initState() {
@@ -296,17 +299,15 @@ class _MessagesScreenState extends State<MessagesScreen> {
           child: IconButton(
             icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
             onPressed: () {
-              /*
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              } else {
-                // If there's no previous route, navigate to home screen (index 0)
-                NavigationService.navigateToScreen(0);
-              }
-              */
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              }
+              Navigator.pushReplacement(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const HomeScreen(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+              );
             },
           ),
         ),
@@ -336,7 +337,14 @@ class _MessagesScreenState extends State<MessagesScreen> {
           ],
         ),
       ),
-      // bottomNavigationBar: UnifiedAppFooter(currentIndex: 2),
+      bottomNavigationBar: AppFooter(
+        currentIndex: _currentIndex,
+        onTabSelected: (int index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
     );
   }
 
@@ -1158,10 +1166,20 @@ class _ChatScreenState extends State<ChatScreen> {
       elevation: 2,
       toolbarHeight: 50,
       leading: Container(
-        margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
+        margin: const EdgeInsets.fromLTRB(8, 3, 0, 8),
         child: IconButton(
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    const HomeScreen(),
+                transitionDuration: Duration.zero,
+                reverseTransitionDuration: Duration.zero,
+              ),
+            );
+          },
         ),
       ),
       title: Row(
@@ -1526,9 +1544,9 @@ class _ChatScreenState extends State<ChatScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      */
 
       _messageController.text = messageContent;
+      */
     }
   }
 
