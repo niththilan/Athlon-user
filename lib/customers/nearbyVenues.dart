@@ -4,7 +4,7 @@ import 'package:athlon_user/customers/footer.dart';
 import 'package:flutter/material.dart';
 //import 'bookNow.dart';
 import 'filter_screen.dart';
-import 'bookNow_new.dart';
+import 'bookings.dart';
 import 'widgets/football_spinner.dart';
 
 void main() {
@@ -1005,17 +1005,17 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
             ],
           ),
 
-          // Book Now button positioned in bottom-right corner - navigates to BookNowScreen
+          // Book Now button positioned in bottom-right corner - navigates to SlotsPage
           Positioned(
             bottom: 10,
             right: 14,
             child: ElevatedButton(
               onPressed: () {
-                // Navigate directly to BookNowScreen with venue data
+                // Navigate directly to SlotsPage
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => BookNowScreen(venue: courtData),
+                    builder: (context) => const SlotsPage(),
                   ),
                 );
               },

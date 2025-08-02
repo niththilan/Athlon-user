@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'favourites.dart';
-import 'bookNow_new.dart';
+import 'bookings.dart';
 import 'footer.dart';
 
 Future<void> main() async {
@@ -992,7 +992,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                                   animation,
                                                   secondaryAnimation,
                                                 ) =>
-                                                    BookNowScreen(venue: venue),
+                                                    const SlotsPage(),
                                             transitionDuration: Duration.zero,
                                             reverseTransitionDuration:
                                                 Duration.zero,

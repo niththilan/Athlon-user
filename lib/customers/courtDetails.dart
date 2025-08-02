@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'footer.dart';
-import 'bookNow_new.dart'; // Import BookNow.dart
+import 'bookings.dart'; // Import bookings.dart
 import 'widgets/football_spinner.dart';
 
 void main() {
@@ -244,10 +244,10 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
             onTap: () {
-              // Navigate to BookNow screen
+              // Navigate to SlotsPage screen
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BookNowScreen()),
+                MaterialPageRoute(builder: (context) => const SlotsPage()),
               );
             },
             child: Padding(

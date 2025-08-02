@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'bookNow_new.dart'; // Import the bookNow.dart file
+import 'bookings.dart'; // Import the bookings.dart file
 
 void main() {
   runApp(const MyApp());
@@ -677,11 +677,11 @@ class _SearchScreenState extends State<SearchScreen> {
                               // Book Now button
                               ElevatedButton(
                                 onPressed: () {
-                                  // Navigate to bookNow.dart
+                                  // Navigate to SlotsPage
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => BookNowScreen(),
+                                      builder: (context) => const SlotsPage(),
                                     ),
                                   );
                                 },
