@@ -388,7 +388,7 @@ class NotificationScreenState extends State<NotificationScreen> {
             title: const Text(
               "Notifications",
               style: TextStyle(
-                fontSize: 15,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Poppins',
                 color: Colors.white,

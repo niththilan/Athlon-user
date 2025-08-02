@@ -1574,7 +1574,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
-          // App Bar - matching vendor screen style
+          // App Bar - matching history screen style
           SliverAppBar(
             elevation: _isScrolled ? 4 : 0,
             toolbarHeight: 50,
@@ -1585,7 +1585,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             title: const Text(
               "My Profile",
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Poppins',
                 color: Colors.white,
