@@ -489,13 +489,27 @@ class _MessagesScreenState extends State<MessagesScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1B2C4F),
-        elevation: 2,
+        elevation: 0,
         toolbarHeight: 50,
+        backgroundColor: const Color(0xFF1B2C4F),
+        centerTitle: false,
+        title: const Text(
+          "Messages",
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Poppins',
+            color: Colors.white,
+          ),
+        ),
         leading: Container(
-          margin: const EdgeInsets.fromLTRB(8, 3, 0, 8),
+          margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
           child: IconButton(
-            icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
+            icon: const Icon(
+              Icons.chevron_left,
+              color: Colors.white,
+              size: 28,
+            ),
             onPressed: () {
               Navigator.pushReplacement(
                 context,
@@ -507,20 +521,9 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 ),
               );
             },
+            tooltip: 'Back',
           ),
         ),
-        title: Text(
-          // AppLocalizations.of(context)!.messages,
-          'Messages',
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Poppins',
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: false,
-        leadingWidth: 56,
       ),
       body: SafeArea(
         child: Column(

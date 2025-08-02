@@ -450,14 +450,14 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
-        elevation: 4,
-        toolbarHeight: 60,
+        elevation: 0,
+        toolbarHeight: 50,
         backgroundColor: const Color(0xFF1B2C4F),
         centerTitle: false,
         title: const Text(
           "Nearby Venues",
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
             fontFamily: 'Poppins',
             color: Colors.white,

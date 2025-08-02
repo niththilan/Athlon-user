@@ -1724,11 +1724,21 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       return Scaffold(
         backgroundColor: const Color(0xFFF5F6FA),
         appBar: AppBar(
-          backgroundColor: const Color(0xFF1B2C4F),
-          elevation: 2,
+          elevation: 0,
           toolbarHeight: 50,
+          backgroundColor: const Color(0xFF1B2C4F),
+          centerTitle: false,
+          title: const Text(
+            'Bookings',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Poppins',
+              color: Colors.white,
+            ),
+          ),
           leading: Container(
-            margin: const EdgeInsets.fromLTRB(8, 3, 0, 8),
+            margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
             child: IconButton(
               icon: const Icon(
                 Icons.chevron_left,
@@ -1736,19 +1746,9 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                 size: 28,
               ),
               onPressed: () => Navigator.pop(context),
+              tooltip: 'Back',
             ),
           ),
-          title: const Text(
-            'Bookings',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              fontFamily: 'Poppins',
-              color: Colors.white,
-            ),
-          ),
-          centerTitle: false,
-          leadingWidth: 56,
         ),
         body: Center(
           child: Column(
@@ -1790,11 +1790,21 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1B2C4F),
-        elevation: 2,
+        elevation: 0,
         toolbarHeight: 50,
+        backgroundColor: const Color(0xFF1B2C4F),
+        centerTitle: false,
+        title: const Text(
+          'Bookings',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Poppins',
+            color: Colors.white,
+          ),
+        ),
         leading: Container(
-          margin: const EdgeInsets.fromLTRB(8, 3, 0, 8),
+          margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
           child: IconButton(
             icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
             onPressed: () {
@@ -1805,19 +1815,9 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                 Navigator.of(context).pop();
               }
             },
+            tooltip: 'Back',
           ),
         ),
-        title: const Text(
-          'Bookings',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Poppins',
-            color: Colors.white,
-          ),
-        ),
-        centerTitle: false,
-        leadingWidth: 56,
         actions: [
           IconButton(
             icon: _isRefreshing
