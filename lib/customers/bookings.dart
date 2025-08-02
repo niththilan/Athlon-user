@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'footer.dart';
 
 // Data models (matching homepage structure)
 class Facility {
@@ -1775,7 +1776,14 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
             ],
           ),
         ),
-        bottomNavigationBar: Container(height: 60, color: Colors.white),
+        bottomNavigationBar: AppFooter(
+          currentIndex: currentFooterIndex,
+          onTabSelected: (index) {
+            setState(() {
+              currentFooterIndex = index;
+            });
+          },
+        ),
       );
     }
 
@@ -1925,8 +1933,14 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
           ],
         ),
       ),
-      // Removed UnifiedAppFooter - replace with empty container or implement your own footer
-      bottomNavigationBar: Container(height: 60, color: Colors.white),
+      bottomNavigationBar: AppFooter(
+        currentIndex: currentFooterIndex,
+        onTabSelected: (index) {
+          setState(() {
+            currentFooterIndex = index;
+          });
+        },
+      ),
     );
   }
 
