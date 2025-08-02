@@ -2000,29 +2000,22 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
             children: [
               // Courts dropdown with popup box styling
               Container(
-                height: 36,
+                height: 40,
                 width: 200,
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey[50],
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: const Color(0xFF1B2C4F).withOpacity(0.3),
+                    color: Colors.grey[300]!,
                     width: 1,
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
                     isExpanded: true,
                     value: courts.isNotEmpty ? (selectedCourt?.name ?? '') : '',
                     icon: Container(
-                      margin: const EdgeInsets.only(right: 8),
+                      margin: const EdgeInsets.only(right: 4),
                       child: const Icon(
                         Icons.keyboard_arrow_down,
                         color: Color(0xFF1B2C4F),
@@ -2035,8 +2028,8 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                       fontSize: 14,
                     ),
                     dropdownColor: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    elevation: 8,
+                    borderRadius: BorderRadius.circular(8),
+                    elevation: 2,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     itemHeight: 48,
                     items: courts.isNotEmpty
