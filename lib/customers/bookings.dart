@@ -851,9 +851,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     List<String> formattedRanges = [];
     for (var range in timeRanges) {
       final startDateTime = parseTime(range.first);
-      final endDateTime = parseTime(
-        range.last,
-      ).add(const Duration(minutes: 30));
+      final endDateTime = parseTime(range.last).add(const Duration(minutes: 30));
 
       final startTimeStr = DateFormat('h:mm a').format(startDateTime);
       final endTimeStr = DateFormat('h:mm a').format(endDateTime);
@@ -879,9 +877,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     // For a simple non-split slot
     if (timeRanges.length == 1) {
       final startDateTime = parseTime(slots.first);
-      final endDateTime = parseTime(
-        slots.last,
-      ).add(const Duration(minutes: 30));
+      final endDateTime = parseTime(slots.last).add(const Duration(minutes: 30));
 
       final startTimeStr = DateFormat('h:mm a').format(startDateTime);
       final endTimeStr = DateFormat('h:mm a').format(endDateTime);
@@ -1187,7 +1183,11 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                                   fit: BoxFit.scaleDown,
                                   child: Text(
                                     'Continue',
-                                    style: const TextStyle(
+                                    style: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width < 400
+                                          ? 14
+                                          : 16,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -1837,6 +1837,21 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
         child: Column(
           children: [
             const SizedBox(height: 16), // Spacing between header and content
+            // Add venue selection section
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: VenueSelectionSection(
+                venue: {
+                  'title': selectedCourt?.name ?? 'Selected Court',
+                  'location': 'Sports Complex, 1.2 km',
+                  'sport': selectedCourt?.type ?? 'Football',
+                  'rating': 4.8,
+                  'rate_per_hour': 'Rs. ${selectedCourt?.hourlyRate ?? 700}',
+                  'distance': '1.2 km',
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
             _buildCombinedDateAndSlotsSection(), // Direct call without the outer container
             const SizedBox(height: 20),
             // Single button that changes based on context with info button for bookings
@@ -3783,6 +3798,242 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
         );
       }
     }
+  }
+}
+
+// VenueSelectionSection class
+class VenueSelectionSection extends StatelessWidget {
+  final Map<String, dynamic>? venue;
+
+  const VenueSelectionSection({super.key, this.venue});
+
+  @override
+  Widget build(BuildContext context) {
+    final venueData =
+        venue ??
+        {
+          'title': 'CR7 Futsal Arena',
+          'location': 'Downtown, 2.5 km',
+          'sport': 'Football',
+          'rating': 4.8,
+          'rate_per_hour': 'Rs. 700',
+          'distance': '2.5 km',
+        };
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Selected Venue',
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF374151),
+            letterSpacing: 0.1,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                height: 100,
+                width: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.asset(
+                    _getCourtImage(
+                      venueData['sport']?.toString() ?? 'Football',
+                    ),
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF3F4F6),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          _getSportIcon(
+                            venueData['sport']?.toString() ?? 'Football',
+                          ),
+                          color: const Color(0xFF1B2C4F),
+                          size: 32,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      venueData['title']?.toString() ?? 'Venue',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF111827),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on_outlined,
+                          size: 14,
+                          color: Color(0xFF9CA3AF),
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            venueData['location']?.toString() ?? 'Location',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF6B7280),
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Icon(
+                          Icons.star_rounded,
+                          size: 14,
+                          color: Color(0xFFF59E0B),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${venueData['rating'] ?? 4.8}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF374151),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        _buildAmenityTag(
+                          _getSportFormat(
+                            venueData['sport']?.toString() ?? 'Football',
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        _buildAmenityTag('Indoor'),
+                        const SizedBox(width: 8),
+                        _buildAmenityTag('Parking'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  IconData _getSportIcon(String sport) {
+    switch (sport.toLowerCase()) {
+      case 'football':
+        return Icons.sports_soccer;
+      case 'basketball':
+        return Icons.sports_basketball;
+      case 'tennis':
+        return Icons.sports_tennis;
+      case 'badminton':
+        return Icons.sports_tennis;
+      case 'cricket':
+        return Icons.sports_cricket;
+      case 'baseball':
+        return Icons.sports_baseball;
+      case 'table tennis':
+        return Icons.table_bar;
+      default:
+        return Icons.sports_soccer;
+    }
+  }
+
+  String _getCourtImage(String sport) {
+    switch (sport.toLowerCase()) {
+      case 'football':
+        return 'assets/football.jpg';
+      case 'basketball':
+        return 'assets/basket.jpg';
+      case 'tennis':
+        return 'assets/tennis.jpg';
+      case 'badminton':
+        return 'assets/badminton.jpg';
+      case 'cricket':
+        return 'assets/cricket.jpg';
+      case 'table tennis':
+        return 'assets/tabletennis.jpg';
+      default:
+        return 'assets/football.jpg';
+    }
+  }
+
+  String _getSportFormat(String sport) {
+    switch (sport.toLowerCase()) {
+      case 'football':
+        return '5 vs 5';
+      case 'basketball':
+        return '5 vs 5';
+      case 'tennis':
+        return '1 vs 1';
+      case 'badminton':
+        return '2 vs 2';
+      case 'table tennis':
+        return '1 vs 1';
+      default:
+        return '5 vs 5';
+    }
+  }
+
+  Widget _buildAmenityTag(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9FAFB),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w500,
+          color: Color(0xFF6B7280),
+        ),
+      ),
+    );
   }
 }
 
