@@ -59,6 +59,8 @@ class SportIconHelper {
     switch (sport.toLowerCase()) {
       case 'football':
         return Icons.sports_soccer;
+      case 'futsal':
+        return Icons.sports_soccer;
       case 'basketball':
         return Icons.sports_basketball;
       case 'tennis':
@@ -71,6 +73,38 @@ class SportIconHelper {
         return Icons.sports_baseball;
       case 'table tennis':
         return Icons.table_bar;
+      case 'swimming':
+        return Icons.pool;
+      case 'water polo':
+        return Icons.pool;
+      case 'diving':
+        return Icons.pool;
+      case 'volleyball':
+        return Icons.sports_volleyball;
+      case 'beach volleyball':
+        return Icons.sports_volleyball;
+      case 'squash':
+        return Icons.sports_tennis;
+      case 'netball':
+        return Icons.sports_basketball;
+      case 'golf':
+        return Icons.sports_golf;
+      case 'surfing':
+        return Icons.surfing;
+      case 'boxing':
+        return Icons.sports_mma;
+      case 'mma':
+        return Icons.sports_mma;
+      case 'kickboxing':
+        return Icons.sports_mma;
+      case 'rugby':
+        return Icons.sports_rugby;
+      case 'mountain biking':
+        return Icons.directions_bike;
+      case 'rock climbing':
+        return Icons.terrain;
+      case 'bouldering':
+        return Icons.terrain;
       default:
         return Icons.sports_soccer;
     }
@@ -133,14 +167,14 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     Court(
       id: 'court_1',
       name: 'Court A',
-      type: 'Football',
+      type: 'Futsal',
       isAvailable: true,
       hourlyRate: 2500.0,
     ),
     Court(
       id: 'court_2',
       name: 'Court B',
-      type: 'Football',
+      type: 'Cricket',
       isAvailable: true,
       hourlyRate: 3000.0,
     ),
@@ -151,6 +185,55 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       isAvailable: true,
       hourlyRate: 2000.0,
     ),
+    Court(
+      id: 'court_4',
+      name: 'Court D',
+      type: 'Badminton',
+      isAvailable: true,
+      hourlyRate: 1800.0,
+    ),
+    Court(
+      id: 'court_5',
+      name: 'Court E',
+      type: 'Tennis',
+      isAvailable: true,
+      hourlyRate: 2200.0,
+    ),
+    Court(
+      id: 'court_6',
+      name: 'Pool A',
+      type: 'Swimming',
+      isAvailable: true,
+      hourlyRate: 1500.0,
+    ),
+    Court(
+      id: 'court_7',
+      name: 'Court F',
+      type: 'Squash',
+      isAvailable: true,
+      hourlyRate: 2000.0,
+    ),
+    Court(
+      id: 'court_8',
+      name: 'Court G',
+      type: 'Table Tennis',
+      isAvailable: true,
+      hourlyRate: 1200.0,
+    ),
+    Court(
+      id: 'court_9',
+      name: 'Court H',
+      type: 'Volleyball',
+      isAvailable: true,
+      hourlyRate: 1800.0,
+    ),
+    Court(
+      id: 'court_10',
+      name: 'Court I',
+      type: 'Boxing',
+      isAvailable: true,
+      hourlyRate: 2000.0,
+    ),
   ];
   
   String? currentFacilityId = 'facility_1'; // Mock facility ID
@@ -158,12 +241,22 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   int selectedCourtIndex = 0;
 
   Court? get selectedCourt {
+    // Get courts for the currently selected sport
+    final courtsForSport = _getCourtsForSelectedSport();
+    
     // Safety check to prevent out of bounds and handle empty courts
-    if (courts.isEmpty) return null;
-    if (selectedCourtIndex >= courts.length) {
+    if (courtsForSport.isEmpty) return null;
+    if (selectedCourtIndex >= courtsForSport.length) {
       selectedCourtIndex = 0;
     }
-    return courts[selectedCourtIndex];
+    return courtsForSport[selectedCourtIndex];
+  }
+
+  // Helper method to get courts for the currently selected sport
+  List<Court> _getCourtsForSelectedSport() {
+    if (selectedSport == null) return courts;
+    
+    return courts.where((court) => court.type == selectedSport).toList();
   }
 
   // Dynamic time slots based on venue opening hours
@@ -186,9 +279,10 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     _initializeSelectedSlots();
     _loadVenueOpeningHours();
     
-    // Initialize selected sport from venue data
-    if (widget.selectedVenue != null && widget.selectedVenue!.sports.isNotEmpty) {
-      selectedSport = widget.selectedVenue!.sports.first;
+    // Initialize selected sport from available courts
+    final availableSports = _getAvailableSportsFromCourts();
+    if (availableSports.isNotEmpty) {
+      selectedSport = availableSports.first;
     }
   }
 
@@ -1908,6 +2002,9 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
             ),
             const SizedBox(height: 16),
             _buildCombinedDateAndSlotsSection(), // Direct call without the outer container
+            const SizedBox(height: 16),
+            // Call button positioned next to the container
+            _buildCallButton(),
             const SizedBox(height: 20),
             // Single button that changes based on context with info button for bookings
             if (courts.isNotEmpty &&
@@ -2055,116 +2152,114 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header row with dropdowns and View Calendar button
-          Column(
+          // Header row with dropdown and View Calendar button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  // View Calendar button
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        showCalendar = !showCalendar;
-                      });
-                    },
-                    child: Text(
-                      showCalendar
-                          ? 'Hide Calendar'
-                          : 'View Calendar',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: const Color(0xFF1B2C4F),
-                        decoration: showCalendar ? TextDecoration.underline : null,
-                      ),
+              // Sports dropdown
+              if (_getAvailableSportsFromCourts().isNotEmpty)
+                Container(
+                  height: 40,
+                  width: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[50],
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.grey[300]!,
+                      width: 1,
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 2), // Spacing between header and dropdowns
-              // Sports dropdown row
-              if (widget.selectedVenue != null && widget.selectedVenue!.sports.isNotEmpty)
-                Row(
-                  children: [
-                    Container(
-                      height: 40,
-                      width: 200,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: Colors.grey[300]!,
-                          width: 1,
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      value: selectedSport ?? (_getAvailableSportsFromCourts().isNotEmpty ? _getAvailableSportsFromCourts().first : null),
+                      icon: Container(
+                        margin: const EdgeInsets.only(right: 4),
+                        child: const Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Color(0xFF1B2C4F),
+                          size: 20,
                         ),
                       ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          isExpanded: true,
-                          value: selectedSport ?? widget.selectedVenue!.sports.first,
-                          icon: Container(
-                            margin: const EdgeInsets.only(right: 4),
-                            child: const Icon(
-                              Icons.keyboard_arrow_down,
-                              color: Color(0xFF1B2C4F),
-                              size: 20,
-                            ),
-                          ),
-                          style: const TextStyle(
-                            color: Color(0xFF1B2C4F),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                          ),
-                          dropdownColor: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                          elevation: 2,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          itemHeight: 48,
-                          items: widget.selectedVenue!.sports
-                              .map(
-                                (sport) => DropdownMenuItem<String>(
-                                  value: sport,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 8,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          _getSportIcon(sport),
-                                          size: 16,
-                                          color: const Color(0xFF1B2C4F),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            sport,
-                                            style: const TextStyle(
-                                              color: Color(0xFF2D3142),
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 14,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                      style: const TextStyle(
+                        color: Color(0xFF1B2C4F),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                      dropdownColor: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      elevation: 2,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      itemHeight: 48,
+                      items: _getAvailableSportsFromCourts()
+                          .map(
+                            (sport) => DropdownMenuItem<String>(
+                              value: sport,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
                                 ),
-                              )
-                              .toList(),
-                          onChanged: (String? newValue) {
-                            if (newValue != null) {
-                              setState(() {
-                                selectedSport = newValue;
-                              });
-                            }
-                          },
-                        ),
-                      ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      _getSportIcon(sport),
+                                      size: 16,
+                                      color: const Color(0xFF1B2C4F),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        sport,
+                                        style: const TextStyle(
+                                          color: Color(0xFF2D3142),
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 14,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            selectedSport = newValue;
+                            // Reset court selection when sport changes
+                            selectedCourtIndex = 0;
+                            // Update time slots for new sport/court combination
+                            _updateTimeSlots();
+                          });
+                        }
+                      },
                     ),
-                  ],
+                  ),
+                )
+              else
+                const SizedBox(width: 200), // Maintain spacing when no dropdown
+              // View Calendar button
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    showCalendar = !showCalendar;
+                  });
+                },
+                child: Text(
+                  showCalendar
+                      ? 'Hide Calendar'
+                      : 'View Calendar',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF1B2C4F),
+                    decoration: showCalendar ? TextDecoration.underline : null,
+                  ),
                 ),
+              ),
             ],
           ),
           const SizedBox(height: 25),
@@ -2843,6 +2938,130 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
             ),
           ),
       ],
+    );
+  }
+
+  // Build call button widget
+  Widget _buildCallButton() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ElevatedButton.icon(
+        onPressed: () {
+          _makePhoneCall();
+        },
+        icon: const Icon(
+          Icons.phone,
+          color: Colors.white,
+          size: 20,
+        ),
+        label: const Text(
+          'Call Venue',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF1B2C4F),
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 2,
+        ),
+      ),
+    );
+  }
+
+  // Handle phone call action
+  void _makePhoneCall() {
+    const phoneNumber = '+94771234567';
+    
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.4),
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1B2C4F).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.phone,
+                    color: Color(0xFF1B2C4F),
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Call Venue',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1B2C4F),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  phoneNumber,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF666666),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: const Text('Cancel'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Calling $phoneNumber...'),
+                              backgroundColor: const Color(0xFF1B2C4F),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1B2C4F),
+                        ),
+                        child: const Text('Call'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -3817,6 +4036,26 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
         );
       }
     }
+  }
+
+  // Helper method to get only sports that have actual courts available
+  List<String> _getAvailableSportsFromCourts() {
+    // If a venue is selected, prioritize venue sports
+    if (widget.selectedVenue != null && widget.selectedVenue!.sports.isNotEmpty) {
+      return widget.selectedVenue!.sports;
+    }
+    
+    // Fallback to court-based filtering if no venue is selected
+    if (courts.isEmpty) return [];
+    
+    // Get unique sport types from available courts
+    final availableSportTypes = courts
+        .where((court) => court.isAvailable)
+        .map((court) => court.type)
+        .toSet()
+        .toList();
+    
+    return availableSportTypes;
   }
 
   IconData _getSportIcon(String sport) {

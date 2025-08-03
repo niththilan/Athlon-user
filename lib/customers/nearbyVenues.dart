@@ -71,7 +71,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   // Current tab index for footer navigation
   int _currentTabIndex = 0;
 
-  // Sports filter list with icons - Comprehensive list based on venue data
+  // Sports filter list with icons - Only includes sports that are actually available in venues
   final Map<String, IconData> _filterOptionsWithIcons = {
     'All': Icons.grid_view_rounded,
     'Indoor': Icons.home_rounded,
@@ -89,19 +89,17 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     'Beach Volleyball': Icons.sports_volleyball_rounded,
     'Golf': Icons.sports_golf_rounded,
     'Surfing': Icons.surfing_rounded,
-    'Yoga': Icons.self_improvement_rounded,
-    'Pilates': Icons.self_improvement_rounded,
-    'Fitness': Icons.fitness_center_rounded,
     'Mountain Biking': Icons.directions_bike_rounded,
-    'Hiking': Icons.hiking_rounded,
-    'Trail Running': Icons.directions_run_rounded,
     'Boxing': Icons.sports_mma_rounded,
     'MMA': Icons.sports_mma_rounded,
     'Kickboxing': Icons.sports_mma_rounded,
     'Baseball': Icons.sports_baseball_rounded,
+    'Rugby': Icons.sports_rugby_rounded,
+    'Football': Icons.sports_soccer_rounded,
     'Rock Climbing': Icons.terrain_rounded,
     'Bouldering': Icons.terrain_rounded,
-    'Rappelling': Icons.terrain_rounded,
+    'Table Tennis': Icons.table_bar_rounded,
+    'Netball': Icons.sports_basketball_rounded,
   };
 
   // List of all venues with distance
@@ -150,7 +148,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 5.2,
       imageUrl:
           "https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Swimming", "Water Polo", "Diving", "Aqua Aerobics", "Yoga"],
+      sports: ["Swimming", "Water Polo", "Diving"],
       openingHours: "5:30 AM - 9:30 PM",
       ratePerHour: "Rs. 1,200",
     ),
@@ -162,7 +160,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 2.7,
       imageUrl:
           "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Basketball", "Volleyball", "Futsal", "Netball", "Fitness"],
+      sports: ["Basketball", "Volleyball", "Futsal", "Netball"],
       openingHours: "7:00 AM - 11:00 PM",
       ratePerHour: "Rs. 1,800",
     ),
@@ -174,7 +172,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 8.6,
       imageUrl:
           "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Golf", "Tennis", "Swimming", "Fitness", "Dining"],
+      sports: ["Golf", "Tennis", "Swimming"],
       openingHours: "6:00 AM - 8:00 PM",
       ratePerHour: "Rs. 5,000",
     ),
@@ -186,7 +184,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 1.5,
       imageUrl:
           "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Tennis", "Badminton", "Squash", "Swimming", "Yoga"],
+      sports: ["Tennis", "Badminton", "Squash", "Swimming"],
       openingHours: "6:00 AM - 8:00 PM",
       ratePerHour: "Rs. 2,000",
     ),
@@ -198,19 +196,19 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 12.3,
       imageUrl:
           "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Surfing", "Swimming", "Beach Volleyball", "Diving", "Yoga"],
+      sports: ["Surfing", "Swimming", "Beach Volleyball", "Diving"],
       openingHours: "7:00 AM - 6:00 PM",
       ratePerHour: "Rs. 1,500",
     ),
     VenueModel(
       id: '9',
-      title: "CENTRAL YOGA & FITNESS",
+      title: "COLOMBO BOXING & MARTIAL ARTS",
       location: "22 Wellness Street, Nawala 10107",
       rating: 4.65,
       distance: 1.9,
       imageUrl:
           "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Yoga", "Pilates", "Fitness", "Zumba", "Boxing"],
+      sports: ["Boxing"],
       openingHours: "6:30 AM - 10:30 PM",
       ratePerHour: "Rs. 1,000",
     ),
@@ -222,7 +220,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 10.5,
       imageUrl:
           "https://images.unsplash.com/photo-1541625602330-2277a4c46182?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Mountain Biking", "Hiking", "Trail Running", "Rock Climbing", "Camping"],
+      sports: ["Mountain Biking", "Rock Climbing"],
       openingHours: "6:00 AM - 6:00 PM",
       ratePerHour: "Rs. 800",
     ),
@@ -234,7 +232,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 4.3,
       imageUrl:
           "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Boxing", "MMA", "Kickboxing", "Fitness", "Wrestling"],
+      sports: ["Boxing", "MMA", "Kickboxing"],
       openingHours: "7:00 AM - 10:00 PM",
       ratePerHour: "Rs. 1,500",
     ),
@@ -246,7 +244,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 7.8,
       imageUrl:
           "https://images.unsplash.com/photo-1531415074968-036ba1b575da?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Cricket", "Baseball", "Softball", "Rugby", "Football"],
+      sports: ["Cricket", "Baseball", "Rugby", "Football"],
       openingHours: "6:00 AM - 9:00 PM",
       ratePerHour: "Rs. 2,500",
     ),
@@ -258,7 +256,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 9.2,
       imageUrl:
           "https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Rock Climbing", "Bouldering", "Rappelling", "Hiking", "Camping"],
+      sports: ["Rock Climbing", "Bouldering"],
       openingHours: "7:00 AM - 5:00 PM",
       ratePerHour: "Rs. 2,000",
     ),
