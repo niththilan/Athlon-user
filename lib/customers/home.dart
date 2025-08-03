@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'userProfile.dart';
-import 'nearbyVenues.dart';
 import 'widgets/football_spinner.dart';
 import 'availableSports.dart'; // Add this import
 import 'courtDetails.dart'; // Add this import
+import 'search.dart'; // Add search import
 
 import 'footer.dart';
 import 'nearbyVenues.dart' as venues; // Import the nearbyVenues file
@@ -131,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
         // Navigate to search screen
         Navigator.push(
           context,
-          NoAnimationRoute(builder: (context) => const NearByVenueScreen()),
+          NoAnimationRoute(builder: (context) => const SearchScreen()),
         );
       },
       child: Container(

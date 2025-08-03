@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'bookings.dart'; // Import the bookings.dart file
+import 'nearbyVenues.dart'; // Import for VenueModel
+import 'footer.dart'; // Import footer
 
 void main() {
   runApp(const MyApp());
@@ -49,6 +51,7 @@ class _SearchScreenState extends State<SearchScreen> {
   bool _isLoading = false;
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
+  int _currentTabIndex = 0; // Add current tab index for footer
 
   @override
   void initState() {
@@ -160,6 +163,14 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: AppFooter(
+        currentIndex: _currentTabIndex,
+        onTabSelected: (index) {
+          setState(() {
+            _currentTabIndex = index;
+          });
+        },
+      ),
     );
   }
 
@@ -184,19 +195,19 @@ class _SearchScreenState extends State<SearchScreen> {
           autofocus: true,
           style: const TextStyle(
             color: Color(0xFF2D3142),
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
           ),
           textAlignVertical: TextAlignVertical.center,
           decoration: InputDecoration(
             hintText: 'Search sports venues...',
             hintStyle: TextStyle(
               color: Colors.grey[400],
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.w400,
             ),
             prefixIcon: Container(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(2),
               child: const Icon(
                 Icons.search_rounded,
                 color: Color(0xFF1B2C4F),
@@ -225,7 +236,7 @@ class _SearchScreenState extends State<SearchScreen> {
             fillColor: Colors.white,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 20,
-              vertical: 16,
+              vertical: 10,
             ),
             border: InputBorder.none,
             enabledBorder: InputBorder.none,
@@ -273,12 +284,12 @@ class _SearchScreenState extends State<SearchScreen> {
         Expanded(
           child: ListView.builder(
             controller: _scrollController,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             physics: const BouncingScrollPhysics(),
             itemCount: _recentSearches.length,
             itemBuilder: (context, index) {
               return Container(
-                margin: const EdgeInsets.fromLTRB(8, 4, 8, 4),
+                margin: const EdgeInsets.fromLTRB(0, 4, 0, 4),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -444,14 +455,14 @@ class _SearchScreenState extends State<SearchScreen> {
             itemBuilder: (context, index) {
               final venue = _searchResults[index];
               return Container(
-                margin: const EdgeInsets.fromLTRB(8, 0, 8, 16),
+                margin: const EdgeInsets.only(bottom: 20.0),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF1B2C4F).withOpacity(0.08),
-                      blurRadius: 12,
+                      color: Colors.black.withOpacity(0.02),
+                      blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
                   ],
@@ -459,144 +470,140 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Image Header with overlays
-                    ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
-                      ),
-                      child: Container(
-                        height: 160,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withOpacity(0.3),
-                              Colors.transparent,
-                              Colors.black.withOpacity(0.7),
-                            ],
-                            stops: const [0.0, 0.5, 1.0],
-                          ),
+                    // Image Section with modern overlay
+                    Container(
+                      height: 160,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: Radius.circular(16),
                         ),
-                        child: Stack(
-                          children: [
-                            // Background image placeholder
-                            Container(
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    _getColorForVenueType(
-                                      venue.type,
-                                    ).withOpacity(0.7),
-                                    _getColorForVenueType(venue.type),
-                                  ],
-                                ),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  _getIconForVenueType(venue.type),
-                                  size: 60,
-                                  color: Colors.white.withOpacity(0.3),
-                                ),
-                              ),
+                        color: Colors.grey[50],
+                      ),
+                      child: Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(16),
+                              topRight: Radius.circular(16),
                             ),
-                            // Top overlays
-                            Positioned(
-                              top: 12,
-                              left: 12,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: _getColorForVenueType(venue.type),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Text(
-                                  venue.type,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+                            child: Image.network(
+                              venue.imageUrl,
+                              width: double.infinity,
+                              height: 160,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey[50],
+                                  child: Center(
+                                    child: Icon(
+                                      Icons.image_outlined,
+                                      size: 24,
+                                      color: Colors.grey[400],
+                                    ),
                                   ),
-                                ),
+                                );
+                              },
+                            ),
+                          ),
+                          // Minimal favorite button
+                          Positioned(
+                            top: 16,
+                            right: 16,
+                            child: GestureDetector(
+                              onTap: () {
+                                // Handle favorite toggle
+                              },
+                              child: Icon(
+                                Icons.favorite_border,
+                                color: Colors.white,
+                                size: 24,
                               ),
                             ),
-                            Positioned(
-                              top: 12,
-                              right: 12,
+                          ),
+                          // Rating badge on image
+                          Positioned(
+                            bottom: 12,
+                            left: 16,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.95),
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
                               child: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(
-                                    Icons.directions_walk,
-                                    color: Colors.white,
-                                    size: 16,
+                                  Icon(
+                                    Icons.star,
+                                    color: Colors.orange[600],
+                                    size: 12,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    venue.distance,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    venue.rating.toString(),
+                                    style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
+                                      color: Colors.orange[600],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            // Bottom overlay - Title
-                            Positioned(
-                              bottom: 12,
-                              left: 12,
-                              right: 12,
-                              child: Text(
-                                venue.title,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  shadows: [
-                                    Shadow(
-                                      offset: Offset(0, 1),
-                                      blurRadius: 3,
-                                      color: Colors.black54,
-                                    ),
-                                  ],
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    // Content section
+
+                    // Content Section with clean layout
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Location row
+                          // Venue name
+                          Text(
+                            venue.title,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1B2C4F),
+                              height: 1.2,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          // Location
                           Row(
                             children: [
                               Icon(
                                 Icons.location_on_outlined,
-                                size: 16,
-                                color: Colors.grey[600],
+                                size: 14,
+                                color: Colors.grey[500],
                               ),
                               const SizedBox(width: 4),
                               Expanded(
                                 child: Text(
                                   venue.location,
                                   style: TextStyle(
-                                    color: Colors.grey[700],
-                                    fontSize: 14,
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                    height: 1.3,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -604,104 +611,125 @@ class _SearchScreenState extends State<SearchScreen> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 8),
-                          // Time slot row
+
+                          const SizedBox(height: 12),
+
+                          // Distance and Sports
                           Row(
                             children: [
-                              Icon(
-                                Icons.access_time,
-                                size: 16,
-                                color: Colors.grey[600],
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                venue.timeSlot,
-                                style: TextStyle(
-                                  color: Colors.grey[700],
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const Spacer(),
-                              // Green price indicator
+                              // Distance
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF1B2C4F).withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  venue.distance,
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF1B2C4F),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              // Opening status
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
                                 ),
                                 decoration: BoxDecoration(
                                   color: Colors.green.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(4),
+                                  borderRadius: BorderRadius.circular(6),
                                 ),
                                 child: Text(
-                                  "Rs. ${venue.price}",
-                                  style: const TextStyle(
-                                    color: Colors.green,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
+                                  "Open Now",
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.green[600],
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
-                          // Bottom row with rating and button
+
+                          const SizedBox(height: 0),
+
+                          // Sports tags and Book Now button
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              // Rating
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.star,
-                                    size: 16,
-                                    color: Colors.amber,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    venue.rating.toString(),
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black87,
-                                    ),
-                                  ),
-                                ],
+                              // Sports tags (up to 3)
+                              Expanded(
+                                child: Wrap(
+                                  spacing: 6,
+                                  runSpacing: 6,
+                                  children: [venue.type].map((sport) {
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 3,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue.withOpacity(0.08),
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(
+                                          color: Colors.blue.withOpacity(0.2),
+                                          width: 0.5,
+                                        ),
+                                      ),
+                                      child: Text(
+                                        sport,
+                                        style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.blue[700],
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
                               ),
-                              // Favorite icon
-                              const SizedBox(width: 16),
-                              Icon(
-                                Icons.favorite_border,
-                                size: 20,
-                                color: Colors.grey[600],
-                              ),
-                              const Spacer(),
+                              
                               // Book Now button
                               ElevatedButton(
                                 onPressed: () {
-                                  // Navigate to SlotsPage
+                                  // Convert VenueResult to VenueModel and navigate to SlotsPage
+                                  final venueModel = _convertToVenueModel(venue);
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => const SlotsPage(),
+                                      builder: (context) => SlotsPage(
+                                        selectedVenue: venueModel,
+                                      ),
                                     ),
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF1B2C4F),
                                   foregroundColor: Colors.white,
-                                  elevation: 0,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                    vertical: 10,
-                                  ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
                                   ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 12,
+                                  ),
+                                  elevation: 0,
+                                  minimumSize: Size.zero,
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 ),
                                 child: const Text(
-                                  "Book Now",
+                                  'Book Now',
                                   style: TextStyle(
-                                    fontWeight: FontWeight.w600,
                                     fontSize: 14,
+                                    fontWeight: FontWeight.w600,
                                   ),
                                 ),
                               ),
@@ -720,31 +748,19 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  // Helper methods for venue styling
-  IconData _getIconForVenueType(String type) {
-    switch (type) {
-      case 'Badminton':
-        return Icons.sports_tennis;
-      case 'Football':
-        return Icons.sports_soccer;
-      case 'Swimming':
-        return Icons.pool;
-      default:
-        return Icons.sports;
-    }
-  }
-
-  Color _getColorForVenueType(String type) {
-    switch (type) {
-      case 'Badminton':
-        return const Color(0xFF3366FF);
-      case 'Football':
-        return const Color(0xFF00C853);
-      case 'Swimming':
-        return const Color(0xFF00BCD4);
-      default:
-        return const Color(0xFF1B2C4F);
-    }
+  // Helper function to convert VenueResult to VenueModel
+  VenueModel _convertToVenueModel(VenueResult venueResult) {
+    return VenueModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(), // Generate unique ID
+      title: venueResult.title,
+      location: venueResult.location,
+      rating: venueResult.rating,
+      distance: double.tryParse(venueResult.distance.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0.0,
+      imageUrl: venueResult.imageUrl,
+      sports: [venueResult.type], // Convert single type to list
+      openingHours: venueResult.timeSlot,
+      ratePerHour: "Rs. ${venueResult.price}",
+    );
   }
 
   void _showCustomSnackBar(BuildContext context, String message) {
