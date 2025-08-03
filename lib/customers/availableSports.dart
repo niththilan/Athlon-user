@@ -5,6 +5,7 @@ import 'favourites.dart';
 import 'bookings.dart';
 import 'footer.dart';
 import 'widgets/football_spinner.dart';
+import 'nearbyVenues.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -404,6 +405,21 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     });
   }
 
+  // Helper function to convert venue Map to VenueModel
+  VenueModel _convertToVenueModel(Map<String, dynamic> venue) {
+    return VenueModel(
+      id: venue['id'] ?? '',
+      title: venue['title'] ?? '',
+      location: venue['location'] ?? '',
+      rating: (venue['rating'] as num?)?.toDouble() ?? 0.0,
+      imageUrl: venue['image_path'] ?? '',
+      sports: [venue['sport'] ?? ''], // Convert single sport to List
+      distance: double.tryParse(venue['distance']?.toString().replaceAll(RegExp(r'[^\d.]'), '') ?? '0') ?? 0.0,
+      openingHours: venue['opening_hours'] ?? '',
+      ratePerHour: venue['rate_per_hour'] ?? '',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // Count favorites for badge display
@@ -701,330 +717,309 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                             final bool isFavorite =
                                 venue['is_favorite'] ?? false;
 
-                            return Container(
-                              margin: const EdgeInsets.only(bottom: 16.0),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.04),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 2),
+                            return GestureDetector(
+                              onTap: () {
+                                // Convert venue data to VenueModel and pass to SlotsPage
+                                final venueModel = _convertToVenueModel(venue);
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    pageBuilder:
+                                        (context, animation, secondaryAnimation) =>
+                                            SlotsPage(selectedVenue: venueModel),
+                                    transitionDuration: Duration.zero,
+                                    reverseTransitionDuration: Duration.zero,
                                   ),
-                                ],
-                              ),
-                              child: Stack(
-                                children: [
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      // Image with favorite button
-                                      Stack(
+                                );
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 20.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.02),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Image Section with modern overlay
+                                    Container(
+                                      height: 160,
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(16),
+                                          topRight: Radius.circular(16),
+                                        ),
+                                        color: Colors.grey[50],
+                                      ),
+                                      child: Stack(
                                         children: [
                                           ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                                  topLeft: Radius.circular(12),
-                                                  topRight: Radius.circular(12),
-                                                ),
-                                            child: Container(
-                                              height: 160,
+                                            borderRadius: const BorderRadius.only(
+                                              topLeft: Radius.circular(16),
+                                              topRight: Radius.circular(16),
+                                            ),
+                                            child: Image.network(
+                                              venue['image_path'] ?? '',
                                               width: double.infinity,
-                                              color: Colors.grey[200],
-                                              child: Image.network(
-                                                venue['image_path'] ?? '',
-                                                fit: BoxFit.cover,
-                                                errorBuilder:
-                                                    (
-                                                      context,
-                                                      error,
-                                                      stackTrace,
-                                                    ) {
-                                                      return Container(
-                                                        color: Colors.grey[100],
-                                                        child: const Center(
-                                                          child: Icon(
-                                                            Icons
-                                                                .image_not_supported,
-                                                            size: 40,
-                                                            color: Colors.grey,
-                                                          ),
-                                                        ),
-                                                      );
-                                                    },
-                                              ),
-                                            ),
-                                          ),
-                                          // Favorite button
-                                          Positioned(
-                                            top: 12,
-                                            right: 12,
-                                            child: GestureDetector(
-                                              onTap: () =>
-                                                  _toggleFavorite(index),
-                                              child: Container(
-                                                padding: const EdgeInsets.all(
-                                                  8,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  shape: BoxShape.circle,
-                                                  boxShadow: [
-                                                    BoxShadow(
-                                                      color: Colors.black
-                                                          .withOpacity(0.1),
-                                                      blurRadius: 4,
-                                                      offset: const Offset(
-                                                        0,
-                                                        2,
-                                                      ),
+                                              height: 160,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) {
+                                                return Container(
+                                                  color: Colors.grey[50],
+                                                  child: Center(
+                                                    child: Icon(
+                                                      Icons.image_outlined,
+                                                      size: 24,
+                                                      color: Colors.grey[400],
                                                     ),
-                                                  ],
-                                                ),
-                                                child: Icon(
-                                                  isFavorite
-                                                      ? Icons.favorite
-                                                      : Icons.favorite_border,
-                                                  color: isFavorite
-                                                      ? Colors.red
-                                                      : Colors.grey[600],
-                                                  size: 20,
-                                                ),
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          // Minimal favorite button
+                                          Positioned(
+                                            top: 16,
+                                            right: 16,
+                                            child: GestureDetector(
+                                              onTap: () => _toggleFavorite(index),
+                                              child: Icon(
+                                                isFavorite ? Icons.favorite : Icons.favorite_border,
+                                                color: isFavorite ? Colors.red : Colors.white,
+                                                size: 24,
                                               ),
                                             ),
                                           ),
-                                          // Distance badge
+                                          // Rating badge on image
                                           Positioned(
                                             bottom: 12,
-                                            left: 12,
+                                            left: 16,
                                             child: Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 4,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                color: Colors.black.withOpacity(
-                                                  0.7,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
+                                              padding: const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 4,
                                               ),
-                                              child: Text(
-                                                venue['distance'] ?? '',
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white.withOpacity(0.95),
+                                                borderRadius: BorderRadius.circular(10),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withOpacity(0.1),
+                                                    blurRadius: 4,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    Icons.star,
+                                                    color: Colors.orange[600],
+                                                    size: 12,
+                                                  ),
+                                                  const SizedBox(width: 4),
+                                                  Text(
+                                                    venue['rating']?.toString() ?? '4.5',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: Colors.orange[600],
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                           ),
                                         ],
                                       ),
+                                    ),
 
-                                      // Venue details
-                                      Padding(
-                                        padding: const EdgeInsets.all(16),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            // Venue name
-                                            Text(
-                                              venue['title'] ?? '',
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                                color: Color(0xFF2D3142),
+                                    // Content Section with clean layout
+                                    Padding(
+                                      padding: const EdgeInsets.all(16),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          // Venue name
+                                          Text(
+                                            venue['title'] ?? '',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: Color(0xFF1B2C4F),
+                                              height: 1.2,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+
+                                          const SizedBox(height: 8),
+
+                                          // Location
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.location_on_outlined,
+                                                size: 14,
+                                                color: Colors.grey[500],
                                               ),
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-
-                                            const SizedBox(height: 4),
-
-                                            // Location
-                                            Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.location_on_outlined,
-                                                  size: 14,
-                                                  color: Colors.grey[500],
-                                                ),
-                                                const SizedBox(width: 4),
-                                                Expanded(
-                                                  child: Text(
-                                                    venue['location'] ?? '',
-                                                    style: TextStyle(
-                                                      fontSize: 13,
-                                                      color: Colors.grey[600],
-                                                    ),
-                                                    maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
+                                              const SizedBox(width: 4),
+                                              Expanded(
+                                                child: Text(
+                                                  venue['location'] ?? '',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.grey[600],
+                                                    height: 1.3,
                                                   ),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
+                                          ),
 
-                                            const SizedBox(height: 12),
+                                          const SizedBox(height: 12),
 
-                                            // Rating and Price
-                                            Row(
-                                              children: [
-                                                // Rating
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 6,
-                                                        vertical: 2,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.orange
-                                                        .withOpacity(0.1),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          4,
-                                                        ),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      const Icon(
-                                                        Icons.star,
-                                                        color: Colors.orange,
-                                                        size: 12,
-                                                      ),
-                                                      const SizedBox(width: 2),
-                                                      Text(
-                                                        venue['rating']
-                                                                ?.toString() ??
-                                                            '0.0',
-                                                        style: const TextStyle(
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color: Colors.orange,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
+                                          // Distance and Opening status
+                                          Row(
+                                            children: [
+                                              // Distance
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                  vertical: 4,
                                                 ),
-
-                                                const SizedBox(width: 8),
-
-                                                // Price
-                                                Text(
-                                                  venue['rate_per_hour'] ?? '',
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xFF1B2C4F).withOpacity(0.08),
+                                                  borderRadius: BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                  venue['distance'] ?? '2.5 km',
                                                   style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w500,
                                                     color: Color(0xFF1B2C4F),
                                                   ),
                                                 ),
-                                              ],
-                                            ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              // Opening status
+                                              Container(
+                                                padding: const EdgeInsets.symmetric(
+                                                  horizontal: 8,
+                                                  vertical: 4,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.green.withOpacity(0.1),
+                                                  borderRadius: BorderRadius.circular(6),
+                                                ),
+                                                child: Text(
+                                                  "Open Now",
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.green[600],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
 
-                                            const SizedBox(height: 8),
+                                          const SizedBox(height: 0),
 
-                                            // Sports tags (simplified)
-                                            Wrap(
-                                              spacing: 4,
-                                              runSpacing: 4,
-                                              children: [venue['sport'] ?? '']
-                                                  .where(
-                                                    (sport) => sport.isNotEmpty,
-                                                  )
-                                                  .take(3)
-                                                  .map((sport) {
-                                                    return Container(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 6,
-                                                            vertical: 2,
+                                          // Sports tags and Book Now button
+                                          Row(
+                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            children: [
+                                              // Sports tags (up to 3)
+                                              Expanded(
+                                                child: Wrap(
+                                                  spacing: 6,
+                                                  runSpacing: 6,
+                                                  children: [venue['sport'] ?? 'Football']
+                                                      .where((sport) => sport.isNotEmpty)
+                                                      .take(3)
+                                                      .map((sport) {
+                                                        return Container(
+                                                          padding: const EdgeInsets.symmetric(
+                                                            horizontal: 8,
+                                                            vertical: 3,
                                                           ),
-                                                      decoration: BoxDecoration(
-                                                        color: const Color(
-                                                          0xFF1B2C4F,
-                                                        ).withOpacity(0.1),
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              4,
+                                                          decoration: BoxDecoration(
+                                                            color: Colors.blue.withOpacity(0.08),
+                                                            borderRadius: BorderRadius.circular(6),
+                                                            border: Border.all(
+                                                              color: Colors.blue.withOpacity(0.2),
+                                                              width: 0.5,
                                                             ),
-                                                      ),
-                                                      child: Text(
-                                                        sport,
-                                                        style: const TextStyle(
-                                                          fontSize: 11,
-                                                          color: Color(
-                                                            0xFF1B2C4F,
                                                           ),
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                        ),
+                                                          child: Text(
+                                                            sport,
+                                                            style: TextStyle(
+                                                              fontSize: 10,
+                                                              fontWeight: FontWeight.w500,
+                                                              color: Colors.blue[700],
+                                                            ),
+                                                          ),
+                                                        );
+                                                      })
+                                                      .toList(),
+                                                ),
+                                              ),
+                                              
+                                              // Book Now button
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  // Convert venue data to VenueModel and pass to SlotsPage
+                                                  final venueModel = _convertToVenueModel(venue);
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => SlotsPage(
+                                                        selectedVenue: venueModel,
                                                       ),
-                                                    );
-                                                  })
-                                                  .toList(),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  // Book Now button positioned in bottom-right corner
-                                  Positioned(
-                                    bottom: 10,
-                                    right: 14,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          PageRouteBuilder(
-                                            pageBuilder:
-                                                (
-                                                  context,
-                                                  animation,
-                                                  secondaryAnimation,
-                                                ) =>
-                                                    const SlotsPage(),
-                                            transitionDuration: Duration.zero,
-                                            reverseTransitionDuration:
-                                                Duration.zero,
+                                                    ),
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: const Color(0xFF1B2C4F),
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                  ),
+                                                  padding: const EdgeInsets.symmetric(
+                                                    horizontal: 20,
+                                                    vertical: 12,
+                                                  ),
+                                                  elevation: 0,
+                                                  minimumSize: Size.zero,
+                                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                ),
+                                                child: const Text(
+                                                  'Book Now',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        );
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(
-                                          0xFF1B2C4F,
-                                        ),
-                                        foregroundColor: Colors.white,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 16,
-                                          vertical: 8,
-                                        ),
-                                        elevation: 2,
-                                      ),
-                                      child: const Text(
-                                        'Book Now',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                        ],
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             );
                           },
