@@ -54,6 +54,29 @@ class TimeSlot {
     : days = days ?? [];
 }
 
+class SportIconHelper {
+  static IconData getSportIcon(String sport) {
+    switch (sport.toLowerCase()) {
+      case 'football':
+        return Icons.sports_soccer;
+      case 'basketball':
+        return Icons.sports_basketball;
+      case 'tennis':
+        return Icons.sports_tennis;
+      case 'badminton':
+        return Icons.sports_tennis;
+      case 'cricket':
+        return Icons.sports_cricket;
+      case 'baseball':
+        return Icons.sports_baseball;
+      case 'table tennis':
+        return Icons.table_bar;
+      default:
+        return Icons.sports_soccer;
+    }
+  }
+}
+
 void main() {
   runApp(const SlotsBookingApp());
 }
@@ -2032,49 +2055,75 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header row with dropdown and View Calendar button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Header row with dropdowns and View Calendar button
+          Column(
             children: [
-              // Courts dropdown with popup box styling
-              Container(
-                height: 40,
-                width: 200,
-                decoration: BoxDecoration(
-                  color: Colors.grey[50],
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Colors.grey[300]!,
-                    width: 1,
-                  ),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    isExpanded: true,
-                    value: courts.isNotEmpty ? (selectedCourt?.name ?? '') : '',
-                    icon: Container(
-                      margin: const EdgeInsets.only(right: 4),
-                      child: const Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Color(0xFF1B2C4F),
-                        size: 20,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  // View Calendar button
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        showCalendar = !showCalendar;
+                      });
+                    },
+                    child: Text(
+                      showCalendar
+                          ? 'Hide Calendar'
+                          : 'View Calendar',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF1B2C4F),
+                        decoration: showCalendar ? TextDecoration.underline : null,
                       ),
                     ),
-                    style: const TextStyle(
-                      color: Color(0xFF1B2C4F),
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                    ),
-                    dropdownColor: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    elevation: 2,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    itemHeight: 48,
-                    items: courts.isNotEmpty
-                        ? courts
+                  ),
+                ],
+              ),
+              const SizedBox(height: 2), // Spacing between header and dropdowns
+              // Sports dropdown row
+              if (widget.selectedVenue != null && widget.selectedVenue!.sports.isNotEmpty)
+                Row(
+                  children: [
+                    Container(
+                      height: 40,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Colors.grey[300]!,
+                          width: 1,
+                        ),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          isExpanded: true,
+                          value: selectedSport ?? widget.selectedVenue!.sports.first,
+                          icon: Container(
+                            margin: const EdgeInsets.only(right: 4),
+                            child: const Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Color(0xFF1B2C4F),
+                              size: 20,
+                            ),
+                          ),
+                          style: const TextStyle(
+                            color: Color(0xFF1B2C4F),
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                          dropdownColor: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          elevation: 2,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          itemHeight: 48,
+                          items: widget.selectedVenue!.sports
                               .map(
-                                (court) => DropdownMenuItem<String>(
-                                  value: court.name,
+                                (sport) => DropdownMenuItem<String>(
+                                  value: sport,
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 8,
@@ -2082,14 +2131,14 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                                     child: Row(
                                       children: [
                                         Icon(
-                                          Icons.sports_tennis,
+                                          _getSportIcon(sport),
                                           size: 16,
                                           color: const Color(0xFF1B2C4F),
                                         ),
                                         const SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
-                                            court.name,
+                                            sport,
                                             style: const TextStyle(
                                               color: Color(0xFF2D3142),
                                               fontWeight: FontWeight.w500,
@@ -2098,85 +2147,24 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                        Text(
-                                          court.type,
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                        ),
                                       ],
                                     ),
                                   ),
                                 ),
                               )
-                              .toList()
-                        : [
-                            DropdownMenuItem<String>(
-                              value: '',
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                ),
-                                child: const Row(
-                                  children: [
-                                    Icon(
-                                      Icons.sports_outlined,
-                                      size: 16,
-                                      color: Color(0xFF999999),
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      'No courts available',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(0xFF999999),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                    onChanged: courts.isNotEmpty
-                        ? (String? newValue) {
+                              .toList(),
+                          onChanged: (String? newValue) {
                             if (newValue != null) {
                               setState(() {
-                                for (int i = 0; i < courts.length; i++) {
-                                  if (courts[i].name == newValue) {
-                                    selectedCourtIndex = i;
-                                    _updateTimeSlots(); // Add this line to update time slots
-                                    return;
-                                  }
-                                }
+                                selectedSport = newValue;
                               });
                             }
-                          }
-                        : null,
-                  ),
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              // View Calendar button
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    showCalendar = !showCalendar;
-                  });
-                },
-                child: Text(
-                  showCalendar
-                      ? 'Hide Calendar'
-                      : 'View Calendar',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: const Color(0xFF1B2C4F),
-                    decoration: showCalendar ? TextDecoration.underline : null,
-                  ),
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 25),
@@ -3830,6 +3818,10 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       }
     }
   }
+
+  IconData _getSportIcon(String sport) {
+    return SportIconHelper.getSportIcon(sport);
+  }
 }
 
 // VenueSelectionSection class
@@ -3907,7 +3899,7 @@ class VenueSelectionSection extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
-                              _getSportIcon(
+                              SportIconHelper.getSportIcon(
                                 venueData['sport']?.toString() ?? 'Football',
                               ),
                               color: const Color(0xFF1B2C4F),
@@ -3928,7 +3920,7 @@ class VenueSelectionSection extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(
-                              _getSportIcon(
+                              SportIconHelper.getSportIcon(
                                 venueData['sport']?.toString() ?? 'Football',
                               ),
                               color: const Color(0xFF1B2C4F),
@@ -3971,21 +3963,6 @@ class VenueSelectionSection extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        const Icon(
-                          Icons.star_rounded,
-                          size: 14,
-                          color: Color(0xFFF59E0B),
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          '${venueData['rating'] ?? 4.8}',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF374151),
-                          ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -4016,26 +3993,6 @@ class VenueSelectionSection extends StatelessWidget {
     );
   }
 
-  IconData _getSportIcon(String sport) {
-    switch (sport.toLowerCase()) {
-      case 'football':
-        return Icons.sports_soccer;
-      case 'basketball':
-        return Icons.sports_basketball;
-      case 'tennis':
-        return Icons.sports_tennis;
-      case 'badminton':
-        return Icons.sports_tennis;
-      case 'cricket':
-        return Icons.sports_cricket;
-      case 'baseball':
-        return Icons.sports_baseball;
-      case 'table tennis':
-        return Icons.table_bar;
-      default:
-        return Icons.sports_soccer;
-    }
-  }
 
   String _getCourtImage(String sport) {
     switch (sport.toLowerCase()) {
@@ -4092,54 +4049,6 @@ class VenueSelectionSection extends StatelessWidget {
     );
   }
 
-  Widget _buildSportsDropdown(Map<String, dynamic> venueData) {
-    final List<String> availableSports = 
-        List<String>.from(venueData['sports_available'] ?? []);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Available Sports',
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF6B7280),
-          ),
-        ),
-        const SizedBox(height: 6),
-        if (availableSports.isNotEmpty)
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: availableSports.map((sport) {
-              return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 3,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(
-                    color: Colors.blue.withOpacity(0.2),
-                    width: 0.5,
-                  ),
-                ),
-                child: Text(
-                  sport,
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.blue[700],
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-      ],
-    );
-  }
 
   Widget _buildSportsContainers(Map<String, dynamic> venueData) {
     final List<String> availableSports = 
