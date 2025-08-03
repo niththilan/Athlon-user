@@ -129,15 +129,15 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1B2C4F),
-        elevation: _isScrolled ? 2 : 0,
+        elevation: 0,
         toolbarHeight: 50,
         title: const Text(
           "Search",
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
             fontFamily: 'Poppins',
             color: Colors.white,
@@ -155,7 +155,87 @@ class _SearchScreenState extends State<SearchScreen> {
       ),
       body: Column(
         children: [
-          _buildSearchBar(),
+          // Search bar
+          Container(
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F6FA),
+              boxShadow: _isScrolled
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        offset: const Offset(0, 1),
+                        blurRadius: 5,
+                      ),
+                    ]
+                  : [],
+            ),
+            child: _buildSearchBar(),
+          ),
+          // Results header - only show when there are search results
+          if (_searchController.text.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              child: Row(
+                children: [
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: "Found ",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey[700],
+                            ),
+                          ),
+                          TextSpan(
+                            text: "${_searchResults.length} venues",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1B2C4F),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Sort & Filter button
+                  TextButton.icon(
+                    icon: const Icon(
+                      Icons.tune_rounded,
+                      size: 18,
+                      color: Color(0xFF1B2C4F),
+                    ),
+                    label: const Text(
+                      "Filter",
+                      style: TextStyle(
+                        color: Color(0xFF1B2C4F),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    style: TextButton.styleFrom(
+                      backgroundColor: const Color(0xFFF5F6FA),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () {
+                      _showCustomSnackBar(context, "Filter options");
+                    },
+                  ),
+                ],
+              ),
+            ),
           Expanded(
             child: _searchController.text.isEmpty
                 ? _buildRecentSearches()
@@ -176,91 +256,82 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Widget _buildSearchBar() {
     return Container(
-      margin: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+      height: 48, // Fixed height to prevent expansion
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1B2C4F).withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
+            color: const Color(0xFF1B2C4F).withOpacity(0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: TextField(
-          controller: _searchController,
-          autofocus: true,
-          style: const TextStyle(
-            color: Color(0xFF2D3142),
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-          ),
-          textAlignVertical: TextAlignVertical.center,
-          decoration: InputDecoration(
-            hintText: 'Search sports venues...',
-            hintStyle: TextStyle(
-              color: Colors.grey[400],
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Row(
+          children: [
+            const Icon(
+              Icons.search_outlined, // outlined version
+              color: Color(0xFF1B2C4F),
+              size: 22,
             ),
-            prefixIcon: Container(
-              padding: const EdgeInsets.all(2),
-              child: const Icon(
-                Icons.search_rounded,
-                color: Color(0xFF1B2C4F),
-                size: 24,
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: _searchController,
+                autofocus: true,
+                maxLines: 1, // Ensure single line
+                decoration: InputDecoration(
+                  hintText: 'Search sports venues...',
+                  hintStyle: TextStyle(
+                    color: Colors.grey[400],
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  border: InputBorder.none,
+                  isCollapsed: true,
+                  contentPadding: EdgeInsets.zero, // Remove default padding
+                ),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF1B2C4F),
+                ),
+                onChanged: (value) {
+                  if (value.isNotEmpty) {
+                    _performSearch(value);
+                  } else {
+                    setState(() {
+                      _searchResults.clear();
+                    });
+                  }
+                },
+                onSubmitted: (value) {
+                  if (value.trim().isNotEmpty) {
+                    // Add to search history logic can be added here if needed
+                  }
+                },
               ),
             ),
-            suffixIcon: _searchController.text.isNotEmpty
-                ? Container(
-                    padding: const EdgeInsets.all(10),
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.clear_rounded,
-                        color: Color(0xFF1B2C4F),
-                        size: 22,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _searchController.clear();
-                          _searchResults.clear();
-                        });
-                      },
-                    ),
-                  )
-                : null,
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 10,
-            ),
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(
-                color: const Color(0xFF1B2C4F).withOpacity(0.2),
-                width: 1.5,
+            if (_searchController.text.isNotEmpty)
+              IconButton(
+                icon: const Icon(
+                  Icons.clear_rounded,
+                  color: Color(0xFF1B2C4F),
+                  size: 20,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _searchController.clear();
+                    _searchResults.clear();
+                  });
+                },
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
               ),
-            ),
-            isDense: true,
-            isCollapsed: false,
-            floatingLabelBehavior: FloatingLabelBehavior.never,
-            alignLabelWithHint: true,
-          ),
-          onChanged: (value) {
-            if (value.isNotEmpty) {
-              _performSearch(value);
-            } else {
-              setState(() {
-                _searchResults.clear();
-              });
-            }
-          },
+          ],
         ),
       ),
     );
@@ -275,7 +346,7 @@ class _SearchScreenState extends State<SearchScreen> {
           child: Text(
             "Recent Searches",
             style: TextStyle(
-              fontSize: 18,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
               color: Color(0xFF1B2C4F),
             ),
@@ -401,60 +472,15 @@ class _SearchScreenState extends State<SearchScreen> {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(32, 12, 24, 4),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Venues (${_searchResults.length})",
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1B2C4F),
-                ),
-              ),
-              TextButton.icon(
-                onPressed: () {
-                  _showCustomSnackBar(context, "Filter options");
-                },
-                icon: const Icon(
-                  Icons.filter_list_rounded,
-                  size: 20,
-                  color: Color(0xFF1B2C4F),
-                ),
-                label: const Text(
-                  "Filter",
-                  style: TextStyle(
-                    color: Color(0xFF1B2C4F),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 4,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            controller: _scrollController,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-            physics: const BouncingScrollPhysics(),
-            itemCount: _searchResults.length,
-            itemBuilder: (context, index) {
-              final venue = _searchResults[index];
-              return Container(
+    return Expanded(
+      child: ListView.builder(
+        controller: _scrollController,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+        physics: const BouncingScrollPhysics(),
+        itemCount: _searchResults.length,
+        itemBuilder: (context, index) {
+          final venue = _searchResults[index];
+          return Container(
                 margin: const EdgeInsets.only(bottom: 20.0),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -743,9 +769,7 @@ class _SearchScreenState extends State<SearchScreen> {
               );
             },
           ),
-        ),
-      ],
-    );
+        );
   }
 
   // Helper function to convert VenueResult to VenueModel
