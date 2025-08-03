@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'favourites.dart';
 import 'bookings.dart';
 import 'footer.dart';
+import 'widgets/football_spinner.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -585,10 +586,9 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            _themeNavyBlue,
-                          ),
+                        FootballSpinner(
+                          size: 50.0,
+                          color: _themeNavyBlue,
                         ),
                         const SizedBox(height: 16),
                         Text(
@@ -1283,8 +1283,9 @@ class _SportsCategoriesState extends State<SportsCategories> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(widget.themeNavyBlue),
+        child: FootballSpinner(
+          size: 30.0,
+          color: widget.themeNavyBlue,
         ),
       );
     }
