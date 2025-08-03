@@ -1,10 +1,10 @@
 // ignore_for_file: deprecated_member_use, file_names
 import 'package:athlon_user/customers/courtDetails.dart';
 import 'package:athlon_user/customers/footer.dart';
+import 'package:athlon_user/customers/bookings.dart';
 import 'package:flutter/material.dart';
 //import 'bookNow.dart';
 import 'filter_screen.dart';
-import 'bookings.dart';
 import 'widgets/football_spinner.dart';
 
 void main() {
@@ -114,7 +114,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 1.2,
       imageUrl:
           "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Futsal", "Cricket", "Indoor"],
+      sports: ["Futsal", "Cricket", "Basketball", "Badminton", "Tennis"],
       openingHours: "6:00 AM - 11:00 PM",
       ratePerHour: "Rs. 3,000",
     ),
@@ -126,7 +126,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 3.5,
       imageUrl:
           "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Futsal", "Cricket", "Indoor"],
+      sports: ["Futsal", "Cricket", "Squash", "Table Tennis", "Volleyball"],
       openingHours: "7:00 AM - 10:00 PM",
       ratePerHour: "Rs. 2,500",
     ),
@@ -138,7 +138,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 0.8,
       imageUrl:
           "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Badminton", "Tennis", "Squash", "Outdoor"],
+      sports: ["Badminton", "Tennis", "Squash", "Table Tennis", "Swimming"],
       openingHours: "6:00 AM - 10:00 PM",
       ratePerHour: "Rs. 2,000",
     ),
@@ -150,7 +150,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 5.2,
       imageUrl:
           "https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Swimming", "Water Polo", "Diving"],
+      sports: ["Swimming", "Water Polo", "Diving", "Aqua Aerobics", "Yoga"],
       openingHours: "5:30 AM - 9:30 PM",
       ratePerHour: "Rs. 1,200",
     ),
@@ -162,7 +162,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 2.7,
       imageUrl:
           "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Basketball", "Volleyball"],
+      sports: ["Basketball", "Volleyball", "Futsal", "Netball", "Fitness"],
       openingHours: "7:00 AM - 11:00 PM",
       ratePerHour: "Rs. 1,800",
     ),
@@ -174,7 +174,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 8.6,
       imageUrl:
           "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Golf"],
+      sports: ["Golf", "Tennis", "Swimming", "Fitness", "Dining"],
       openingHours: "6:00 AM - 8:00 PM",
       ratePerHour: "Rs. 5,000",
     ),
@@ -186,7 +186,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 1.5,
       imageUrl:
           "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Tennis", "Badminton"],
+      sports: ["Tennis", "Badminton", "Squash", "Swimming", "Yoga"],
       openingHours: "6:00 AM - 8:00 PM",
       ratePerHour: "Rs. 2,000",
     ),
@@ -198,7 +198,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 12.3,
       imageUrl:
           "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Surfing", "Swimming", "Beach Volleyball"],
+      sports: ["Surfing", "Swimming", "Beach Volleyball", "Diving", "Yoga"],
       openingHours: "7:00 AM - 6:00 PM",
       ratePerHour: "Rs. 1,500",
     ),
@@ -210,7 +210,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 1.9,
       imageUrl:
           "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Yoga", "Pilates", "Fitness"],
+      sports: ["Yoga", "Pilates", "Fitness", "Zumba", "Boxing"],
       openingHours: "6:30 AM - 10:30 PM",
       ratePerHour: "Rs. 1,000",
     ),
@@ -222,7 +222,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 10.5,
       imageUrl:
           "https://images.unsplash.com/photo-1541625602330-2277a4c46182?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Mountain Biking", "Hiking", "Trail Running"],
+      sports: ["Mountain Biking", "Hiking", "Trail Running", "Rock Climbing", "Camping"],
       openingHours: "6:00 AM - 6:00 PM",
       ratePerHour: "Rs. 800",
     ),
@@ -234,7 +234,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 4.3,
       imageUrl:
           "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Boxing", "MMA", "Kickboxing"],
+      sports: ["Boxing", "MMA", "Kickboxing", "Fitness", "Wrestling"],
       openingHours: "7:00 AM - 10:00 PM",
       ratePerHour: "Rs. 1,500",
     ),
@@ -246,7 +246,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 7.8,
       imageUrl:
           "https://images.unsplash.com/photo-1531415074968-036ba1b575da?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Cricket", "Baseball"],
+      sports: ["Cricket", "Baseball", "Softball", "Rugby", "Football"],
       openingHours: "6:00 AM - 9:00 PM",
       ratePerHour: "Rs. 2,500",
     ),
@@ -258,7 +258,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       distance: 9.2,
       imageUrl:
           "https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Rock Climbing", "Bouldering", "Rappelling"],
+      sports: ["Rock Climbing", "Bouldering", "Rappelling", "Hiking", "Camping"],
       openingHours: "7:00 AM - 5:00 PM",
       ratePerHour: "Rs. 2,000",
     ),
@@ -719,7 +719,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     );
   }
 
-  // CLEAN AND SPACIOUS VENUE CARD DESIGN
+  // MINIMAL & MODERN VENUE CARD DESIGN
   Widget _buildVenueCard(VenueModel venue, bool isFavorite) {
     final Map<String, dynamic> courtData = {
       'id': venue.id,
@@ -778,59 +778,59 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
         );
       },
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16.0),
+        margin: const EdgeInsets.only(bottom: 20.0),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image Section
+            // Image Section with modern overlay
             Container(
-              height: 140,
+              height: 160,
               width: double.infinity,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
                 ),
-                color: Colors.grey[200],
+                color: Colors.grey[50],
               ),
               child: Stack(
                 children: [
                   ClipRRect(
                     borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
                     ),
                     child: Image.network(
                       venue.imageUrl,
                       width: double.infinity,
-                      height: 140,
+                      height: 160,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
-                          color: Colors.grey[100],
-                          child: const Center(
+                          color: Colors.grey[50],
+                          child: Center(
                             child: Icon(
-                              Icons.image_not_supported,
-                              size: 32,
-                              color: Colors.grey,
+                              Icons.image_outlined,
+                              size: 24,
+                              color: Colors.grey[400],
                             ),
                           ),
                         );
                       },
                     ),
                   ),
-                  // Favorite button
+                  // Minimal favorite button
                   Positioned(
                     top: 16,
                     right: 16,
@@ -840,32 +840,25 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                         isFavorite ? Icons.favorite : Icons.favorite_border,
                         color: isFavorite ? Colors.red : Colors.white,
                         size: 24,
-                        shadows: [
-                          Shadow(
-                            color: Colors.black.withOpacity(0.3),
-                            offset: const Offset(0, 1),
-                            blurRadius: 2,
-                          ),
-                        ],
                       ),
                     ),
                   ),
-                  // Rating badge
+                  // Rating badge on image
                   Positioned(
-                    bottom: 16,
+                    bottom: 12,
                     left: 16,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
+                        horizontal: 8,
+                        vertical: 4,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(10),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
+                            blurRadius: 4,
                             offset: const Offset(0, 2),
                           ),
                         ],
@@ -873,18 +866,18 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.star,
-                            color: Colors.orange,
-                            size: 14,
+                            color: Colors.orange[600],
+                            size: 12,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             venue.rating.toString(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: Colors.orange,
+                              color: Colors.orange[600],
                             ),
                           ),
                         ],
@@ -895,18 +888,18 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
               ),
             ),
 
-            // Content Section
+            // Content Section with clean layout
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Venue Name
+                  // Venue name
                   Text(
                     venue.title,
                     style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                       color: Color(0xFF1B2C4F),
                       height: 1.2,
                     ),
@@ -914,22 +907,22 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                     overflow: TextOverflow.ellipsis,
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 8),
 
-                  // Location with icon
+                  // Location
                   Row(
                     children: [
                       Icon(
                         Icons.location_on_outlined,
-                        size: 16,
+                        size: 14,
                         color: Colors.grey[500],
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           venue.location,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 12,
                             color: Colors.grey[600],
                             height: 1.3,
                           ),
@@ -940,59 +933,96 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                     ],
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
-                  // Distance and Sport tags
+                  // Distance and Sports
                   Row(
                     children: [
                       // Distance
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
+                          horizontal: 8,
+                          vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1B2C4F).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          color: const Color(0xFF1B2C4F).withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          "${venue.distance.toStringAsFixed(1)} km away",
+                          "${venue.distance.toStringAsFixed(1)} km",
                           style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
                             color: Color(0xFF1B2C4F),
                           ),
                         ),
                       ),
-
                       const SizedBox(width: 8),
-
-                      // Primary Sport
-                      if (venue.sports.isNotEmpty)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.green.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            venue.sports.first,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.green,
-                            ),
+                      // Opening status
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          "Open Now",
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.green[600],
                           ),
                         ),
+                      ),
+                    ],
+                  ),
 
-                      const Spacer(),
+                  
 
-                      // Book Button
+                  // Sports tags and Book Now button
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      // Sports tags (up to 3)
+                      if (venue.sports.isNotEmpty)
+                        Expanded(
+                          child: Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
+                            children: venue.sports.take(3).map((sport) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: Colors.blue.withOpacity(0.2),
+                                    width: 0.5,
+                                  ),
+                                ),
+                                child: Text(
+                                  sport,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.blue[700],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      
+                      // Book Now button
                       ElevatedButton(
                         onPressed: () {
+                          // Navigate to bookings screen
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -1004,18 +1034,20 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                           backgroundColor: const Color(0xFF1B2C4F),
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 20,
-                            vertical: 10,
+                            vertical: 12,
                           ),
                           elevation: 0,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: const Text(
                           'Book Now',
                           style: TextStyle(
-                            fontSize: 13,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
