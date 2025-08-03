@@ -842,12 +842,31 @@ class VenueCard extends StatelessWidget {
       height: 240,
       child: GestureDetector(
         onTap: () {
-          // Navigate to CourtDetailScreen when tapped
+          // Navigate to CourtDetailScreen when tapped with venue data
           Navigator.push(
             context,
             PageRouteBuilder(
               pageBuilder: (context, animation, secondaryAnimation) =>
-                  const CourtDetailScreen(),
+                  CourtDetailScreen(
+                    courtData: {
+                      'id': venue.id,
+                      'name': venue.title,
+                      'type': venue.sports.isNotEmpty ? venue.sports.first : 'Sports Facility',
+                      'location': venue.location,
+                      'distance': '${venue.distance} km away',
+                      'rating': venue.rating,
+                      'total_reviews': 124,
+                      'price_per_hour': double.tryParse(venue.ratePerHour.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0.0,
+                      'opening_hours': venue.openingHours,
+                      'closing_time': 'Closes at 11:00 PM',
+                      'phone': '+94 77 123 4567',
+                      'email': 'info@${venue.title.toLowerCase().replaceAll(' ', '')}.lk',
+                      'website': 'www.${venue.title.toLowerCase().replaceAll(' ', '')}.lk',
+                      'description': 'Premium sports facility with state-of-the-art equipment and professional-grade surfaces.',
+                      'images': [venue.imageUrl],
+                      'sports_available': venue.sports,
+                    },
+                  ),
               transitionDuration: Duration.zero,
               reverseTransitionDuration: Duration.zero,
             ),

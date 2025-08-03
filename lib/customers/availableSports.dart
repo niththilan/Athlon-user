@@ -6,6 +6,7 @@ import 'bookings.dart';
 import 'footer.dart';
 import 'widgets/football_spinner.dart';
 import 'nearbyVenues.dart';
+import 'courtDetails.dart' as court;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -761,28 +762,58 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                       ),
                                       child: Stack(
                                         children: [
-                                          ClipRRect(
-                                            borderRadius: const BorderRadius.only(
-                                              topLeft: Radius.circular(16),
-                                              topRight: Radius.circular(16),
-                                            ),
-                                            child: Image.network(
-                                              venue['image_path'] ?? '',
-                                              width: double.infinity,
-                                              height: 160,
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) {
-                                                return Container(
-                                                  color: Colors.grey[50],
-                                                  child: Center(
-                                                    child: Icon(
-                                                      Icons.image_outlined,
-                                                      size: 24,
-                                                      color: Colors.grey[400],
-                                                    ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              // Navigate to court details page
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => court.CourtDetailScreen(
+                                                    courtData: {
+                                                      'id': venue['id'],
+                                                      'name': venue['title'],
+                                                      'type': venue['sport'],
+                                                      'location': venue['location'],
+                                                      'distance': venue['distance'],
+                                                      'rating': venue['rating'],
+                                                      'total_reviews': 124,
+                                                      'price_per_hour': double.tryParse(venue['rate_per_hour']?.toString().replaceAll(RegExp(r'[^\d.]'), '') ?? '0') ?? 0.0,
+                                                      'opening_hours': venue['opening_hours'] ?? 'Open Now',
+                                                      'closing_time': 'Closes at 11:00 PM',
+                                                      'phone': '+94 77 123 4567',
+                                                      'email': 'info@venue.lk',
+                                                      'website': 'www.venue.lk',
+                                                      'description': 'Premium sports facility with state-of-the-art equipment.',
+                                                      'images': [venue['image_path'] ?? ''],
+                                                      'sports_available': [venue['sport']],
+                                                    },
                                                   ),
-                                                );
-                                              },
+                                                ),
+                                              );
+                                            },
+                                            child: ClipRRect(
+                                              borderRadius: const BorderRadius.only(
+                                                topLeft: Radius.circular(16),
+                                                topRight: Radius.circular(16),
+                                              ),
+                                              child: Image.network(
+                                                venue['image_path'] ?? '',
+                                                width: double.infinity,
+                                                height: 160,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error, stackTrace) {
+                                                  return Container(
+                                                    color: Colors.grey[50],
+                                                    child: Center(
+                                                      child: Icon(
+                                                        Icons.image_outlined,
+                                                        size: 24,
+                                                        color: Colors.grey[400],
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
                                             ),
                                           ),
                                           // Minimal favorite button
