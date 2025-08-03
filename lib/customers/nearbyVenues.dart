@@ -1022,11 +1022,13 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       // Book Now button
                       ElevatedButton(
                         onPressed: () {
-                          // Navigate to bookings screen
+                          // Navigate to bookings screen with venue data
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const SlotsPage(),
+                              builder: (context) => SlotsPage(
+                                selectedVenue: venue,
+                              ),
                             ),
                           );
                         },

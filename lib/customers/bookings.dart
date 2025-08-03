@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'footer.dart';
+import 'nearbyVenues.dart';
 
 // Data models (matching homepage structure)
 class Facility {
@@ -85,8 +86,9 @@ class SlotsBookingApp extends StatelessWidget {
 
 class SlotsPage extends StatefulWidget {
   final String? selectedCourtId;
+  final VenueModel? selectedVenue;
 
-  const SlotsPage({Key? key, this.selectedCourtId}) : super(key: key);
+  const SlotsPage({Key? key, this.selectedCourtId, this.selectedVenue}) : super(key: key);
 
   @override
   State<SlotsPage> createState() => _SlotsPageState();
@@ -149,6 +151,9 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   // Mock booking data storage
   Map<String, Map<String, Map<String, String>>> mockBookings = {};
 
+  // Selected venue and sport dropdown
+  String? selectedSport;
+
   @override
   void initState() {
     super.initState();
@@ -157,6 +162,11 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     _initializeFacilities();
     _initializeSelectedSlots();
     _loadVenueOpeningHours();
+    
+    // Initialize selected sport from venue data
+    if (widget.selectedVenue != null && widget.selectedVenue!.sports.isNotEmpty) {
+      selectedSport = widget.selectedVenue!.sports.first;
+    }
   }
 
   @override
@@ -1849,13 +1859,27 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: VenueSelectionSection(
-                venue: {
+                venue: widget.selectedVenue != null ? {
+                  'title': widget.selectedVenue!.title,
+                  'location': widget.selectedVenue!.location,
+                  'sport': selectedSport ?? widget.selectedVenue!.sports.first,
+                  'rating': widget.selectedVenue!.rating,
+                  'rate_per_hour': widget.selectedVenue!.ratePerHour,
+                  'distance': '${widget.selectedVenue!.distance.toStringAsFixed(1)} km',
+                  'sports_available': widget.selectedVenue!.sports,
+                  'imageUrl': widget.selectedVenue!.imageUrl,
+                } : {
                   'title': selectedCourt?.name ?? 'Selected Court',
                   'location': 'Sports Complex, 1.2 km',
                   'sport': selectedCourt?.type ?? 'Football',
                   'rating': 4.8,
                   'rate_per_hour': 'Rs. ${selectedCourt?.hourlyRate ?? 700}',
                   'distance': '1.2 km',
+                },
+                onSportChanged: (String sport) {
+                  setState(() {
+                    selectedSport = sport;
+                  });
                 },
               ),
             ),
@@ -3811,8 +3835,9 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
 // VenueSelectionSection class
 class VenueSelectionSection extends StatelessWidget {
   final Map<String, dynamic>? venue;
+  final Function(String)? onSportChanged;
 
-  const VenueSelectionSection({super.key, this.venue});
+  const VenueSelectionSection({super.key, this.venue, this.onSportChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -3871,27 +3896,47 @@ class VenueSelectionSection extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.asset(
-                    _getCourtImage(
-                      venueData['sport']?.toString() ?? 'Football',
-                    ),
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF3F4F6),
-                          borderRadius: BorderRadius.circular(12),
+                  child: venueData['imageUrl'] != null 
+                    ? Image.network(
+                        venueData['imageUrl'],
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF3F4F6),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              _getSportIcon(
+                                venueData['sport']?.toString() ?? 'Football',
+                              ),
+                              color: const Color(0xFF1B2C4F),
+                              size: 32,
+                            ),
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        _getCourtImage(
+                          venueData['sport']?.toString() ?? 'Football',
                         ),
-                        child: Icon(
-                          _getSportIcon(
-                            venueData['sport']?.toString() ?? 'Football',
-                          ),
-                          color: const Color(0xFF1B2C4F),
-                          size: 32,
-                        ),
-                      );
-                    },
-                  ),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF3F4F6),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(
+                              _getSportIcon(
+                                venueData['sport']?.toString() ?? 'Football',
+                              ),
+                              color: const Color(0xFF1B2C4F),
+                              size: 32,
+                            ),
+                          );
+                        },
+                      ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -3944,19 +3989,23 @@ class VenueSelectionSection extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        _buildAmenityTag(
-                          _getSportFormat(
-                            venueData['sport']?.toString() ?? 'Football',
+                    // Sports containers section
+                    if (venueData['sports_available'] != null)
+                      _buildSportsContainers(venueData),
+                    if (venueData['sports_available'] == null)
+                      Row(
+                        children: [
+                          _buildAmenityTag(
+                            _getSportFormat(
+                              venueData['sport']?.toString() ?? 'Football',
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        _buildAmenityTag('Indoor'),
-                        const SizedBox(width: 8),
-                        _buildAmenityTag('Parking'),
-                      ],
-                    ),
+                          const SizedBox(width: 8),
+                          _buildAmenityTag('Indoor'),
+                          const SizedBox(width: 8),
+                          _buildAmenityTag('Parking'),
+                        ],
+                      ),
                   ],
                 ),
               ),
@@ -4040,6 +4089,95 @@ class VenueSelectionSection extends StatelessWidget {
           color: Color(0xFF6B7280),
         ),
       ),
+    );
+  }
+
+  Widget _buildSportsDropdown(Map<String, dynamic> venueData) {
+    final List<String> availableSports = 
+        List<String>.from(venueData['sports_available'] ?? []);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Available Sports',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: Color(0xFF6B7280),
+          ),
+        ),
+        const SizedBox(height: 6),
+        if (availableSports.isNotEmpty)
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: availableSports.map((sport) {
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: Colors.blue.withOpacity(0.2),
+                    width: 0.5,
+                  ),
+                ),
+                child: Text(
+                  sport,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.blue[700],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildSportsContainers(Map<String, dynamic> venueData) {
+    final List<String> availableSports = 
+        List<String>.from(venueData['sports_available'] ?? []);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (availableSports.isNotEmpty)
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: availableSports.take(3).map((sport) {
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: Colors.blue.withOpacity(0.2),
+                    width: 0.5,
+                  ),
+                ),
+                child: Text(
+                  sport,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.blue[700],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+      ],
     );
   }
 }
