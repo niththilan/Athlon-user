@@ -585,6 +585,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   // Search bar method - matches home page style
   Widget _buildSearchBar() {
     return Container(
+      height: 48, // Fixed height to prevent expansion
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -610,6 +611,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
               child: TextField(
                 controller: _searchController,
                 focusNode: _searchFocusNode,
+                maxLines: 1, // Ensure single line
                 decoration: InputDecoration(
                   hintText: 'Search sports venues...',
                   hintStyle: TextStyle(
@@ -619,6 +621,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                   ),
                   border: InputBorder.none,
                   isCollapsed: true,
+                  contentPadding: EdgeInsets.zero, // Remove default padding
                 ),
                 style: const TextStyle(
                   fontSize: 14,
@@ -705,7 +708,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   Widget _buildVenuesList() {
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16), // Reduced top padding from 4 to 0
       itemCount: _filteredVenues.length,
       itemBuilder: (context, index) {
         final venue = _filteredVenues[index];
@@ -716,7 +719,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     );
   }
 
-  // UPDATED VENUE CARD WITH PROPER NAVIGATION
+  // CLEAN AND SPACIOUS VENUE CARD DESIGN
   Widget _buildVenueCard(VenueModel venue, bool isFavorite) {
     final Map<String, dynamic> courtData = {
       'id': venue.id,
@@ -761,283 +764,269 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       'sports_available': venue.sports,
     };
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+    return GestureDetector(
+      onTap: () {
+        // Navigate to CourtDetailScreen when card is tapped
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                CourtDetailScreen(courtData: courtData),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
           ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image with favorite button
-              Stack(
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image Section
+            Container(
+              height: 140,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                color: Colors.grey[200],
+              ),
+              child: Stack(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      // Navigate to CourtDetailScreen when image is tapped
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  CourtDetailScreen(courtData: courtData),
-                          transitionDuration: Duration.zero,
-                          reverseTransitionDuration: Duration.zero,
-                        ),
-                      );
-                    },
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
-                      ),
-                      child: Container(
-                        height: 160,
-                        width: double.infinity,
-                        color: Colors.grey[200],
-                        child: Image.network(
-                          venue.imageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: Colors.grey[100],
-                              child: const Center(
-                                child: Icon(
-                                  Icons.image_not_supported,
-                                  size: 40,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    child: Image.network(
+                      venue.imageUrl,
+                      width: double.infinity,
+                      height: 140,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[100],
+                          child: const Center(
+                            child: Icon(
+                              Icons.image_not_supported,
+                              size: 32,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                   // Favorite button
                   Positioned(
-                    top: 12,
-                    right: 12,
+                    top: 16,
+                    right: 16,
                     child: GestureDetector(
                       onTap: () => _toggleFavorite(venue.id),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_border,
-                          color: isFavorite ? Colors.red : Colors.white,
-                          size: 24,
-                          shadows: isFavorite
-                              ? []
-                              : [
-                                  Shadow(
-                                    color: Colors.black.withOpacity(0.3),
-                                    offset: const Offset(0, 1),
-                                    blurRadius: 2,
-                                  ),
-                                ],
-                        ),
+                      child: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: isFavorite ? Colors.red : Colors.white,
+                        size: 24,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black.withOpacity(0.3),
+                            offset: const Offset(0, 1),
+                            blurRadius: 2,
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  // Distance badge
+                  // Rating badge
                   Positioned(
-                    bottom: 12,
-                    left: 12,
+                    bottom: 16,
+                    left: 16,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                        horizontal: 10,
+                        vertical: 6,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
-                        borderRadius: BorderRadius.circular(12),
+                        color: Colors.white.withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        "${venue.distance.toStringAsFixed(1)} km",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: Colors.orange,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            venue.rating.toString(),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.orange,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ],
               ),
+            ),
 
-              // Venue details
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Venue name
-                    Text(
-                      venue.title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF2D3142),
+            // Content Section
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Venue Name
+                  Text(
+                    venue.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1B2C4F),
+                      height: 1.2,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Location with icon
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 16,
+                        color: Colors.grey[500],
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    // Location
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on_outlined,
-                          size: 14,
-                          color: Colors.grey[500],
-                        ),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            venue.location,
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.grey[600],
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // Rating and Price
-                    Row(
-                      children: [
-                        // Rating
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.orange.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.star,
-                                color: Colors.orange,
-                                size: 12,
-                              ),
-                              const SizedBox(width: 2),
-                              Text(
-                                venue.rating.toString(),
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.orange,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(width: 8),
-
-                        // Price
-                        Text(
-                          venue.ratePerHour,
-                          style: const TextStyle(
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          venue.location,
+                          style: TextStyle(
                             fontSize: 14,
+                            color: Colors.grey[600],
+                            height: 1.3,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Distance and Sport tags
+                  Row(
+                    children: [
+                      // Distance
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1B2C4F).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          "${venue.distance.toStringAsFixed(1)} km away",
+                          style: const TextStyle(
+                            fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF1B2C4F),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
 
-                    const SizedBox(height: 8),
+                      const SizedBox(width: 8),
 
-                    // Sports tags (simplified)
-                    Wrap(
-                      spacing: 4,
-                      runSpacing: 4,
-                      children: venue.sports.take(3).map((sport) {
-                        return Container(
+                      // Primary Sport
+                      if (venue.sports.isNotEmpty)
+                        Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
+                            horizontal: 12,
+                            vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1B2C4F).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
+                            color: Colors.green.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            sport,
+                            venue.sports.first,
                             style: const TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF1B2C4F),
-                              fontWeight: FontWeight.w500,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.green,
                             ),
                           ),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+                        ),
 
-          // Book Now button positioned in bottom-right corner - navigates to SlotsPage
-          Positioned(
-            bottom: 10,
-            right: 14,
-            child: ElevatedButton(
-              onPressed: () {
-                // Navigate directly to SlotsPage
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SlotsPage(),
+                      const Spacer(),
+
+                      // Book Button
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const SlotsPage(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1B2C4F),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          'Book Now',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1B2C4F),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                elevation: 2,
-              ),
-              child: const Text(
-                'Book Now',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
