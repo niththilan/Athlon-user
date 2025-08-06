@@ -145,7 +145,8 @@ class SlotsPage extends StatefulWidget {
   final String? selectedCourtId;
   final VenueModel? selectedVenue;
 
-  const SlotsPage({Key? key, this.selectedCourtId, this.selectedVenue}) : super(key: key);
+  const SlotsPage({Key? key, this.selectedCourtId, this.selectedVenue})
+    : super(key: key);
 
   @override
   State<SlotsPage> createState() => _SlotsPageState();
@@ -155,7 +156,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   DateTime selectedDate = DateTime.now();
   Set<String> selectedSlots = {}; // For new reservations (available slots)
   String? selectedBookingId; // Track the currently selected booking for removal
-  int currentFooterIndex = 0;
+  int currentFooterIndex = 2;
   bool showCalendar = false;
 
   late List<DateTime> dateList;
@@ -235,7 +236,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       hourlyRate: 2000.0,
     ),
   ];
-  
+
   String? currentFacilityId = 'facility_1'; // Mock facility ID
 
   int selectedCourtIndex = 0;
@@ -243,7 +244,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   Court? get selectedCourt {
     // Get courts for the currently selected sport
     final courtsForSport = _getCourtsForSelectedSport();
-    
+
     // Safety check to prevent out of bounds and handle empty courts
     if (courtsForSport.isEmpty) return null;
     if (selectedCourtIndex >= courtsForSport.length) {
@@ -255,7 +256,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   // Helper method to get courts for the currently selected sport
   List<Court> _getCourtsForSelectedSport() {
     if (selectedSport == null) return courts;
-    
+
     return courts.where((court) => court.type == selectedSport).toList();
   }
 
@@ -278,7 +279,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     _initializeFacilities();
     _initializeSelectedSlots();
     _loadVenueOpeningHours();
-    
+
     // Initialize selected sport from available courts
     final availableSports = _getAvailableSportsFromCourts();
     if (availableSports.isNotEmpty) {
@@ -352,7 +353,15 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       TimeSlot(
         open: '7:00 AM',
         close: '11:00 PM',
-        days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        days: [
+          'Monday',
+          'Tuesday',
+          'Wednesday',
+          'Thursday',
+          'Friday',
+          'Saturday',
+          'Sunday',
+        ],
       ),
     ];
     _generateTimeSlotsForSelectedDate();
@@ -979,7 +988,9 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     List<String> formattedRanges = [];
     for (var range in timeRanges) {
       final startDateTime = parseTime(range.first);
-      final endDateTime = parseTime(range.last).add(const Duration(minutes: 30));
+      final endDateTime = parseTime(
+        range.last,
+      ).add(const Duration(minutes: 30));
 
       final startTimeStr = DateFormat('h:mm a').format(startDateTime);
       final endTimeStr = DateFormat('h:mm a').format(endDateTime);
@@ -1005,7 +1016,9 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     // For a simple non-split slot
     if (timeRanges.length == 1) {
       final startDateTime = parseTime(slots.first);
-      final endDateTime = parseTime(slots.last).add(const Duration(minutes: 30));
+      final endDateTime = parseTime(
+        slots.last,
+      ).add(const Duration(minutes: 30));
 
       final startTimeStr = DateFormat('h:mm a').format(startDateTime);
       final endTimeStr = DateFormat('h:mm a').format(endDateTime);
@@ -1313,7 +1326,8 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                                     'Continue',
                                     style: TextStyle(
                                       fontSize:
-                                          MediaQuery.of(context).size.width < 400
+                                          MediaQuery.of(context).size.width <
+                                              400
                                           ? 14
                                           : 16,
                                       fontWeight: FontWeight.w600,
@@ -1723,7 +1737,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       // Store booking in mock storage
       final courtId = selectedCourt!.id;
       final dateStr = selectedDate.toIso8601String().split('T')[0];
-      
+
       if (mockBookings[courtId] == null) {
         mockBookings[courtId] = {};
       }
@@ -1806,11 +1820,12 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       // Load time slots from mock storage
       final courtId = selectedCourt!.id;
       final dateStr = selectedDate.toIso8601String().split('T')[0];
-      
+
       if (mounted) {
         setState(() {
           // Update slots based on mock data
-          if (mockBookings[courtId] != null && mockBookings[courtId]![dateStr] != null) {
+          if (mockBookings[courtId] != null &&
+              mockBookings[courtId]![dateStr] != null) {
             for (var slot in timeSlots) {
               final bookingId = mockBookings[courtId]![dateStr]![slot.time];
               if (bookingId != null) {
@@ -1976,23 +1991,28 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: VenueSelectionSection(
-                venue: widget.selectedVenue != null ? {
-                  'title': widget.selectedVenue!.title,
-                  'location': widget.selectedVenue!.location,
-                  'sport': selectedSport ?? widget.selectedVenue!.sports.first,
-                  'rating': widget.selectedVenue!.rating,
-                  'rate_per_hour': widget.selectedVenue!.ratePerHour,
-                  'distance': '${widget.selectedVenue!.distance.toStringAsFixed(1)} km',
-                  'sports_available': widget.selectedVenue!.sports,
-                  'imageUrl': widget.selectedVenue!.imageUrl,
-                } : {
-                  'title': selectedCourt?.name ?? 'Selected Court',
-                  'location': 'Sports Complex, 1.2 km',
-                  'sport': selectedCourt?.type ?? 'Football',
-                  'rating': 4.8,
-                  'rate_per_hour': 'Rs. ${selectedCourt?.hourlyRate ?? 700}',
-                  'distance': '1.2 km',
-                },
+                venue: widget.selectedVenue != null
+                    ? {
+                        'title': widget.selectedVenue!.title,
+                        'location': widget.selectedVenue!.location,
+                        'sport':
+                            selectedSport ?? widget.selectedVenue!.sports.first,
+                        'rating': widget.selectedVenue!.rating,
+                        'rate_per_hour': widget.selectedVenue!.ratePerHour,
+                        'distance':
+                            '${widget.selectedVenue!.distance.toStringAsFixed(1)} km',
+                        'sports_available': widget.selectedVenue!.sports,
+                        'imageUrl': widget.selectedVenue!.imageUrl,
+                      }
+                    : {
+                        'title': selectedCourt?.name ?? 'Selected Court',
+                        'location': 'Sports Complex, 1.2 km',
+                        'sport': selectedCourt?.type ?? 'Football',
+                        'rating': 4.8,
+                        'rate_per_hour':
+                            'Rs. ${selectedCourt?.hourlyRate ?? 700}',
+                        'distance': '1.2 km',
+                      },
                 onSportChanged: (String sport) {
                   setState(() {
                     selectedSport = sport;
@@ -2035,9 +2055,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                           ),
                         ),
                         child: Text(
-                          selectedSlots.isNotEmpty
-                              ? 'Reserve'
-                              : 'Remove',
+                          selectedSlots.isNotEmpty ? 'Reserve' : 'Remove',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -2165,15 +2183,16 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                   decoration: BoxDecoration(
                     color: Colors.grey[50],
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.grey[300]!,
-                      width: 1,
-                    ),
+                    border: Border.all(color: Colors.grey[300]!, width: 1),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: true,
-                      value: selectedSport ?? (_getAvailableSportsFromCourts().isNotEmpty ? _getAvailableSportsFromCourts().first : null),
+                      value:
+                          selectedSport ??
+                          (_getAvailableSportsFromCourts().isNotEmpty
+                              ? _getAvailableSportsFromCourts().first
+                              : null),
                       icon: Container(
                         margin: const EdgeInsets.only(right: 4),
                         child: const Icon(
@@ -2249,9 +2268,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                   });
                 },
                 child: Text(
-                  showCalendar
-                      ? 'Hide Calendar'
-                      : 'View Calendar',
+                  showCalendar ? 'Hide Calendar' : 'View Calendar',
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
@@ -2950,11 +2967,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
         onPressed: () {
           _makePhoneCall();
         },
-        icon: const Icon(
-          Icons.phone,
-          color: Colors.white,
-          size: 20,
-        ),
+        icon: const Icon(Icons.phone, color: Colors.white, size: 20),
         label: const Text(
           'Call Venue',
           style: TextStyle(
@@ -2979,7 +2992,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   // Handle phone call action
   void _makePhoneCall() {
     const phoneNumber = '+94771234567';
-    
+
     showDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.4),
@@ -3052,7 +3065,15 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1B2C4F),
                         ),
-                        child: const Text('Call'),
+                        child: Text.rich(
+                          TextSpan(
+                            text: 'Call',
+                            style: const TextStyle(
+                              color:
+                                  Colors.white, // Change to your desired color
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -4004,8 +4025,9 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       // Remove bookings from mock storage
       final courtId = selectedCourt!.id;
       final dateStr = selectedDate.toIso8601String().split('T')[0];
-      
-      if (mockBookings[courtId] != null && mockBookings[courtId]![dateStr] != null) {
+
+      if (mockBookings[courtId] != null &&
+          mockBookings[courtId]![dateStr] != null) {
         for (final timeSlot in allSelectedTimes) {
           mockBookings[courtId]![dateStr]!.remove(timeSlot);
         }
@@ -4041,20 +4063,21 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   // Helper method to get only sports that have actual courts available
   List<String> _getAvailableSportsFromCourts() {
     // If a venue is selected, prioritize venue sports
-    if (widget.selectedVenue != null && widget.selectedVenue!.sports.isNotEmpty) {
+    if (widget.selectedVenue != null &&
+        widget.selectedVenue!.sports.isNotEmpty) {
       return widget.selectedVenue!.sports;
     }
-    
+
     // Fallback to court-based filtering if no venue is selected
     if (courts.isEmpty) return [];
-    
+
     // Get unique sport types from available courts
     final availableSportTypes = courts
         .where((court) => court.isAvailable)
         .map((court) => court.type)
         .toSet()
         .toList();
-    
+
     return availableSportTypes;
   }
 
@@ -4127,47 +4150,47 @@ class VenueSelectionSection extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: venueData['imageUrl'] != null 
-                    ? Image.network(
-                        venueData['imageUrl'],
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF3F4F6),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              SportIconHelper.getSportIcon(
-                                venueData['sport']?.toString() ?? 'Football',
+                  child: venueData['imageUrl'] != null
+                      ? Image.network(
+                          venueData['imageUrl'],
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF3F4F6),
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              color: const Color(0xFF1B2C4F),
-                              size: 32,
-                            ),
-                          );
-                        },
-                      )
-                    : Image.asset(
-                        _getCourtImage(
-                          venueData['sport']?.toString() ?? 'Football',
+                              child: Icon(
+                                SportIconHelper.getSportIcon(
+                                  venueData['sport']?.toString() ?? 'Football',
+                                ),
+                                color: const Color(0xFF1B2C4F),
+                                size: 32,
+                              ),
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          _getCourtImage(
+                            venueData['sport']?.toString() ?? 'Football',
+                          ),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF3F4F6),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                SportIconHelper.getSportIcon(
+                                  venueData['sport']?.toString() ?? 'Football',
+                                ),
+                                color: const Color(0xFF1B2C4F),
+                                size: 32,
+                              ),
+                            );
+                          },
                         ),
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF3F4F6),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              SportIconHelper.getSportIcon(
-                                venueData['sport']?.toString() ?? 'Football',
-                              ),
-                              color: const Color(0xFF1B2C4F),
-                              size: 32,
-                            ),
-                          );
-                        },
-                      ),
                 ),
               ),
               const SizedBox(width: 16),
@@ -4232,7 +4255,6 @@ class VenueSelectionSection extends StatelessWidget {
     );
   }
 
-
   String _getCourtImage(String sport) {
     switch (sport.toLowerCase()) {
       case 'football':
@@ -4288,10 +4310,10 @@ class VenueSelectionSection extends StatelessWidget {
     );
   }
 
-
   Widget _buildSportsContainers(Map<String, dynamic> venueData) {
-    final List<String> availableSports = 
-        List<String>.from(venueData['sports_available'] ?? []);
+    final List<String> availableSports = List<String>.from(
+      venueData['sports_available'] ?? [],
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -4302,10 +4324,7 @@ class VenueSelectionSection extends StatelessWidget {
             runSpacing: 6,
             children: availableSports.take(3).map((sport) {
               return Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 3,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                   color: Colors.blue.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(6),

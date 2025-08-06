@@ -415,7 +415,12 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
       rating: (venue['rating'] as num?)?.toDouble() ?? 0.0,
       imageUrl: venue['image_path'] ?? '',
       sports: [venue['sport'] ?? ''], // Convert single sport to List
-      distance: double.tryParse(venue['distance']?.toString().replaceAll(RegExp(r'[^\d.]'), '') ?? '0') ?? 0.0,
+      distance:
+          double.tryParse(
+            venue['distance']?.toString().replaceAll(RegExp(r'[^\d.]'), '') ??
+                '0',
+          ) ??
+          0.0,
       openingHours: venue['opening_hours'] ?? '',
       ratePerHour: venue['rate_per_hour'] ?? '',
     );
@@ -603,10 +608,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        FootballSpinner(
-                          size: 50.0,
-                          color: _themeNavyBlue,
-                        ),
+                        FootballSpinner(size: 50.0, color: _themeNavyBlue),
                         const SizedBox(height: 16),
                         Text(
                           'Loading venues...',
@@ -726,8 +728,13 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                   context,
                                   PageRouteBuilder(
                                     pageBuilder:
-                                        (context, animation, secondaryAnimation) =>
-                                            SlotsPage(selectedVenue: venueModel),
+                                        (
+                                          context,
+                                          animation,
+                                          secondaryAnimation,
+                                        ) => SlotsPage(
+                                          selectedVenue: venueModel,
+                                        ),
                                     transitionDuration: Duration.zero,
                                     reverseTransitionDuration: Duration.zero,
                                   ),
@@ -773,46 +780,82 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                                       'id': venue['id'],
                                                       'name': venue['title'],
                                                       'type': venue['sport'],
-                                                      'location': venue['location'],
-                                                      'distance': venue['distance'],
+                                                      'location':
+                                                          venue['location'],
+                                                      'distance':
+                                                          venue['distance'],
                                                       'rating': venue['rating'],
                                                       'total_reviews': 124,
-                                                      'price_per_hour': double.tryParse(venue['rate_per_hour']?.toString().replaceAll(RegExp(r'[^\d.]'), '') ?? '0') ?? 0.0,
-                                                      'opening_hours': venue['opening_hours'] ?? 'Open Now',
-                                                      'closing_time': 'Closes at 11:00 PM',
-                                                      'phone': '+94 77 123 4567',
+                                                      'price_per_hour':
+                                                          double.tryParse(
+                                                            venue['rate_per_hour']
+                                                                    ?.toString()
+                                                                    .replaceAll(
+                                                                      RegExp(
+                                                                        r'[^\d.]',
+                                                                      ),
+                                                                      '',
+                                                                    ) ??
+                                                                '0',
+                                                          ) ??
+                                                          0.0,
+                                                      'opening_hours':
+                                                          venue['opening_hours'] ??
+                                                          'Open Now',
+                                                      'closing_time':
+                                                          'Closes at 11:00 PM',
+                                                      'phone':
+                                                          '+94 77 123 4567',
                                                       'email': 'info@venue.lk',
                                                       'website': 'www.venue.lk',
-                                                      'description': 'Premium sports facility with state-of-the-art equipment.',
-                                                      'images': [venue['image_path'] ?? ''],
-                                                      'sports_available': [venue['sport']],
+                                                      'description':
+                                                          'Premium sports facility with state-of-the-art equipment.',
+                                                      'images': [
+                                                        venue['image_path'] ??
+                                                            '',
+                                                      ],
+                                                      'sports_available': [
+                                                        venue['sport'],
+                                                      ],
                                                     },
                                                   ),
                                                 ),
                                               );
                                             },
                                             child: ClipRRect(
-                                              borderRadius: const BorderRadius.only(
-                                                topLeft: Radius.circular(16),
-                                                topRight: Radius.circular(16),
-                                              ),
+                                              borderRadius:
+                                                  const BorderRadius.only(
+                                                    topLeft: Radius.circular(
+                                                      16,
+                                                    ),
+                                                    topRight: Radius.circular(
+                                                      16,
+                                                    ),
+                                                  ),
                                               child: Image.network(
                                                 venue['image_path'] ?? '',
                                                 width: double.infinity,
                                                 height: 160,
                                                 fit: BoxFit.cover,
-                                                errorBuilder: (context, error, stackTrace) {
-                                                  return Container(
-                                                    color: Colors.grey[50],
-                                                    child: Center(
-                                                      child: Icon(
-                                                        Icons.image_outlined,
-                                                        size: 24,
-                                                        color: Colors.grey[400],
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
+                                                errorBuilder:
+                                                    (
+                                                      context,
+                                                      error,
+                                                      stackTrace,
+                                                    ) {
+                                                      return Container(
+                                                        color: Colors.grey[50],
+                                                        child: Center(
+                                                          child: Icon(
+                                                            Icons
+                                                                .image_outlined,
+                                                            size: 24,
+                                                            color: Colors
+                                                                .grey[400],
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
                                               ),
                                             ),
                                           ),
@@ -821,10 +864,15 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                             top: 16,
                                             right: 16,
                                             child: GestureDetector(
-                                              onTap: () => _toggleFavorite(index),
+                                              onTap: () =>
+                                                  _toggleFavorite(index),
                                               child: Icon(
-                                                isFavorite ? Icons.favorite : Icons.favorite_border,
-                                                color: isFavorite ? Colors.red : Colors.white,
+                                                isFavorite
+                                                    ? Icons.favorite
+                                                    : Icons.favorite_border,
+                                                color: isFavorite
+                                                    ? Colors.red
+                                                    : Colors.white,
                                                 size: 24,
                                               ),
                                             ),
@@ -834,16 +882,21 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                             bottom: 12,
                                             left: 16,
                                             child: Container(
-                                              padding: const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 4,
-                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 4,
+                                                  ),
                                               decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(0.95),
-                                                borderRadius: BorderRadius.circular(10),
+                                                color: Colors.white.withOpacity(
+                                                  0.95,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
                                                 boxShadow: [
                                                   BoxShadow(
-                                                    color: Colors.black.withOpacity(0.1),
+                                                    color: Colors.black
+                                                        .withOpacity(0.1),
                                                     blurRadius: 4,
                                                     offset: const Offset(0, 2),
                                                   ),
@@ -859,10 +912,13 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                                   ),
                                                   const SizedBox(width: 4),
                                                   Text(
-                                                    venue['rating']?.toString() ?? '4.5',
+                                                    venue['rating']
+                                                            ?.toString() ??
+                                                        '4.5',
                                                     style: TextStyle(
                                                       fontSize: 12,
-                                                      fontWeight: FontWeight.w600,
+                                                      fontWeight:
+                                                          FontWeight.w600,
                                                       color: Colors.orange[600],
                                                     ),
                                                   ),
@@ -878,7 +934,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                     Padding(
                                       padding: const EdgeInsets.all(16),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           // Venue name
                                           Text(
@@ -913,7 +970,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                                     height: 1.3,
                                                   ),
                                                   maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                             ],
@@ -926,13 +984,17 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                             children: [
                                               // Distance
                                               Container(
-                                                padding: const EdgeInsets.symmetric(
-                                                  horizontal: 8,
-                                                  vertical: 4,
-                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4,
+                                                    ),
                                                 decoration: BoxDecoration(
-                                                  color: const Color(0xFF1B2C4F).withOpacity(0.08),
-                                                  borderRadius: BorderRadius.circular(6),
+                                                  color: const Color(
+                                                    0xFF1B2C4F,
+                                                  ).withOpacity(0.08),
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
                                                 ),
                                                 child: Text(
                                                   venue['distance'] ?? '2.5 km',
@@ -946,13 +1008,16 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                               const SizedBox(width: 8),
                                               // Opening status
                                               Container(
-                                                padding: const EdgeInsets.symmetric(
-                                                  horizontal: 8,
-                                                  vertical: 4,
-                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4,
+                                                    ),
                                                 decoration: BoxDecoration(
-                                                  color: Colors.green.withOpacity(0.1),
-                                                  borderRadius: BorderRadius.circular(6),
+                                                  color: Colors.green
+                                                      .withOpacity(0.1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(6),
                                                 ),
                                                 child: Text(
                                                   "Open Now",
@@ -970,7 +1035,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
 
                                           // Sports tags and Book Now button
                                           Row(
-                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
                                             children: [
                                               // Sports tags (up to 3)
                                               Expanded(
@@ -978,19 +1044,32 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                                   spacing: 6,
                                                   runSpacing: 6,
                                                   children: [venue['sport'] ?? 'Football']
-                                                      .where((sport) => sport.isNotEmpty)
+                                                      .where(
+                                                        (sport) =>
+                                                            sport.isNotEmpty,
+                                                      )
                                                       .take(3)
                                                       .map((sport) {
                                                         return Container(
-                                                          padding: const EdgeInsets.symmetric(
-                                                            horizontal: 8,
-                                                            vertical: 3,
-                                                          ),
+                                                          padding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 8,
+                                                                vertical: 3,
+                                                              ),
                                                           decoration: BoxDecoration(
-                                                            color: Colors.blue.withOpacity(0.08),
-                                                            borderRadius: BorderRadius.circular(6),
+                                                            color: Colors.blue
+                                                                .withOpacity(
+                                                                  0.08,
+                                                                ),
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  6,
+                                                                ),
                                                             border: Border.all(
-                                                              color: Colors.blue.withOpacity(0.2),
+                                                              color: Colors.blue
+                                                                  .withOpacity(
+                                                                    0.2,
+                                                                  ),
                                                               width: 0.5,
                                                             ),
                                                           ),
@@ -998,8 +1077,11 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                                             sport,
                                                             style: TextStyle(
                                                               fontSize: 10,
-                                                              fontWeight: FontWeight.w500,
-                                                              color: Colors.blue[700],
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color: Colors
+                                                                  .blue[700],
                                                             ),
                                                           ),
                                                         );
@@ -1007,34 +1089,47 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                                       .toList(),
                                                 ),
                                               ),
-                                              
+
                                               // Book Now button
                                               ElevatedButton(
                                                 onPressed: () {
                                                   // Convert venue data to VenueModel and pass to SlotsPage
-                                                  final venueModel = _convertToVenueModel(venue);
+                                                  final venueModel =
+                                                      _convertToVenueModel(
+                                                        venue,
+                                                      );
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => SlotsPage(
-                                                        selectedVenue: venueModel,
-                                                      ),
+                                                      builder: (context) =>
+                                                          SlotsPage(
+                                                            selectedVenue:
+                                                                venueModel,
+                                                          ),
                                                     ),
                                                   );
                                                 },
                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor: const Color(0xFF1B2C4F),
+                                                  backgroundColor: const Color(
+                                                    0xFF1B2C4F,
+                                                  ),
                                                   foregroundColor: Colors.white,
                                                   shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(8),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
                                                   ),
-                                                  padding: const EdgeInsets.symmetric(
-                                                    horizontal: 20,
-                                                    vertical: 12,
-                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 12,
+                                                      ),
                                                   elevation: 0,
                                                   minimumSize: Size.zero,
-                                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                  tapTargetSize:
+                                                      MaterialTapTargetSize
+                                                          .shrinkWrap,
                                                 ),
                                                 child: const Text(
                                                   'Book Now',
@@ -1309,10 +1404,7 @@ class _SportsCategoriesState extends State<SportsCategories> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Center(
-        child: FootballSpinner(
-          size: 30.0,
-          color: widget.themeNavyBlue,
-        ),
+        child: FootballSpinner(size: 30.0, color: widget.themeNavyBlue),
       );
     }
 

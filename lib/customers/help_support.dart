@@ -622,7 +622,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen>
         currentIndex: _currentTabIndex,
         onTabSelected: (index) {
           setState(() {
-            _currentTabIndex = index;
+            _currentTabIndex = -1;
           });
         },
       ),

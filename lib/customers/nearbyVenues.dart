@@ -69,7 +69,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   final Map<String, bool> _favoriteStatus = {};
 
   // Current tab index for footer navigation
-  int _currentTabIndex = 0;
+  int _currentTabIndex = -1;
 
   // Sports filter list with icons - Only includes sports that are actually available in venues
   final Map<String, IconData> _filterOptionsWithIcons = {
@@ -706,7 +706,12 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   Widget _buildVenuesList() {
     return ListView.builder(
       controller: _scrollController,
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16), // Reduced top padding from 4 to 0
+      padding: const EdgeInsets.fromLTRB(
+        16,
+        0,
+        16,
+        16,
+      ), // Reduced top padding from 4 to 0
       itemCount: _filteredVenues.length,
       itemBuilder: (context, index) {
         final venue = _filteredVenues[index];
@@ -864,11 +869,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.star,
-                            color: Colors.orange[600],
-                            size: 12,
-                          ),
+                          Icon(Icons.star, color: Colors.orange[600], size: 12),
                           const SizedBox(width: 4),
                           Text(
                             venue.rating.toString(),
@@ -978,8 +979,6 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                     ],
                   ),
 
-                  
-
                   // Sports tags and Book Now button
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -1016,7 +1015,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             }).toList(),
                           ),
                         ),
-                      
+
                       // Book Now button
                       ElevatedButton(
                         onPressed: () {
@@ -1024,9 +1023,8 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => SlotsPage(
-                                selectedVenue: venue,
-                              ),
+                              builder: (context) =>
+                                  SlotsPage(selectedVenue: venue),
                             ),
                           );
                         },
