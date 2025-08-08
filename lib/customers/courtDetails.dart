@@ -189,6 +189,320 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
     }
   }
 
+  void _showOpeningHoursDialog() {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.4),
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        backgroundColor: Colors.white,
+        elevation: 8,
+        child: Container(
+          width: MediaQuery.of(context).size.width > 500
+              ? 480
+              : MediaQuery.of(context).size.width * 0.9,
+          constraints: BoxConstraints(
+            maxWidth: 480,
+            minWidth: 280,
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
+          ),
+          padding: EdgeInsets.all(
+            MediaQuery.of(context).size.width < 400 ? 16 : 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Opening Hours',
+                  style: TextStyle(
+                    fontSize: MediaQuery.of(context).size.width < 400 ? 16 : 18,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF2D3142),
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.width < 400 ? 12 : 16,
+                ),
+                const Text(
+                  'Weekly Schedule',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1B2C4F),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildScheduleRow('Monday', '6:00 AM - 11:00 PM'),
+                _buildScheduleRow('Tuesday', '6:00 AM - 11:00 PM'),
+                _buildScheduleRow('Wednesday', '6:00 AM - 11:00 PM'),
+                _buildScheduleRow('Thursday', '6:00 AM - 11:00 PM'),
+                _buildScheduleRow('Friday', '6:00 AM - 12:00 AM'),
+                _buildScheduleRow('Saturday', '5:00 AM - 12:00 AM'),
+                _buildScheduleRow('Sunday', '5:00 AM - 11:00 PM'),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF3F4F6),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: Color(0xFF1B2C4F),
+                        size: 16,
+                      ),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Hours may vary on holidays',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.width < 400 ? 16 : 24,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: Text(
+                        'Close',
+                        style: TextStyle(
+                          color: const Color(0xFF8A8E99),
+                          fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScheduleRow(String day, String hours) {
+    final isToday = _isToday(day);
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            day,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: isToday ? FontWeight.w600 : FontWeight.w500,
+              color: isToday ? const Color(0xFF1B2C4F) : const Color(0xFF6B7280),
+            ),
+          ),
+          Text(
+            hours,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: isToday ? FontWeight.w600 : FontWeight.w400,
+              color: isToday ? const Color(0xFF1B2C4F) : const Color(0xFF6B7280),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _isToday(String day) {
+    final now = DateTime.now();
+    final weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    final today = weekdays[now.weekday - 1];
+    return day == today;
+  }
+
+
+  void _showReviewDialog() {
+    int selectedRating = 0;
+    final TextEditingController reviewController = TextEditingController();
+    
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.4),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          backgroundColor: Colors.white,
+          elevation: 8,
+          child: Container(
+            width: MediaQuery.of(context).size.width > 500
+                ? 480
+                : MediaQuery.of(context).size.width * 0.9,
+            constraints: BoxConstraints(
+              maxWidth: 480,
+              minWidth: 280,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            padding: EdgeInsets.all(
+              MediaQuery.of(context).size.width < 400 ? 16 : 24,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Write a Review',
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width < 400 ? 16 : 18,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF2D3142),
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.width < 400 ? 12 : 16,
+                  ),
+                  const Text(
+                    'Rate your experience',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF8A8E99),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (index) {
+                      return IconButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedRating = index + 1;
+                          });
+                        },
+                        icon: Icon(
+                          index < selectedRating ? Icons.star : Icons.star_border,
+                          color: const Color(0xFFFBBF24),
+                          size: 32,
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: reviewController,
+                    maxLines: 4,
+                    style: const TextStyle(fontSize: 16, color: Color(0xFF2D3142)),
+                    decoration: InputDecoration(
+                      hintText: 'Share your experience...',
+                      hintStyle: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF8A8E99),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: const Color(0xFF8A8E99).withOpacity(0.3)),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Color(0xFF1B2C4F), width: 2),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.width < 400 ? 16 : 24,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                        ),
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: const Color(0xFF8A8E99),
+                            fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text(
+                                'Review submitted successfully',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              backgroundColor: Colors.green,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF1B2C4F),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Submit Review',
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 15,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildActionButton(
     String text,
     IconData icon,
@@ -697,6 +1011,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                           color: Color(0xFF6B7280),
                           size: 16,
                         ),
+                        onTap: _showOpeningHoursDialog,
                       ),
                       const Divider(
                         color: Color(0xFFE5E7EB),
@@ -742,6 +1057,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                           color: Color(0xFF6B7280),
                           size: 16,
                         ),
+                        onTap: _showReviewDialog,
                       ),
                     ],
                   ),
