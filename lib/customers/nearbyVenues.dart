@@ -1105,39 +1105,59 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
 
   // Navigate to filter screen
   void _navigateToFilterScreen(BuildContext context) async {
-    final result = await Navigator.push<Map<String, dynamic>>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => FilterScreen(
-          currentSortingMode: _sortingMode,
-          currentActiveFilter: _activeFilter,
-          currentDistanceRadius: _distanceRadius,
-          filterOptions: _filterOptionsWithIcons,
-        ),
-      ),
+    // Show loading screen immediately when filter is tapped
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.white,
+      builder: (BuildContext context) {
+        return const FootballLoadingWidget();
+      },
     );
 
-    if (result != null) {
-      // Show loading screen when sorting/filtering changes
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        barrierColor: Colors.white,
-        builder: (BuildContext context) {
-          return const FootballLoadingWidget();
-        },
+    // Loading delay
+    await Future.delayed(const Duration(milliseconds: 400));
+
+    if (mounted) {
+      Navigator.pop(context); // Close loading dialog
+
+      // Navigate to filter screen without animation
+      final result = await Navigator.push<Map<String, dynamic>>(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => FilterScreen(
+            currentSortingMode: _sortingMode,
+            currentActiveFilter: _activeFilter,
+            currentDistanceRadius: _distanceRadius,
+            filterOptions: _filterOptionsWithIcons,
+          ),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
       );
 
-      // Loading delay
-      await Future.delayed(const Duration(milliseconds: 400));
+      if (result != null) {
+        // Show loading screen when sorting/filtering changes
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          barrierColor: Colors.white,
+          builder: (BuildContext context) {
+            return const FootballLoadingWidget();
+          },
+        );
 
-      if (mounted) {
-        Navigator.pop(context); // Close loading dialog
-        setState(() {
-          _sortingMode = result['sortingMode'] ?? _sortingMode;
-          _activeFilter = result['activeFilter'] ?? _activeFilter;
-          _distanceRadius = result['distanceRadius'] ?? _distanceRadius;
-        });
+        // Loading delay
+        await Future.delayed(const Duration(milliseconds: 400));
+
+        if (mounted) {
+          Navigator.pop(context); // Close loading dialog
+          setState(() {
+            _sortingMode = result['sortingMode'] ?? _sortingMode;
+            _activeFilter = result['activeFilter'] ?? _activeFilter;
+            _distanceRadius = result['distanceRadius'] ?? _distanceRadius;
+          });
+        }
       }
     }
   }
