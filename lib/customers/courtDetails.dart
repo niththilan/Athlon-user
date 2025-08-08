@@ -1073,7 +1073,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                 // Available Sports Section
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -1088,12 +1088,11 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 0),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(left: 8.0),
+                            padding: const EdgeInsets.only(left: 4.0),
                             child: Text(
                               "Available Sports in this Venue",
                               style: TextStyle(
@@ -1105,7 +1104,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
