@@ -423,7 +423,7 @@ class HistoryScreenState extends State<HistoryScreen> {
         ],
       ),
       bottomNavigationBar: AppFooter(
-        currentIndex: 0,
+        currentIndex: 2,
         onTabSelected: (int index) {
           if (index != 2) {
             // Home = 0, Favorites = 1, Bookings = 2, Chat = 3

@@ -69,7 +69,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   final Map<String, bool> _favoriteStatus = {};
 
   // Current tab index for footer navigation
-  int _currentTabIndex = -1;
+  int _currentTabIndex = 0;
 
   // Sports filter list with icons - Only includes sports that are actually available in venues
   final Map<String, IconData> _filterOptionsWithIcons = {

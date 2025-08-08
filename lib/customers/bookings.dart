@@ -156,7 +156,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   DateTime selectedDate = DateTime.now();
   Set<String> selectedSlots = {}; // For new reservations (available slots)
   String? selectedBookingId; // Track the currently selected booking for removal
-  int currentFooterIndex = 2;
+  int currentFooterIndex = 0;
   bool showCalendar = false;
 
   late List<DateTime> dateList;

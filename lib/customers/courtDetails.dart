@@ -77,7 +77,7 @@ class CourtDetailScreen extends StatefulWidget {
 class _CourtDetailScreenState extends State<CourtDetailScreen> {
   bool _isFavorite = false;
   int _currentImageIndex = 0;
-  int _currentIndex = 2; // For footer navigation
+  int _currentIndex = 0; // For footer navigation
   bool _isLoading = true;
 
   // Mock court data
