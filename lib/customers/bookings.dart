@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_super_parameters, duplicate_ignore, curly_braces_in_flow_control_structures, avoid_print, sized_box_for_whitespace, unnecessary_brace_in_string_interps
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -118,6 +118,7 @@ void main() {
 class SlotsBookingApp extends StatelessWidget {
   final String? selectedCourtId;
 
+  // ignore: use_super_parameters
   const SlotsBookingApp({Key? key, this.selectedCourtId}) : super(key: key);
 
   @override

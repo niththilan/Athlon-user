@@ -46,7 +46,8 @@ class SportsVenueScreen extends StatefulWidget {
   State<SportsVenueScreen> createState() => _SportsVenueScreenState();
 }
 
-class _SportsVenueScreenState extends State<SportsVenueScreen> {
+class _SportsVenueScreenState extends State<SportsVenueScreen>
+    with SingleTickerProviderStateMixin {
   final ScrollController _venuesScrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
@@ -57,6 +58,15 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
 
   // Footer state
   int _currentFooterIndex = 0;
+
+  // Enhanced favorite system - matching nearbyVenues.dart
+  late AnimationController _animationController;
+
+  // Map to track favorite status for each venue
+  final Map<String, bool> _favoriteStatus = {};
+
+  // List to store favorite venues data
+  final List<Map<String, dynamic>> _favoriteVenues = [];
 
   // Theme colors
   final Color _themeNavyBlue = const Color(0xFF1B2C4F);
@@ -179,6 +189,12 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     super.initState();
     _searchController.addListener(_onSearchChanged);
 
+    // Initialize animation controller for favorites
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+
     // Set the initial sport if provided and load venues
     if (widget.initialSport.isNotEmpty) {
       _selectedSport = widget.initialSport;
@@ -191,6 +207,15 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
         _loadVenuesData();
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _venuesScrollController.dispose();
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    _animationController.dispose(); // Dispose animation controller
+    super.dispose();
   }
 
   // Load venues data from local data without showing them
@@ -260,14 +285,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _venuesScrollController.dispose();
-    _searchController.removeListener(_onSearchChanged);
-    _searchController.dispose();
-    super.dispose();
-  }
-
   void _onSearchChanged() {
     setState(() {
       _searchQuery = _searchController.text.toLowerCase();
@@ -302,99 +319,69 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     _loadVenuesForSport(sportName);
   }
 
-  void _navigateToFavorites() {
-    // Force rebuild favorites list before navigating
-    List<Map<String, dynamic>> currentFavorites = [];
+  // Enhanced toggle favorite function - matching nearbyVenues.dart
+  void _toggleFavorite(String venueId) {
+    setState(() {
+      bool isCurrentlyFavorite = _favoriteStatus[venueId] ?? false;
+      _favoriteStatus[venueId] = !isCurrentlyFavorite;
 
-    // Create deep copies to avoid reference issues
-    for (var venue in _venues) {
-      if (venue['is_favorite'] == true) {
-        currentFavorites.add(Map<String, dynamic>.from(venue));
-        // Add debug logs to trace favorites
-        debugPrint('Adding to favorites: ${venue['title']}');
+      if (!isCurrentlyFavorite) {
+        // Adding to favorites
+        Map<String, dynamic> venue = _venues.firstWhere(
+          (v) => v['id'] == venueId,
+        );
+        Map<String, dynamic> favoriteVenue = {
+          'id': venue['id'],
+          'title': venue['title'],
+          'location': venue['location'],
+          'rating': venue['rating'],
+          'imagePath': venue['image_path'],
+          'distance': venue['distance'],
+        };
+        _favoriteVenues.add(favoriteVenue);
+
+        // Show confirmation snackbar
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Added to favorites: ${venue['title']}'),
+              duration: const Duration(seconds: 2),
+              action: SnackBarAction(
+                label: 'View Favorites',
+                onPressed: () => _navigateToFavorites(),
+              ),
+            ),
+          );
+        }
+      } else {
+        // Removing from favorites
+        _favoriteVenues.removeWhere((venue) => venue['id'] == venueId);
       }
-    }
-    // Add count debug log
-    debugPrint('Total favorites count: ${currentFavorites.length}');
+    });
 
-    // Show a message if no favorites are found
-    if (currentFavorites.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No favorites yet! Heart some venues to add them.'),
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
-    }
+    // Add haptic feedback and animation
+    _animationController.reset();
+    _animationController.forward();
+  }
 
-    // Navigate to favorites with current data
+  // Enhanced favorites navigation - matching nearbyVenues.dart
+  void _navigateToFavorites() {
+    // Navigate to favorites with current data and proper callback
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => FavoritesScreen(
-          favoriteVenues: currentFavorites,
-          onRemoveFavorite: _removeFavorite,
+          favoriteVenues: List.from(_favoriteVenues), // Create a copy
+          onRemoveFavorite: _handleRemoveFavorite, // Use enhanced callback
         ),
       ),
     );
   }
 
-  void _toggleFavorite(int index) {
-    // Find the venue in the original list
-    int originalIndex = _venues.indexWhere(
-      (venue) => venue['title'] == _filteredVenues[index]['title'],
-    );
-
-    if (originalIndex != -1) {
-      // Toggle favorite status locally
-      setState(() {
-        _venues[originalIndex]['is_favorite'] =
-            !(_venues[originalIndex]['is_favorite'] ?? false);
-        _filteredVenues[index]['is_favorite'] =
-            _venues[originalIndex]['is_favorite'];
-      });
-
-      // Debug log for toggling
-      debugPrint(
-        'Toggled favorite for: ${_venues[originalIndex]['title']} to ${_venues[originalIndex]['is_favorite']}',
-      );
-
-      // If user just made it a favorite, show a confirmation
-      if (_venues[originalIndex]['is_favorite'] == true) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Added to favorites: ${_venues[originalIndex]['title']}',
-              ),
-              duration: const Duration(seconds: 2),
-              action: SnackBarAction(
-                label: 'View Favorites',
-                onPressed: () {
-                  _navigateToFavorites();
-                },
-              ),
-            ),
-          );
-        }
-      }
-    }
-  }
-
-  void _removeFavorite(Map<String, dynamic> venue) {
+  // Handle removing favorite from favorites screen - matching nearbyVenues.dart
+  void _handleRemoveFavorite(Map<String, dynamic> venue) {
     setState(() {
-      int index = _venues.indexWhere((v) => v['title'] == venue['title']);
-      if (index != -1) {
-        _venues[index]['is_favorite'] = false;
-
-        // Update filtered venues if needed
-        int filteredIndex = _filteredVenues.indexWhere(
-          (v) => v['title'] == venue['title'],
-        );
-        if (filteredIndex != -1) {
-          _filteredVenues[filteredIndex]['is_favorite'] = false;
-        }
-      }
+      _favoriteStatus[venue['id']] = false;
+      _favoriteVenues.removeWhere((v) => v['id'] == venue['id']);
     });
 
     debugPrint('Removed from favorites: ${venue['title']}');
@@ -404,6 +391,11 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
     setState(() {
       _currentFooterIndex = index;
     });
+
+    // Navigate to favorites screen when favorites tab is selected
+    if (index == 1) {
+      _navigateToFavorites();
+    }
   }
 
   // Helper function to convert venue Map to VenueModel
@@ -428,9 +420,9 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Count favorites for badge display
-    final int favoriteCount = _venues
-        .where((venue) => venue['is_favorite'] == true)
+    // Count favorites for badge display - matching nearbyVenues.dart
+    final int favoriteCount = _favoriteStatus.values
+        .where((isFavorite) => isFavorite == true)
         .length;
 
     return Scaffold(
@@ -458,7 +450,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
           ),
         ),
         actions: [
-          // Add a favorites indicator with count in the app bar
+          // Enhanced favorites indicator with count - matching nearbyVenues.dart
           if (favoriteCount > 0)
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
@@ -467,9 +459,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.favorite, color: Colors.white),
-                    onPressed: () {
-                      _navigateToFavorites();
-                    },
+                    onPressed: () => _navigateToFavorites(),
                   ),
                   Positioned(
                     top: 8,
@@ -717,8 +707,9 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                           itemCount: _filteredVenues.length,
                           itemBuilder: (context, index) {
                             final venue = _filteredVenues[index];
+                            // Use enhanced favorite system - matching nearbyVenues.dart
                             final bool isFavorite =
-                                venue['is_favorite'] ?? false;
+                                _favoriteStatus[venue['id']] ?? false;
 
                             return GestureDetector(
                               onTap: () {
@@ -859,13 +850,13 @@ class _SportsVenueScreenState extends State<SportsVenueScreen> {
                                               ),
                                             ),
                                           ),
-                                          // Minimal favorite button
+                                          // Enhanced favorite button - matching nearbyVenues.dart
                                           Positioned(
                                             top: 16,
                                             right: 16,
                                             child: GestureDetector(
                                               onTap: () =>
-                                                  _toggleFavorite(index),
+                                                  _toggleFavorite(venue['id']),
                                               child: Icon(
                                                 isFavorite
                                                     ? Icons.favorite

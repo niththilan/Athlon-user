@@ -27,7 +27,25 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   void initState() {
     super.initState();
-    _favoriteVenues = List.from(widget.favoriteVenues);
+    // Use mock data if favoriteVenues is empty, otherwise use provided data
+    _favoriteVenues = widget.favoriteVenues.isEmpty
+        ? _getMockFavoriteVenues()
+        : List.from(widget.favoriteVenues);
+  }
+
+  // Mock data for demonstration purposes
+  List<Map<String, dynamic>> _getMockFavoriteVenues() {
+    return [
+      {
+        'id': '1',
+        'title': "ARK SPORTS - INDOOR CRICKET & FUTSAL",
+        'location': '141/A, Wattala 11300',
+        'rating': 4.23,
+        'imagePath':
+            "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+        'distance': '3.5 km',
+      },
+    ];
   }
 
   // Footer navigation to handle all tabs
