@@ -5,6 +5,7 @@ import 'home.dart' as home;
 import 'favourites.dart';
 import 'history.dart';
 import 'messages.dart';
+import 'widgets/football_spinner.dart';
 
 class AppFooter extends StatelessWidget {
   final int currentIndex;
@@ -19,14 +20,17 @@ class AppFooter extends StatelessWidget {
   Future<void> _navigateToFavorites(BuildContext context) async {
     try {
       // Show loading indicator
-
       showDialog(
         context: context,
         barrierDismissible: false,
+        barrierColor: Colors.white,
         builder: (BuildContext context) {
-          return const Center(child: CircularProgressIndicator());
+          return const FootballLoadingWidget();
         },
       );
+
+      // Simulate loading time - much shorter
+      await Future.delayed(const Duration(milliseconds: 300));
 
       List<Map<String, dynamic>> favoriteVenues = [];
 
@@ -78,6 +82,104 @@ class AppFooter extends StatelessWidget {
           reverseTransitionDuration: Duration.zero,
         ),
       );
+    }
+  }
+
+  Future<void> _navigateToHistory(BuildContext context) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.white,
+        builder: (BuildContext context) {
+          return const FootballLoadingWidget();
+        },
+      );
+
+      // Simulate loading time
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      // Close loading dialog
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
+      // Navigate to history screen
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const HistoryScreen(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
+    } catch (e) {
+      // Handle any errors
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
+      // Still navigate to history screen
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const HistoryScreen(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
+      );
+    }
+  }
+
+  Future<void> _navigateToMessages(BuildContext context) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.white,
+        builder: (BuildContext context) {
+          return const FootballLoadingWidget();
+        },
+      );
+
+      // Reduced loading time for faster navigation
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      // Close loading dialog and navigate
+      if (context.mounted) {
+        Navigator.pop(context);
+
+        // Navigate to messages screen
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const MessagesScreen(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      }
+    } catch (e) {
+      // Handle any errors
+      if (context.mounted) {
+        Navigator.pop(context);
+
+        // Still navigate to messages screen
+        Navigator.pushReplacement(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const MessagesScreen(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      }
     }
   }
 
@@ -133,26 +235,10 @@ class AppFooter extends StatelessWidget {
                 _navigateToFavorites(context);
                 break;
               case 2:
-                Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const HistoryScreen(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
+                _navigateToHistory(context);
                 break;
               case 3:
-                Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const MessagesScreen(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
+                _navigateToMessages(context);
                 break;
             }
           }

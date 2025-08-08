@@ -1018,15 +1018,53 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
 
                       // Book Now button
                       ElevatedButton(
-                        onPressed: () {
-                          // Navigate to bookings screen with venue data
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  SlotsPage(selectedVenue: venue),
-                            ),
-                          );
+                        onPressed: () async {
+                          try {
+                            // Show loading indicator
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              barrierColor: Colors.white,
+                              builder: (BuildContext context) {
+                                return const FootballLoadingWidget();
+                              },
+                            );
+
+                            // Simulate loading time
+                            await Future.delayed(const Duration(milliseconds: 400));
+
+                            // Close loading dialog
+                            if (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            }
+
+                            // Navigate to bookings screen with venue data (instant transition)
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder: (context, animation, secondaryAnimation) =>
+                                    SlotsPage(selectedVenue: venue),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
+                              ),
+                            );
+                          } catch (e) {
+                            // Handle any errors
+                            if (Navigator.canPop(context)) {
+                              Navigator.pop(context);
+                            }
+                            
+                            // Still navigate to bookings screen
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                pageBuilder: (context, animation, secondaryAnimation) =>
+                                    SlotsPage(selectedVenue: venue),
+                                transitionDuration: Duration.zero,
+                                reverseTransitionDuration: Duration.zero,
+                              ),
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF1B2C4F),

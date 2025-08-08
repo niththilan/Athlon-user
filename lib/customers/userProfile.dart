@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'help_support.dart';
 import 'settings.dart'; // Import the settings screen
+import 'widgets/football_spinner.dart';
 
 // Constants for consistent styling - matching vendor screen
 const Color primaryColor = Color(0xFF1B2C4F);
@@ -76,12 +77,6 @@ class MockAuthService {
           'location': 'Ark Sports Complex',
           'time': 'Yesterday',
           'icon': Icons.calendar_today,
-        },
-        {
-          'title': 'Joined Team',
-          'location': 'Blue Dragons',
-          'time': '2 days ago',
-          'icon': Icons.group_add,
         },
       ],
       'favorite_venues': [
@@ -1599,7 +1594,34 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   color: Colors.white,
                   size: 28,
                 ),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () async {
+                  try {
+                    // Show loading indicator
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      barrierColor: Colors.white,
+                      builder: (BuildContext context) {
+                        return const FootballLoadingWidget();
+                      },
+                    );
+
+                    // Simulate loading time
+                    await Future.delayed(const Duration(milliseconds: 200));
+
+                    // Close loading dialog and navigate back
+                    if (context.mounted) {
+                      Navigator.pop(context); // Close loading
+                      Navigator.pop(context); // Go back
+                    }
+                  } catch (e) {
+                    // Handle any errors
+                    if (context.mounted) {
+                      Navigator.pop(context); // Close loading
+                      Navigator.pop(context); // Go back
+                    }
+                  }
+                },
                 tooltip: 'Back',
               ),
             ),

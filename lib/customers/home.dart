@@ -9,46 +9,7 @@ import 'search.dart'; // Add search import
 
 import 'footer.dart';
 import 'nearbyVenues.dart' as venues; // Import the nearbyVenues file
-
-// Add a custom route with no animation
-class NoAnimationRoute<T> extends PageRoute<T> {
-  NoAnimationRoute({
-    required this.builder,
-    super.settings,
-
-    this.maintainState = true,
-  }) : super(fullscreenDialog: false);
-
-  final WidgetBuilder builder;
-
-  @override
-  final bool maintainState;
-
-  @override
-  Duration get transitionDuration => Duration.zero;
-
-  @override
-  Color? get barrierColor => null;
-
-  @override
-  String? get barrierLabel => null;
-
-  @override
-  bool get opaque => true;
-
-  @override
-  Widget buildPage(
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-  ) {
-    return builder(context);
-  }
-
-  @override
-  bool get barrierDismissible => false;
-}
-
+import 'services/navigation_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -64,8 +25,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Simulate loading for 1 second
-    Future.delayed(const Duration(seconds: 1), () {
+    // Quick initialization for home screen (200ms)
+    Future.delayed(const Duration(milliseconds: 200), () {
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -81,26 +42,77 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Navigation methods to match facility owner's homepage
-  void _navigateToNotifications() {
-    Navigator.push(
-      context,
-      PageRouteBuilder(
-        pageBuilder: (context, animation, secondaryAnimation) =>
-            const NotificationScreen(),
-        transitionDuration: Duration.zero,
-        reverseTransitionDuration: Duration.zero,
-      ),
-    );
+  Future<void> _navigateToNotifications() async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.white,
+        builder: (BuildContext context) {
+          return const FootballLoadingWidget();
+        },
+      );
+
+      // Simulate loading time
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      // Close loading dialog
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
+      // Navigate to notification screen
+      NavigationService.pushInstant(const NotificationScreen());
+    } catch (e) {
+      // Handle any errors
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
+      // Still navigate to notification screen
+      NavigationService.pushInstant(const NotificationScreen());
+    }
+  }
+
+  Future<void> _navigateToProfile() async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.white,
+        builder: (BuildContext context) {
+          return const FootballLoadingWidget();
+        },
+      );
+
+      // Simulate loading time
+      await Future.delayed(const Duration(milliseconds: 100));
+
+      // Close loading dialog
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
+      // Navigate to profile screen
+      NavigationService.pushInstant(const UserProfileScreen());
+    } catch (e) {
+      // Handle any errors
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
+      // Still navigate to profile screen
+      NavigationService.pushInstant(const UserProfileScreen());
+    }
   }
 
   Widget _buildSearchBar() {
     return GestureDetector(
       onTap: () {
         // Navigate to search screen
-        Navigator.push(
-          context,
-          NoAnimationRoute(builder: (context) => const SearchScreen()),
-        );
+        NavigationService.pushInstant(const SearchScreen());
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 0),
@@ -185,17 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Color(0xFF1B2C4F),
                 size: 28,
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const UserProfileScreen(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
-              },
+              onPressed: () => _navigateToProfile(),
               tooltip: 'Profile',
             ),
             const SizedBox(width: 25),
@@ -440,14 +442,8 @@ class FeatureCard extends StatelessWidget {
                 // Navigation only for enabled cards
                 if (title == "Book") {
                   // Navigate to Nearby Venues screen
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          const venues.NearByVenueScreen(),
-                      transitionDuration: Duration.zero,
-                      reverseTransitionDuration: Duration.zero,
-                    ),
+                  NavigationService.pushInstant(
+                    const venues.NearByVenueScreen(),
                   );
                 }
               },
@@ -625,12 +621,7 @@ class SportsSection extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   // Navigate to Available Sports screen
-                  Navigator.push(
-                    context,
-                    NoAnimationRoute(
-                      builder: (context) => const SportsVenueScreen(),
-                    ),
-                  );
+                  NavigationService.pushInstant(const SportsVenueScreen());
                 },
                 child: Text(
                   "See More",
@@ -677,12 +668,7 @@ class SportsCard extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           // Navigate to Available Sports screen with the selected sport
-          Navigator.push(
-            context,
-            NoAnimationRoute(
-              builder: (context) => SportsVenueScreen(initialSport: sport),
-            ),
-          );
+          NavigationService.pushInstant(SportsVenueScreen(initialSport: sport));
         },
         child: Column(
           children: [
@@ -753,14 +739,8 @@ class VenuesSection extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   // Navigate to Nearby Venues screen with no transition
-                  Navigator.push(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          const venues.NearByVenueScreen(),
-                      transitionDuration: Duration.zero,
-                      reverseTransitionDuration: Duration.zero,
-                    ),
+                  NavigationService.pushInstant(
+                    const venues.NearByVenueScreen(),
                   );
                 },
                 child: Text(
@@ -811,32 +791,35 @@ class VenueCard extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           // Navigate to CourtDetailScreen when tapped with venue data
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (context, animation, secondaryAnimation) =>
-                  CourtDetailScreen(
-                    courtData: {
-                      'id': venue.id,
-                      'name': venue.title,
-                      'type': venue.sports.isNotEmpty ? venue.sports.first : 'Sports Facility',
-                      'location': venue.location,
-                      'distance': '${venue.distance} km away',
-                      'rating': venue.rating,
-                      'total_reviews': 124,
-                      'price_per_hour': double.tryParse(venue.ratePerHour.replaceAll(RegExp(r'[^\d.]'), '')) ?? 0.0,
-                      'opening_hours': venue.openingHours,
-                      'closing_time': 'Closes at 11:00 PM',
-                      'phone': '+94 77 123 4567',
-                      'email': 'info@${venue.title.toLowerCase().replaceAll(' ', '')}.lk',
-                      'website': 'www.${venue.title.toLowerCase().replaceAll(' ', '')}.lk',
-                      'description': 'Premium sports facility with state-of-the-art equipment and professional-grade surfaces.',
-                      'images': [venue.imageUrl],
-                      'sports_available': venue.sports,
-                    },
-                  ),
-              transitionDuration: Duration.zero,
-              reverseTransitionDuration: Duration.zero,
+          NavigationService.pushInstant(
+            CourtDetailScreen(
+              courtData: {
+                'id': venue.id,
+                'name': venue.title,
+                'type': venue.sports.isNotEmpty
+                    ? venue.sports.first
+                    : 'Sports Facility',
+                'location': venue.location,
+                'distance': '${venue.distance} km away',
+                'rating': venue.rating,
+                'total_reviews': 124,
+                'price_per_hour':
+                    double.tryParse(
+                      venue.ratePerHour.replaceAll(RegExp(r'[^\d.]'), ''),
+                    ) ??
+                    0.0,
+                'opening_hours': venue.openingHours,
+                'closing_time': 'Closes at 11:00 PM',
+                'phone': '+94 77 123 4567',
+                'email':
+                    'info@${venue.title.toLowerCase().replaceAll(' ', '')}.lk',
+                'website':
+                    'www.${venue.title.toLowerCase().replaceAll(' ', '')}.lk',
+                'description':
+                    'Premium sports facility with state-of-the-art equipment and professional-grade surfaces.',
+                'images': [venue.imageUrl],
+                'sports_available': venue.sports,
+              },
             ),
           );
         },

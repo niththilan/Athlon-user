@@ -74,7 +74,8 @@ class CourtDetailScreen extends StatefulWidget {
   State<CourtDetailScreen> createState() => _CourtDetailScreenState();
 }
 
-class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProviderStateMixin {
+class _CourtDetailScreenState extends State<CourtDetailScreen>
+    with TickerProviderStateMixin {
   bool _isFavorite = false;
   int _currentImageIndex = 0;
   int _currentIndex = 0; // For footer navigation
@@ -286,7 +287,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                         'Close',
                         style: TextStyle(
                           color: const Color(0xFF8A8E99),
-                          fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 16,
+                          fontSize: MediaQuery.of(context).size.width < 400
+                              ? 14
+                              : 16,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -313,7 +316,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
             style: TextStyle(
               fontSize: 14,
               fontWeight: isToday ? FontWeight.w600 : FontWeight.w500,
-              color: isToday ? const Color(0xFF1B2C4F) : const Color(0xFF6B7280),
+              color: isToday
+                  ? const Color(0xFF1B2C4F)
+                  : const Color(0xFF6B7280),
             ),
           ),
           Text(
@@ -321,7 +326,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
             style: TextStyle(
               fontSize: 14,
               fontWeight: isToday ? FontWeight.w600 : FontWeight.w400,
-              color: isToday ? const Color(0xFF1B2C4F) : const Color(0xFF6B7280),
+              color: isToday
+                  ? const Color(0xFF1B2C4F)
+                  : const Color(0xFF6B7280),
             ),
           ),
         ],
@@ -331,22 +338,31 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
 
   bool _isToday(String day) {
     final now = DateTime.now();
-    final weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    final weekdays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
     final today = weekdays[now.weekday - 1];
     return day == today;
   }
 
-
   void _showReviewDialog() {
     int selectedRating = 0;
     final TextEditingController reviewController = TextEditingController();
-    
+
     showDialog(
       context: context,
       barrierColor: Colors.black.withOpacity(0.4),
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
           backgroundColor: Colors.white,
           elevation: 8,
           child: Container(
@@ -369,7 +385,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                   Text(
                     'Write a Review',
                     style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width < 400 ? 16 : 18,
+                      fontSize: MediaQuery.of(context).size.width < 400
+                          ? 16
+                          : 18,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFF2D3142),
                     ),
@@ -379,10 +397,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                   ),
                   const Text(
                     'Rate your experience',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF8A8E99),
-                    ),
+                    style: TextStyle(fontSize: 14, color: Color(0xFF8A8E99)),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -395,7 +410,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                           });
                         },
                         icon: Icon(
-                          index < selectedRating ? Icons.star : Icons.star_border,
+                          index < selectedRating
+                              ? Icons.star
+                              : Icons.star_border,
                           color: const Color(0xFFFBBF24),
                           size: 32,
                         ),
@@ -406,7 +423,10 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                   TextField(
                     controller: reviewController,
                     maxLines: 4,
-                    style: const TextStyle(fontSize: 16, color: Color(0xFF2D3142)),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF2D3142),
+                    ),
                     decoration: InputDecoration(
                       hintText: 'Share your experience...',
                       hintStyle: const TextStyle(
@@ -418,11 +438,16 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                         vertical: 14,
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: const Color(0xFF8A8E99).withOpacity(0.3)),
+                        borderSide: BorderSide(
+                          color: const Color(0xFF8A8E99).withOpacity(0.3),
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(color: Color(0xFF1B2C4F), width: 2),
+                        borderSide: const BorderSide(
+                          color: Color(0xFF1B2C4F),
+                          width: 2,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       filled: true,
@@ -447,7 +472,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                           'Cancel',
                           style: TextStyle(
                             color: const Color(0xFF8A8E99),
-                            fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 16,
+                            fontSize: MediaQuery.of(context).size.width < 400
+                                ? 14
+                                : 16,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -460,9 +487,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                             SnackBar(
                               content: const Text(
                                 'Review submitted successfully',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                style: TextStyle(fontWeight: FontWeight.w500),
                               ),
                               backgroundColor: Colors.green,
                               behavior: SnackBarBehavior.floating,
@@ -487,7 +512,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                         child: Text(
                           'Submit Review',
                           style: TextStyle(
-                            fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 15,
+                            fontSize: MediaQuery.of(context).size.width < 400
+                                ? 14
+                                : 15,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -657,9 +684,12 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                                 child: Center(
                                   child: CircularProgressIndicator(
                                     value:
-                                        loadingProgress.expectedTotalBytes != null
-                                        ? loadingProgress.cumulativeBytesLoaded /
-                                              loadingProgress.expectedTotalBytes!
+                                        loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes!
                                         : null,
                                     color: const Color(0xFF1B2C4F),
                                   ),
@@ -759,7 +789,10 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                     left: 0,
                     right: 0,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(
@@ -802,7 +835,10 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProvid
                           return Opacity(
                             opacity: 1.0 - _indicatorController.value,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.black.withOpacity(0.6),
                                 borderRadius: BorderRadius.circular(20),
@@ -1167,6 +1203,7 @@ class _SportsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isNetwork = imagePath.startsWith('http');
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: GestureDetector(
@@ -1181,7 +1218,9 @@ class _SportsCard extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 image: DecorationImage(
-                  image: AssetImage(imagePath),
+                  image: isNetwork
+                      ? NetworkImage(imagePath)
+                      : AssetImage(imagePath),
                   fit: BoxFit.cover,
                 ),
               ),

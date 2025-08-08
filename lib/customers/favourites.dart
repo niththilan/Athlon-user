@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'footer.dart';
+import 'widgets/football_spinner.dart';
 
 import 'courtDetails.dart';
 import 'nearbyVenues.dart';
@@ -137,8 +138,33 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
           child: IconButton(
             icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-            onPressed: () {
-              Navigator.of(context).pop();
+            onPressed: () async {
+              try {
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  barrierColor: Colors.white,
+                  builder: (BuildContext context) {
+                    return const FootballLoadingWidget();
+                  },
+                );
+
+                // Simulate loading time
+                await Future.delayed(const Duration(milliseconds: 200));
+
+                // Close loading dialog and navigate back
+                if (context.mounted) {
+                  Navigator.pop(context); // Close loading
+                  Navigator.of(context).pop(); // Go back
+                }
+              } catch (e) {
+                // Handle any errors
+                if (context.mounted) {
+                  Navigator.pop(context); // Close loading
+                  Navigator.of(context).pop(); // Go back
+                }
+              }
             },
           ),
         ),

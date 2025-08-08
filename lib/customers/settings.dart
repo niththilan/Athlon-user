@@ -273,19 +273,6 @@ class _SettingsScreenState extends State<SettingsScreen>
       ),
       child: Column(
         children: [
-          _buildSettingsSwitch(
-            title: 'Dark Mode',
-            subtitle: 'Apply dark theme to the app',
-            value: isDarkMode,
-            onChanged: (value) {
-              setState(() {
-                isDarkMode = value;
-              });
-            },
-            icon: Icons.dark_mode_outlined,
-            isFirst: true,
-          ),
-          _buildDivider(),
           _buildSettingsTile(
             title: 'Language',
             subtitle: selectedLanguage,
@@ -296,6 +283,7 @@ class _SettingsScreenState extends State<SettingsScreen>
               color: textLightColor,
               size: 20,
             ),
+            isFirst: true,
             isLast: true,
           ),
         ],

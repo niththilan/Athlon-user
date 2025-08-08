@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
+import 'widgets/football_spinner.dart';
 
 // New Filter Screen
 class FilterScreen extends StatefulWidget {
@@ -40,13 +41,13 @@ class _FilterScreenState extends State<FilterScreen> {
       backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
         elevation: 4,
-        toolbarHeight: 60,
+        toolbarHeight: 50,
         backgroundColor: const Color(0xFF1B2C4F),
         centerTitle: false,
         title: const Text(
           "Sort & Filter",
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
             fontFamily: 'Poppins',
             color: Colors.white,
@@ -295,12 +296,45 @@ class _FilterScreenState extends State<FilterScreen> {
               ),
               elevation: 0,
             ),
-            onPressed: () {
-              Navigator.pop(context, {
-                'sortingMode': _sortingMode,
-                'activeFilter': _activeFilter,
-                'distanceRadius': _distanceRadius,
-              });
+            onPressed: () async {
+              try {
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  barrierColor: Colors.white,
+                  builder: (BuildContext context) {
+                    return const FootballLoadingWidget();
+                  },
+                );
+
+                // Simulate processing time
+                await Future.delayed(const Duration(milliseconds: 300));
+
+                // Close loading dialog
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                }
+
+                // Return filter results
+                Navigator.pop(context, {
+                  'sortingMode': _sortingMode,
+                  'activeFilter': _activeFilter,
+                  'distanceRadius': _distanceRadius,
+                });
+              } catch (e) {
+                // Handle any errors
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                }
+                
+                // Still return filter results
+                Navigator.pop(context, {
+                  'sortingMode': _sortingMode,
+                  'activeFilter': _activeFilter,
+                  'distanceRadius': _distanceRadius,
+                });
+              }
             },
             child: const Text(
               "Apply Filters",

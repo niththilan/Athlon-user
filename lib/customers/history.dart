@@ -60,215 +60,200 @@ class HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  // Add mock data for testing
+  // Add mock data for player history
   void _initializeMockData() {
     final now = DateTime.now();
     bookingHistory = [
-      // Today's bookings
+      // Today's bookings - from player perspective
       BookingHistoryItem(
         id: '1',
-        customerName: 'John Smith',
         courtName: 'Football Court A',
         courtType: 'Football',
+        facilityName: 'CR7 Arena',
         date: now,
         startTime: '6:00 PM',
         endTime: '7:00 PM',
         duration: 60,
         price: 2500.0,
         status: 'confirmed',
-        customerPhone: '+94 77 123 4567',
       ),
       BookingHistoryItem(
         id: '2',
-        customerName: 'Sarah Johnson',
         courtName: 'Basketball Court B',
         courtType: 'Basketball',
+        facilityName: 'Champion\'s Arena',
         date: now,
         startTime: '4:00 PM',
         endTime: '5:30 PM',
         duration: 90,
         price: 3000.0,
         status: 'confirmed',
-        customerPhone: '+94 71 987 6543',
       ),
       BookingHistoryItem(
         id: '3',
-        customerName: 'Mike Wilson',
         courtName: 'Tennis Court 1',
         courtType: 'Tennis',
+        facilityName: 'Colombo Tennis Club',
         date: now,
         startTime: '8:00 PM',
         endTime: '9:00 PM',
         duration: 60,
         price: 2000.0,
         status: 'completed',
-        customerPhone: '+94 76 555 7890',
       ),
 
       // Yesterday's bookings
       BookingHistoryItem(
         id: '4',
-        customerName: 'Emma Davis',
         courtName: 'Football Court B',
         courtType: 'Football',
+        facilityName: 'Sports Complex Central',
         date: now.subtract(Duration(days: 1)),
         startTime: '5:00 PM',
         endTime: '6:30 PM',
         duration: 90,
         price: 3500.0,
         status: 'completed',
-        customerPhone: '+94 75 444 3210',
       ),
       BookingHistoryItem(
         id: '5',
-        customerName: 'Alex Thompson',
         courtName: 'Badminton Court A',
         courtType: 'Badminton',
+        facilityName: 'Metro Sports Club',
         date: now.subtract(Duration(days: 1)),
         startTime: '7:00 PM',
         endTime: '8:00 PM',
         duration: 60,
         price: 1500.0,
         status: 'completed',
-        customerPhone: '+94 77 888 9999',
       ),
       BookingHistoryItem(
         id: '6',
-        customerName: 'Lisa Brown',
         courtName: 'Football Court A',
         courtType: 'Football',
+        facilityName: 'CR7 Arena',
         date: now.subtract(Duration(days: 1)),
         startTime: '3:00 PM',
         endTime: '4:00 PM',
         duration: 60,
         price: 2500.0,
         status: 'cancelled',
-        customerPhone: '+94 70 222 1111',
       ),
 
       // Two days ago
       BookingHistoryItem(
         id: '7',
-        customerName: 'David Miller',
         courtName: 'Tennis Court 2',
         courtType: 'Tennis',
+        facilityName: 'Colombo Tennis Club',
         date: now.subtract(Duration(days: 2)),
         startTime: '6:30 PM',
         endTime: '7:30 PM',
         duration: 60,
         price: 2000.0,
         status: 'completed',
-        customerPhone: '+94 72 333 4444',
       ),
       BookingHistoryItem(
         id: '8',
-        customerName: 'Jessica Taylor',
         courtName: 'Basketball Court A',
         courtType: 'Basketball',
+        facilityName: 'Champion\'s Arena',
         date: now.subtract(Duration(days: 2)),
         startTime: '8:00 PM',
         endTime: '9:30 PM',
         duration: 90,
         price: 3000.0,
         status: 'completed',
-        customerPhone: '+94 78 666 7777',
       ),
 
       // Three days ago
       BookingHistoryItem(
         id: '9',
-        customerName: 'Robert Anderson',
         courtName: 'Football Court C',
         courtType: 'Football',
+        facilityName: 'Elite Sports Arena',
         date: now.subtract(Duration(days: 3)),
         startTime: '4:30 PM',
         endTime: '6:00 PM',
         duration: 90,
         price: 3500.0,
         status: 'completed',
-        customerPhone: '+94 74 111 2222',
       ),
       BookingHistoryItem(
         id: '10',
-        customerName: 'Maria Garcia',
         courtName: 'Volleyball Court A',
         courtType: 'Volleyball',
+        facilityName: 'Volleyball Center',
         date: now.subtract(Duration(days: 3)),
         startTime: '7:00 PM',
         endTime: '8:30 PM',
         duration: 90,
         price: 2800.0,
         status: 'completed',
-        customerPhone: '+94 73 555 6666',
       ),
 
       // A week ago
       BookingHistoryItem(
         id: '11',
-        customerName: 'Kevin Lee',
         courtName: 'Badminton Court B',
         courtType: 'Badminton',
+        facilityName: 'Metro Sports Club',
         date: now.subtract(Duration(days: 7)),
         startTime: '5:30 PM',
         endTime: '6:30 PM',
         duration: 60,
         price: 1500.0,
         status: 'completed',
-        customerPhone: '+94 76 777 8888',
       ),
       BookingHistoryItem(
         id: '12',
-        customerName: 'Amy Chen',
         courtName: 'Tennis Court 1',
         courtType: 'Tennis',
+        facilityName: 'Colombo Tennis Club',
         date: now.subtract(Duration(days: 7)),
         startTime: '6:00 PM',
         endTime: '7:00 PM',
         duration: 60,
         price: 2000.0,
         status: 'completed',
-        customerPhone: '+94 71 999 0000',
       ),
 
       // Future bookings
       BookingHistoryItem(
         id: '13',
-        customerName: 'Tom Wilson',
         courtName: 'Football Court A',
         courtType: 'Football',
+        facilityName: 'CR7 Arena',
         date: now.add(Duration(days: 1)),
         startTime: '5:00 PM',
         endTime: '6:00 PM',
         duration: 60,
         price: 2500.0,
         status: 'confirmed',
-        customerPhone: '+94 77 444 5555',
       ),
       BookingHistoryItem(
         id: '14',
-        customerName: 'Rachel Green',
         courtName: 'Basketball Court B',
         courtType: 'Basketball',
+        facilityName: 'Champion\'s Arena',
         date: now.add(Duration(days: 2)),
         startTime: '7:00 PM',
         endTime: '8:30 PM',
         duration: 90,
         price: 3000.0,
         status: 'confirmed',
-        customerPhone: '+94 75 666 7777',
       ),
       BookingHistoryItem(
         id: '15',
-        customerName: 'Mark Johnson',
         courtName: 'Tennis Court 2',
         courtType: 'Tennis',
+        facilityName: 'Colombo Tennis Club',
         date: now.add(Duration(days: 3)),
         startTime: '6:30 PM',
         endTime: '7:30 PM',
         duration: 60,
         price: 2000.0,
         status: 'pending',
-        customerPhone: '+94 72 888 9999',
       ),
     ];
   }
@@ -499,18 +484,13 @@ class HistoryScreenState extends State<HistoryScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left: Court details above customer name
+          // Left: Court details and facility name
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   booking.courtName,
-                  style: TextStyle(fontSize: 14, color: textSecondary),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  booking.customerName,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -519,13 +499,13 @@ class HistoryScreenState extends State<HistoryScreen> {
                 ),
                 SizedBox(height: 2),
                 Text(
-                  '${DateFormat('MMM d').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
-                  style: TextStyle(fontSize: 13, color: textSecondary),
+                  booking.facilityName,
+                  style: TextStyle(fontSize: 14, color: textSecondary),
                 ),
                 SizedBox(height: 2),
                 Text(
-                  'Phone: ${booking.customerPhone}',
-                  style: TextStyle(fontSize: 12, color: textSecondary),
+                  '${DateFormat('MMM d').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
+                  style: TextStyle(fontSize: 13, color: textSecondary),
                 ),
               ],
             ),
@@ -546,27 +526,6 @@ class HistoryScreenState extends State<HistoryScreen> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    margin: EdgeInsets.only(right: 4),
-                    child: GestureDetector(
-                      onTap: () => _makePhoneCall(booking.customerPhone),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 41, 107, 65),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.phone,
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                   SizedBox(
                     width: 40,
                     height: 40,
@@ -590,7 +549,9 @@ class HistoryScreenState extends State<HistoryScreen> {
                 ],
               ),
               // Status box (right, below price, aligned with court details/time)
-              if (booking.status.toLowerCase() != 'confirmed')
+              if (booking.status.toLowerCase() != 'confirmed' && 
+                  booking.status.toLowerCase() != 'completed' && 
+                  booking.status.toLowerCase() != 'cancelled')
                 Container(
                   margin: EdgeInsets.only(top: 6),
                   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -614,25 +575,6 @@ class HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  void _makePhoneCall(String phoneNumber) {
-    // Remove any formatting and ensure we have a valid number
-    final cleanNumber = phoneNumber.replaceAll(RegExp(r'[^\d+]'), '');
-
-    // For now, show a snackbar. In a real app, you would use url_launcher
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Calling $cleanNumber...'),
-        backgroundColor: darkGreenColor, // Changed to dark green
-        duration: Duration(seconds: 2),
-      ),
-    );
-
-    // Uncomment and add url_launcher dependency to actually make calls:
-    // final url = 'tel:$cleanNumber';
-    // if (await canLaunch(url)) {
-    //   await launch(url);
-    // }
-  }
 
   void _showBookingDetails(BookingHistoryItem booking) {
     showDialog(
@@ -681,13 +623,8 @@ class HistoryScreenState extends State<HistoryScreen> {
 
                 SizedBox(height: 20),
 
-                // Customer Information
-                _buildDetailRow('Customer Name', booking.customerName),
-                _buildDetailRow('Phone Number', booking.customerPhone),
-
-                SizedBox(height: 16),
-
-                // Court Information
+                // Facility Information
+                _buildDetailRow('Facility Name', booking.facilityName),
                 _buildDetailRow('Court Name', booking.courtName),
                 _buildDetailRow('Court Type', booking.courtType),
 
@@ -703,7 +640,6 @@ class HistoryScreenState extends State<HistoryScreen> {
                   '${booking.startTime} - ${booking.endTime}',
                 ),
                 _buildDetailRow('Duration', '${booking.duration} minutes'),
-                _buildDetailRow('Status', booking.status.toUpperCase()),
 
                 SizedBox(height: 16),
 
@@ -744,21 +680,20 @@ class HistoryScreenState extends State<HistoryScreen> {
                       child: GestureDetector(
                         onTap: () {
                           Navigator.of(context).pop();
-                          _makePhoneCall(booking.customerPhone);
                         },
                         child: Container(
                           padding: EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            color: darkGreenColor, // Changed to dark green
+                            color: primaryColor,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.phone, size: 18, color: Colors.white),
+                              Icon(Icons.close, size: 18, color: Colors.white),
                               SizedBox(width: 8),
                               Text(
-                                'Call Court',
+                                'Close',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -1224,31 +1159,29 @@ class HistoryScreenState extends State<HistoryScreen> {
   }
 }
 
-/// Simplified data model for booking history items
+/// Simplified data model for booking history items (player-focused)
 class BookingHistoryItem {
   final String id;
-  final String customerName;
   final String courtName;
   final String courtType;
+  final String facilityName;
   final DateTime date;
   final String startTime;
   final String endTime;
   final int duration;
   final double price;
   final String status;
-  final String customerPhone;
 
   BookingHistoryItem({
     required this.id,
-    required this.customerName,
     required this.courtName,
     required this.courtType,
+    required this.facilityName,
     required this.date,
     required this.startTime,
     required this.endTime,
     required this.duration,
     required this.price,
     required this.status,
-    required this.customerPhone,
   });
 }

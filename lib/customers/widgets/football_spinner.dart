@@ -63,10 +63,15 @@ class FootballLoadingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      height: double.infinity,
-      color: backgroundColor ?? const Color(0xFFF5F6FA),
-      child: const Center(child: FootballSpinner(size: 60.0)),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      color: backgroundColor ?? Colors.white,
+      child: const Center(
+        child: FootballSpinner(
+          size: 60.0,
+          color: Color(0xFF1B2C4F),
+        ),
+      ),
     );
   }
 }
