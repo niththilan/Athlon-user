@@ -74,11 +74,13 @@ class CourtDetailScreen extends StatefulWidget {
   State<CourtDetailScreen> createState() => _CourtDetailScreenState();
 }
 
-class _CourtDetailScreenState extends State<CourtDetailScreen> {
+class _CourtDetailScreenState extends State<CourtDetailScreen> with TickerProviderStateMixin {
   bool _isFavorite = false;
   int _currentImageIndex = 0;
   int _currentIndex = 0; // For footer navigation
   bool _isLoading = true;
+  PageController _pageController = PageController();
+  late AnimationController _indicatorController;
 
   // Mock court data
   late Map<String, dynamic> _courtDetails;
@@ -87,6 +89,10 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
   void initState() {
     super.initState();
     _initializeCourtData();
+    _indicatorController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
     _startSlideshow();
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
@@ -97,14 +103,24 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
     });
   }
 
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _indicatorController.dispose();
+    super.dispose();
+  }
+
   void _startSlideshow() {
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted && _pageController.hasClients) {
         final images = _courtDetails['images'];
         if (images is List && images.isNotEmpty) {
-          setState(() {
-            _currentImageIndex = (_currentImageIndex + 1) % images.length;
-          });
+          final nextIndex = (_currentImageIndex + 1) % images.length;
+          _pageController.animateToPage(
+            nextIndex,
+            duration: const Duration(milliseconds: 800),
+            curve: Curves.easeInOutCubic,
+          );
         }
         _startSlideshow();
       }
@@ -286,70 +302,89 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
           // Top Image Carousel
           SliverToBoxAdapter(
             child: SizedBox(
-              height: 300,
+              height: 350,
               child: Stack(
                 children: [
                   // Image Carousel
                   PageView.builder(
+                    controller: _pageController,
                     itemCount: _courtDetails['images'].length,
+                    physics: const BouncingScrollPhysics(),
                     onPageChanged: (index) {
                       setState(() {
                         _currentImageIndex = index;
                       });
+                      _indicatorController.reset();
+                      _indicatorController.forward();
                     },
                     itemBuilder: (context, index) {
-                      return Image.network(
-                        _courtDetails['images'][index],
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            color: Colors.white,
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                value:
-                                    loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                    : null,
-                                color: const Color(0xFF1B2C4F),
-                              ),
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
                             ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.white,
-                            child: const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.sports_soccer,
-                                  size: 50,
-                                  color: Color(0xFF1B2C4F),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  'ARK SPORTS',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF1B2C4F),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(0),
+                          child: Image.network(
+                            _courtDetails['images'][index],
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                color: Colors.white,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    value:
+                                        loadingProgress.expectedTotalBytes != null
+                                        ? loadingProgress.cumulativeBytesLoaded /
+                                              loadingProgress.expectedTotalBytes!
+                                        : null,
+                                    color: const Color(0xFF1B2C4F),
                                   ),
                                 ),
-                                Text(
-                                  'Indoor Sports Facility',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Color(0xFF1B2C4F),
-                                  ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.white,
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.sports_soccer,
+                                      size: 50,
+                                      color: Color(0xFF1B2C4F),
+                                    ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      'ARK SPORTS',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF1B2C4F),
+                                      ),
+                                    ),
+                                    Text(
+                                      'Indoor Sports Facility',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF1B2C4F),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
-                        },
+                              );
+                            },
+                          ),
+                        ),
                       );
                     },
                   ),
@@ -404,29 +439,84 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                     ),
                   ),
 
-                  // Bottom indicators
+                  // Bottom indicators with enhanced animation
                   Positioned(
                     bottom: 20,
                     left: 0,
                     right: 0,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        _courtDetails['images'].length,
-                        (index) => Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 3),
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: index == _currentImageIndex
-                                ? Colors.white
-                                : Colors.white.withOpacity(0.5),
-                            shape: BoxShape.circle,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          _courtDetails['images'].length,
+                          (index) => AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: index == _currentImageIndex ? 24 : 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: index == _currentImageIndex
+                                  ? Colors.white
+                                  : Colors.white.withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(4),
+                              boxShadow: index == _currentImageIndex
+                                  ? [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.3),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : [],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
+
+                  // Swipe hint overlay (appears briefly on first load)
+                  if (_currentImageIndex == 0)
+                    Positioned(
+                      bottom: 60,
+                      right: 20,
+                      child: AnimatedBuilder(
+                        animation: _indicatorController,
+                        builder: (context, child) {
+                          return Opacity(
+                            opacity: 1.0 - _indicatorController.value,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.6),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.swipe,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Swipe',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -450,8 +540,8 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             child: Text(
                               _courtDetails['name'],
                               style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
                                 color: Color(0xFF1B2C4F),
                               ),
                             ),
@@ -545,7 +635,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         title: Text(
                           _courtDetails['location'],
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF1B2C4F),
                           ),
@@ -556,6 +646,11 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             fontSize: 14,
                             color: Color(0xFF6B7280),
                           ),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Color(0xFF6B7280),
+                          size: 16,
                         ),
                       ),
                       const Divider(
@@ -585,7 +680,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         title: Text(
                           _courtDetails['opening_hours'],
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF1B2C4F),
                           ),
@@ -596,6 +691,11 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             fontSize: 14,
                             color: Color(0xFF6B7280),
                           ),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Color(0xFF6B7280),
+                          size: 16,
                         ),
                       ),
                       const Divider(
@@ -625,7 +725,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                         title: const Text(
                           'Write a Review',
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF1B2C4F),
                           ),
@@ -636,6 +736,11 @@ class _CourtDetailScreenState extends State<CourtDetailScreen> {
                             fontSize: 14,
                             color: Color(0xFF6B7280),
                           ),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Color(0xFF6B7280),
+                          size: 16,
                         ),
                       ),
                     ],
