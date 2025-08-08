@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'footer.dart';
 import 'nearbyVenues.dart';
+import 'widgets/football_spinner.dart';
 
 // Data models (matching homepage structure)
 class Facility {
@@ -428,6 +429,16 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   Future<void> _refreshBookingData() async {
     if (_isRefreshing) return; // Prevent multiple simultaneous refreshes
 
+    // Show loading screen
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.white,
+      builder: (BuildContext context) {
+        return const FootballLoadingWidget();
+      },
+    );
+
     setState(() {
       _isRefreshing = true;
     });
@@ -438,10 +449,14 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
         Future(() => _initializeFacilities()),
         _loadVenueOpeningHours(),
       ]);
+
+      // Additional loading delay to show refresh feedback
+      await Future.delayed(const Duration(milliseconds: 500));
     } catch (e) {
       print('Error refreshing booking data: $e');
     } finally {
       if (mounted) {
+        Navigator.pop(context); // Close loading dialog
         setState(() {
           _isRefreshing = false;
         });

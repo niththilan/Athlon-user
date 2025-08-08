@@ -1031,7 +1031,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             );
 
                             // Simulate loading time
-                            await Future.delayed(const Duration(milliseconds: 400));
+                            await Future.delayed(
+                              const Duration(milliseconds: 400),
+                            );
 
                             // Close loading dialog
                             if (Navigator.canPop(context)) {
@@ -1042,8 +1044,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             Navigator.push(
                               context,
                               PageRouteBuilder(
-                                pageBuilder: (context, animation, secondaryAnimation) =>
-                                    SlotsPage(selectedVenue: venue),
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        SlotsPage(selectedVenue: venue),
                                 transitionDuration: Duration.zero,
                                 reverseTransitionDuration: Duration.zero,
                               ),
@@ -1053,13 +1056,14 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                             if (Navigator.canPop(context)) {
                               Navigator.pop(context);
                             }
-                            
+
                             // Still navigate to bookings screen
                             Navigator.push(
                               context,
                               PageRouteBuilder(
-                                pageBuilder: (context, animation, secondaryAnimation) =>
-                                    SlotsPage(selectedVenue: venue),
+                                pageBuilder:
+                                    (context, animation, secondaryAnimation) =>
+                                        SlotsPage(selectedVenue: venue),
                                 transitionDuration: Duration.zero,
                                 reverseTransitionDuration: Duration.zero,
                               ),
@@ -1114,11 +1118,27 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     );
 
     if (result != null) {
-      setState(() {
-        _sortingMode = result['sortingMode'] ?? _sortingMode;
-        _activeFilter = result['activeFilter'] ?? _activeFilter;
-        _distanceRadius = result['distanceRadius'] ?? _distanceRadius;
-      });
+      // Show loading screen when sorting/filtering changes
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: Colors.white,
+        builder: (BuildContext context) {
+          return const FootballLoadingWidget();
+        },
+      );
+
+      // Loading delay
+      await Future.delayed(const Duration(milliseconds: 400));
+
+      if (mounted) {
+        Navigator.pop(context); // Close loading dialog
+        setState(() {
+          _sortingMode = result['sortingMode'] ?? _sortingMode;
+          _activeFilter = result['activeFilter'] ?? _activeFilter;
+          _distanceRadius = result['distanceRadius'] ?? _distanceRadius;
+        });
+      }
     }
   }
 }

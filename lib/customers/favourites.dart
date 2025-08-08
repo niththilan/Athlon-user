@@ -420,13 +420,34 @@ class VenueCardFavorite extends StatelessWidget {
 
                     // View More Button
                     ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const CourtDetailScreen(),
-                          ),
+                      onPressed: () async {
+                        // Show loading screen immediately
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          barrierColor: Colors.white,
+                          builder: (BuildContext context) {
+                            return const FootballLoadingWidget();
+                          },
                         );
+
+                        // Loading delay
+                        await Future.delayed(const Duration(milliseconds: 300));
+
+                        // Navigate without animation
+                        if (context.mounted) {
+                          Navigator.pop(context); // Close loading dialog
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      const CourtDetailScreen(),
+                              transitionDuration: Duration.zero,
+                              reverseTransitionDuration: Duration.zero,
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1B2C4F),

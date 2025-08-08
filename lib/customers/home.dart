@@ -372,7 +372,26 @@ class NotificationScreenState extends State<NotificationScreen> {
                   color: Colors.white,
                   size: 28,
                 ),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () async {
+                  // Show loading screen
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    barrierColor: Colors.white,
+                    builder: (BuildContext context) {
+                      return const FootballLoadingWidget();
+                    },
+                  );
+
+                  // Loading delay
+                  await Future.delayed(const Duration(milliseconds: 200));
+
+                  // Navigate back to home
+                  if (context.mounted) {
+                    Navigator.pop(context); // Close loading dialog
+                    Navigator.pop(context); // Go back to home
+                  }
+                },
                 tooltip: 'Back',
               ),
             ),

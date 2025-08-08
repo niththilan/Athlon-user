@@ -600,12 +600,33 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(12),
-            onTap: () {
-              // Navigate to SlotsPage screen
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SlotsPage()),
+            onTap: () async {
+              // Show loading screen immediately
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                barrierColor: Colors.white,
+                builder: (BuildContext context) {
+                  return const FootballLoadingWidget();
+                },
               );
+
+              // Loading delay
+              await Future.delayed(const Duration(milliseconds: 300));
+
+              // Navigate to SlotsPage screen without animation
+              if (context.mounted) {
+                Navigator.pop(context); // Close loading dialog
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const SlotsPage(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  ),
+                );
+              }
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
