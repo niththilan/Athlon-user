@@ -152,7 +152,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
             'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
             'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
           ],
-          'sports_available': ['Football', 'Cricket', 'Basketball'],
+          'sports_available': ['Futsal', 'Cricket', 'Basketball'],
         };
   }
 
@@ -349,6 +349,60 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
     ];
     final today = weekdays[now.weekday - 1];
     return day == today;
+  }
+
+  List<Widget> _buildSportsCards() {
+    // Safely get sports available, ensuring it's a List<String>
+    final dynamic sportsData = _courtDetails['sports_available'];
+    final List<String> sportsAvailable;
+    
+    if (sportsData is List) {
+      sportsAvailable = sportsData.cast<String>();
+    } else {
+      sportsAvailable = [];
+    }
+    
+    // Return empty list if no sports available
+    if (sportsAvailable.isEmpty) {
+      return [];
+    }
+    
+    // Sports image mapping
+    final Map<String, String> sportsImages = {
+      'Futsal': 'assets/football.jpg',
+      'Football': 'assets/football.jpg',
+      'Basketball': 'assets/basket.jpg',
+      'Tennis': 'assets/tennis.jpg',
+      'Cricket': 'assets/crickett.jpg',
+      'Badminton': 'assets/badminton.jpg',
+      'Swimming': 'assets/swimming.jpg',
+      'Squash': 'assets/tennis.jpg',
+      'Table Tennis': 'assets/tennis.jpg',
+      'Volleyball': 'assets/basket.jpg',
+      'Golf': 'assets/golf.jpg',
+      'Boxing': 'assets/boxing.jpg',
+      'MMA': 'assets/boxing.jpg',
+      'Kickboxing': 'assets/boxing.jpg',
+      'Water Polo': 'assets/swimming.jpg',
+      'Diving': 'assets/swimming.jpg',
+      'Beach Volleyball': 'assets/basket.jpg',
+      'Surfing': 'assets/surfing.jpg',
+      'Mountain Biking': 'assets/biking.jpg',
+      'Baseball': 'assets/crickett.jpg',
+      'Rugby': 'assets/football.jpg',
+      'Rock Climbing': 'assets/climbing.jpg',
+      'Bouldering': 'assets/climbing.jpg',
+      'Netball': 'assets/basket.jpg',
+    };
+
+    // Create cards only for the sports in the list, in the exact order
+    return sportsAvailable.map((sport) {
+      final imagePath = sportsImages[sport] ?? 'assets/football.jpg';
+      return _SportsCard(
+        sport: sport,
+        imagePath: imagePath,
+      );
+    }).toList();
   }
 
   void _showReviewDialog() {
@@ -1130,66 +1184,74 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
                 // Available Sports Section
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white,
+                        const Color(0xFFF8FAFC),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+                        color: const Color(0xFF1B2C4F).withOpacity(0.08),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                        spreadRadius: 0,
+                      ),
+                      BoxShadow(
+                        color: Colors.white,
+                        blurRadius: 0,
+                        offset: const Offset(0, 1),
+                        spreadRadius: 0,
                       ),
                     ],
+                    border: Border.all(
+                      color: const Color(0xFFE5E7EB).withOpacity(0.5),
+                      width: 0.5,
+                    ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 4.0),
-                            child: Text(
-                              "Available Sports in this Venue",
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Available Sports",
                               style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF2D3142),
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF1B2C4F),
+                                letterSpacing: -0.5,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            _SportsCard(
-                              sport: "Football",
-                              imagePath: "assets/football.jpg",
-                            ),
-                            _SportsCard(
-                              sport: "Basketball",
-                              imagePath: "assets/basket.jpg",
-                            ),
-                            _SportsCard(
-                              sport: "Tennis",
-                              imagePath: "assets/tennis.jpg",
-                            ),
-                            _SportsCard(
-                              sport: "Cricket",
-                              imagePath: "assets/crickett.jpg",
-                            ),
-                            _SportsCard(
-                              sport: "Badminton",
-                              imagePath: "assets/badminton.jpg",
+                            const SizedBox(height: 2),
+                            Text(
+                              "Sports offered at this venue",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF6B7280),
+                                letterSpacing: 0.2,
+                              ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 20),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          child: Row(
+                            children: _buildSportsCards(),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -1226,36 +1288,147 @@ class _SportsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isNetwork = imagePath.startsWith('http');
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.only(right: 16.0),
       child: GestureDetector(
         onTap: () {
           // You can add navigation logic here if needed
         },
-        child: Column(
-          children: [
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                image: DecorationImage(
-                  image: isNetwork
-                      ? NetworkImage(imagePath)
-                      : AssetImage(imagePath),
-                  fit: BoxFit.cover,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF1B2C4F).withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+                spreadRadius: 0,
+              ),
+              BoxShadow(
+                color: Colors.white.withOpacity(0.9),
+                blurRadius: 0,
+                offset: const Offset(0, 1),
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 110,
+                height: 110,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white,
+                      const Color(0xFFF8FAFC),
+                    ],
+                  ),
+                  border: Border.all(
+                    color: const Color(0xFFE5E7EB).withOpacity(0.6),
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF1B2C4F).withOpacity(0.06),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                      spreadRadius: 0,
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(19),
+                  child: Stack(
+                    children: [
+                      // Background gradient overlay
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.transparent,
+                              const Color(0xFF1B2C4F).withOpacity(0.3),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Sport image
+                      Positioned.fill(
+                        child: Image(
+                          image: isNetwork
+                              ? NetworkImage(imagePath)
+                              : AssetImage(imagePath) as ImageProvider,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    const Color(0xFF1B2C4F).withOpacity(0.8),
+                                    const Color(0xFF2D3E5F).withOpacity(0.9),
+                                  ],
+                                ),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.sports_rounded,
+                                  color: Colors.white,
+                                  size: 32,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      // Sport name overlay
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 8,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.transparent,
+                                Colors.black.withOpacity(0.7),
+                              ],
+                            ),
+                          ),
+                          child: Text(
+                            sport,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                              letterSpacing: 0.3,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black45,
+                                  offset: Offset(0, 1),
+                                  blurRadius: 2,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              sport,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF2D3142),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
