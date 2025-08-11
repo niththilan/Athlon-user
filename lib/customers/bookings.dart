@@ -343,8 +343,8 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 50,
-                      height: 36,
+                      width: 80,
+                      height: 40,
                       decoration: BoxDecoration(
                         color: const Color.fromARGB(255, 8, 89, 11),
                         borderRadius: BorderRadius.circular(10),
@@ -415,8 +415,8 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 50,
-                      height: 36,
+                      width: 80,
+                      height: 40,
                       margin: const EdgeInsets.only(right: 6),
                       decoration: BoxDecoration(
                         color: const Color.fromARGB(255, 8, 89, 11),
@@ -451,8 +451,8 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                       ),
                     ),
                     Container(
-                      width: 50,
-                      height: 36,
+                      width: 80,
+                      height: 40,
                       decoration: BoxDecoration(
                         color: const Color.fromARGB(255, 8, 89, 11),
                         borderRadius: BorderRadius.circular(10),
