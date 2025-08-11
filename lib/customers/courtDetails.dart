@@ -675,7 +675,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        const SlotsPage(),
+                        SlotsPage(
+                          courtData: _courtDetails,
+                        ),
                     transitionDuration: Duration.zero,
                     reverseTransitionDuration: Duration.zero,
                   ),

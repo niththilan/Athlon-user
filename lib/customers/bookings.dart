@@ -118,9 +118,10 @@ void main() {
 
 class SlotsBookingApp extends StatelessWidget {
   final String? selectedCourtId;
+  final Map<String, dynamic>? courtData;
 
   // ignore: use_super_parameters
-  const SlotsBookingApp({Key? key, this.selectedCourtId}) : super(key: key);
+  const SlotsBookingApp({Key? key, this.selectedCourtId, this.courtData}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -137,7 +138,7 @@ class SlotsBookingApp extends StatelessWidget {
           ),
         ),
       ),
-      home: SlotsPage(selectedCourtId: selectedCourtId),
+      home: SlotsPage(selectedCourtId: selectedCourtId, courtData: courtData),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -146,8 +147,9 @@ class SlotsBookingApp extends StatelessWidget {
 class SlotsPage extends StatefulWidget {
   final String? selectedCourtId;
   final VenueModel? selectedVenue;
+  final Map<String, dynamic>? courtData;
 
-  const SlotsPage({Key? key, this.selectedCourtId, this.selectedVenue})
+  const SlotsPage({Key? key, this.selectedCourtId, this.selectedVenue, this.courtData})
     : super(key: key);
 
   @override
@@ -282,10 +284,17 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     _initializeSelectedSlots();
     _loadVenueOpeningHours();
 
-    // Initialize selected sport from available courts
-    final availableSports = _getAvailableSportsFromCourts();
-    if (availableSports.isNotEmpty) {
-      selectedSport = availableSports.first;
+    // Initialize selected sport from court data or available courts
+    if (widget.courtData != null && widget.courtData!['sports_available'] != null) {
+      final List<dynamic> sportsFromCourt = widget.courtData!['sports_available'];
+      if (sportsFromCourt.isNotEmpty) {
+        selectedSport = sportsFromCourt.first.toString();
+      }
+    } else {
+      final availableSports = _getAvailableSportsFromCourts();
+      if (availableSports.isNotEmpty) {
+        selectedSport = availableSports.first;
+      }
     }
   }
 
@@ -2007,7 +2016,26 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: VenueSelectionSection(
-                venue: widget.selectedVenue != null
+                venue: widget.courtData != null
+                    ? {
+                        'title': widget.courtData!['name'] ?? 'Court Details',
+                        'location': widget.courtData!['location'] ?? 'Location',
+                        'sport': selectedSport ?? (widget.courtData!['sports_available'] as List?)?.first ?? 'Football',
+                        'rating': widget.courtData!['rating'] ?? 4.8,
+                        'rate_per_hour': 'Rs. ${widget.courtData!['price_per_hour'] ?? 2500}',
+                        'distance': widget.courtData!['distance'] ?? '2.5 km',
+                        'sports_available': widget.courtData!['sports_available'] ?? ['Football'],
+                        'imageUrl': (widget.courtData!['images'] as List?)?.isNotEmpty == true 
+                            ? widget.courtData!['images'][0] 
+                            : null,
+                        'phone': widget.courtData!['phone'],
+                        'email': widget.courtData!['email'],
+                        'website': widget.courtData!['website'],
+                        'description': widget.courtData!['description'],
+                        'opening_hours': widget.courtData!['opening_hours'],
+                        'closing_time': widget.courtData!['closing_time'],
+                      }
+                    : widget.selectedVenue != null
                     ? {
                         'title': widget.selectedVenue!.title,
                         'location': widget.selectedVenue!.location,
@@ -4078,6 +4106,12 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
 
   // Helper method to get only sports that have actual courts available
   List<String> _getAvailableSportsFromCourts() {
+    // If court data is provided, prioritize court data sports
+    if (widget.courtData != null && widget.courtData!['sports_available'] != null) {
+      final List<dynamic> sportsFromCourt = widget.courtData!['sports_available'];
+      return sportsFromCourt.map((sport) => sport.toString()).toList();
+    }
+
     // If a venue is selected, prioritize venue sports
     if (widget.selectedVenue != null &&
         widget.selectedVenue!.sports.isNotEmpty) {
