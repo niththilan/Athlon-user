@@ -42,6 +42,8 @@ flutter:
     - assets/logo.jpg
     - assets/netball.jpg
     - assets/lolc.webp
+    - assets/courts1.jpg
+    - assets/courts3.jpg
 
 flutter_launcher_icons:
   android: "launcher_icon"

@@ -605,7 +605,7 @@ class FeatureSection extends StatelessWidget {
     return FeatureCard(
       title: "Book Venue",
       description: "Find and book your perfect sports venue nearby",
-      imagePath: 'assets/courts.jpg',
+      imagePath: 'assets/courts3.jpg',
     );
   }
 }
