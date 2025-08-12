@@ -449,121 +449,154 @@ class FeatureCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Check if this is the Find Players card to disable it
-    bool isDisabled = title == "Find Players";
-
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: isDisabled
-            ? null
-            : () {
-                // Navigation only for enabled cards
-                if (title == "Book") {
-                  // Navigate to Nearby Venues screen
-                  NavigationService.pushInstant(
-                    const venues.NearByVenueScreen(),
-                  );
-                }
-              },
+        onTap: () {
+          // Navigate to Nearby Venues screen
+          NavigationService.pushInstant(
+            const venues.NearByVenueScreen(),
+          );
+        },
         borderRadius: BorderRadius.circular(16),
-        child: Ink(
+        child: Container(
           decoration: BoxDecoration(
-            color: isDisabled ? Colors.grey.shade100 : Colors.white,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha((0.08 * 255).toInt()),
-                blurRadius: 12,
-                offset: Offset(0, 4),
+                color: const Color(0xFF1B2C4F).withOpacity(0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+                spreadRadius: 0,
+              ),
+              BoxShadow(
+                color: const Color(0xFF1B2C4F).withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+                spreadRadius: 0,
               ),
             ],
           ),
           child: Stack(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 120,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(16),
-                      ),
-                      image: DecorationImage(
-                        image: AssetImage(imagePath),
-                        fit: BoxFit.cover,
-                        colorFilter: isDisabled
-                            ? ColorFilter.mode(
-                                Colors.grey.withOpacity(0.7),
-                                BlendMode.srcOver,
-                              )
-                            : null,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: 4),
-                        Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: isDisabled
-                                ? Colors.grey.shade600
-                                : Color(0xFF2D3142),
-                          ),
-                        ),
-                        SizedBox(height: 1),
-                        Text(
-                          isDisabled ? "Coming soon..." : description,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDisabled
-                                ? Colors.grey.shade500
-                                : Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              // Add "Coming Soon" overlay for disabled cards
-              if (isDisabled)
-                Positioned(
-                  top: 8,
-                  right: 8,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.shade600,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 4,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: const Text(
-                      'Coming Soon',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w600,
-                      ),
+              // Background image with overlay
+              Container(
+                height: 180,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  image: DecorationImage(
+                    image: AssetImage(imagePath),
+                    fit: BoxFit.cover,
+                    colorFilter: ColorFilter.mode(
+                      Colors.black.withOpacity(0.3),
+                      BlendMode.darken,
                     ),
                   ),
                 ),
+              ),
+              // Gradient overlay for better text readability
+              Container(
+                height: 180,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withOpacity(0.7),
+                    ],
+                  ),
+                ),
+              ),
+              // Content
+              Positioned(
+                bottom: 20,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            description,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.white.withOpacity(0.9),
+                              height: 1.4,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Start booking today',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white.withOpacity(0.8),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(25),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Book Now',
+                                  style: TextStyle(
+                                    color: const Color(0xFF1B2C4F),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Icon(
+                                  Icons.arrow_forward_rounded,
+                                  color: const Color(0xFF1B2C4F),
+                                  size: 16,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -572,30 +605,16 @@ class FeatureCard extends StatelessWidget {
   }
 }
 
-// Update FeatureSection to include onTap handlers
+// Updated FeatureSection with only Book feature
 class FeatureSection extends StatelessWidget {
   const FeatureSection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: FeatureCard(
-            title: "Find Players",
-            description: "Find players and join their activities",
-            imagePath: 'assets/findplay.jpg',
-          ),
-        ),
-        SizedBox(width: 14),
-        Expanded(
-          child: FeatureCard(
-            title: "Book",
-            description: "Book your slots in venues nearby",
-            imagePath: 'assets/courts.jpg',
-          ),
-        ),
-      ],
+    return FeatureCard(
+      title: "Book Venue",
+      description: "Find and book your perfect sports venue nearby",
+      imagePath: 'assets/courts.jpg',
     );
   }
 }
