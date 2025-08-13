@@ -42,8 +42,8 @@ class AppFooter extends StatelessWidget {
         Navigator.pop(context);
       }
 
-      // Navigate to favorites screen with the list (even if empty)
-      Navigator.pushReplacement(
+      // Navigate to favorites screen with push instead of pushReplacement
+      Navigator.push(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) => FavoritesScreen(
@@ -70,7 +70,7 @@ class AppFooter extends StatelessWidget {
       );
 
       // Navigate to empty favorites as fallback
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
@@ -105,8 +105,8 @@ class AppFooter extends StatelessWidget {
         Navigator.pop(context);
       }
 
-      // Navigate to history screen
-      Navigator.pushReplacement(
+      // Navigate to history screen with push instead of pushReplacement
+      Navigator.push(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
@@ -122,7 +122,7 @@ class AppFooter extends StatelessWidget {
       }
 
       // Still navigate to history screen
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
@@ -135,51 +135,17 @@ class AppFooter extends StatelessWidget {
   }
 
   Future<void> _navigateToMessages(BuildContext context) async {
-    try {
-      // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        barrierColor: Colors.white,
-        builder: (BuildContext context) {
-          return const FootballLoadingWidget();
-        },
+    // Direct navigation without loading indicator for fastest performance
+    if (context.mounted) {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const MessagesScreen(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
       );
-
-      // Reduced loading time for faster navigation
-      await Future.delayed(const Duration(milliseconds: 100));
-
-      // Close loading dialog and navigate
-      if (context.mounted) {
-        Navigator.pop(context);
-
-        // Navigate to messages screen
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const MessagesScreen(),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ),
-        );
-      }
-    } catch (e) {
-      // Handle any errors
-      if (context.mounted) {
-        Navigator.pop(context);
-
-        // Still navigate to messages screen
-        Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                const MessagesScreen(),
-            transitionDuration: Duration.zero,
-            reverseTransitionDuration: Duration.zero,
-          ),
-        );
-      }
     }
   }
 
@@ -220,7 +186,9 @@ class AppFooter extends StatelessWidget {
           if (index != currentIndex) {
             switch (index) {
               case 0:
-                Navigator.pushReplacement(
+                // For home, we might want to pop back to home instead of pushing
+                // This prevents building up a large navigation stack
+                Navigator.pushAndRemoveUntil(
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
@@ -228,6 +196,7 @@ class AppFooter extends StatelessWidget {
                     transitionDuration: Duration.zero,
                     reverseTransitionDuration: Duration.zero,
                   ),
+                  (route) => false, // This removes all previous routes
                 );
                 break;
               case 1:

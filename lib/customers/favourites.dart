@@ -223,7 +223,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           ElevatedButton(
             onPressed: () {
               // Navigate to Nearby Venues screen
-              Navigator.of(context).pushReplacement(
+              Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => const NearByVenueScreen(),
                 ),

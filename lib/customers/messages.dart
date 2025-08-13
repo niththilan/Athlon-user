@@ -513,15 +513,16 @@ class _MessagesScreenState extends State<MessagesScreen> {
           child: IconButton(
             icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
             onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      const HomeScreen(),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                ),
-              );
+              Navigator.pop(context);
+              // Navigator.push(
+              //   context,
+              //   PageRouteBuilder(
+              //     pageBuilder: (context, animation, secondaryAnimation) =>
+              //         const HomeScreen(),
+              //     transitionDuration: Duration.zero,
+              //     reverseTransitionDuration: Duration.zero,
+              //   ),
+              // );
             },
             tooltip: 'Back',
           ),
@@ -1346,15 +1347,16 @@ class _ChatScreenState extends State<ChatScreen> {
         child: IconButton(
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) =>
-                    const HomeScreen(),
-                transitionDuration: Duration.zero,
-                reverseTransitionDuration: Duration.zero,
-              ),
-            );
+            Navigator.pop(context);
+            // Navigator.push(
+            //   context,
+            //   PageRouteBuilder(
+            //     pageBuilder: (context, animation, secondaryAnimation) =>
+            //         const HomeScreen(),
+            //     transitionDuration: Duration.zero,
+            //     reverseTransitionDuration: Duration.zero,
+            //   ),
+            // );
           },
         ),
       ),

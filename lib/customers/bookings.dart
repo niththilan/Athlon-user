@@ -121,7 +121,8 @@ class SlotsBookingApp extends StatelessWidget {
   final Map<String, dynamic>? courtData;
 
   // ignore: use_super_parameters
-  const SlotsBookingApp({Key? key, this.selectedCourtId, this.courtData}) : super(key: key);
+  const SlotsBookingApp({Key? key, this.selectedCourtId, this.courtData})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -149,8 +150,12 @@ class SlotsPage extends StatefulWidget {
   final VenueModel? selectedVenue;
   final Map<String, dynamic>? courtData;
 
-  const SlotsPage({Key? key, this.selectedCourtId, this.selectedVenue, this.courtData})
-    : super(key: key);
+  const SlotsPage({
+    Key? key,
+    this.selectedCourtId,
+    this.selectedVenue,
+    this.courtData,
+  }) : super(key: key);
 
   @override
   State<SlotsPage> createState() => _SlotsPageState();
@@ -285,8 +290,10 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     _loadVenueOpeningHours();
 
     // Initialize selected sport from court data or available courts
-    if (widget.courtData != null && widget.courtData!['sports_available'] != null) {
-      final List<dynamic> sportsFromCourt = widget.courtData!['sports_available'];
+    if (widget.courtData != null &&
+        widget.courtData!['sports_available'] != null) {
+      final List<dynamic> sportsFromCourt =
+          widget.courtData!['sports_available'];
       if (sportsFromCourt.isNotEmpty) {
         selectedSport = sportsFromCourt.first.toString();
       }
@@ -337,7 +344,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                   ),
                 ),
                 const SizedBox(height: 20),
-                
+
                 // Main explanation with visual
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -398,7 +405,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                   ],
                 ),
                 const SizedBox(height: 16),
-                
+
                 const Text(
                   'Each box represents 30 minutes.',
                   textAlign: TextAlign.center,
@@ -409,7 +416,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                   ),
                 ),
                 const SizedBox(height: 16),
-                
+
                 // 1 hour example
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -497,23 +504,20 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                   ],
                 ),
                 const SizedBox(height: 8),
-                
+
                 const Text(
                   '(9:00 AM to 10:00 AM)',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF666666),
-                  ),
+                  style: TextStyle(fontSize: 12, color: Color(0xFF666666)),
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Simple button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1B2C4F),
@@ -539,7 +543,6 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       },
     );
   }
-
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
@@ -1472,7 +1475,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                                   final customerPhone = phoneController.text
                                       .trim();
 
-                                  Navigator.of(context).pop();
+                                  Navigator.pop(context);
 
                                   _showReservationDialog(
                                     customerName: customerName,
@@ -1505,7 +1508,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                             ),
                             const SizedBox(height: 8),
                             TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
+                              onPressed: () => Navigator.pop(context),
                               style: TextButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 16,
@@ -1532,7 +1535,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                           children: [
                             Flexible(
                               child: TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
+                                onPressed: () => Navigator.pop(context),
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
@@ -2149,7 +2152,34 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                 color: Colors.white,
                 size: 28,
               ),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () async {
+                try {
+                  // Show loading indicator
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    barrierColor: Colors.white,
+                    builder: (BuildContext context) {
+                      return const FootballLoadingWidget(); // Make sure this widget is imported
+                    },
+                  );
+
+                  // Simulate loading time
+                  await Future.delayed(const Duration(milliseconds: 200));
+
+                  // Close loading dialog and navigate back
+                  if (context.mounted) {
+                    Navigator.pop(context); // Close loading
+                    Navigator.of(context).pop(); // Go back to previous screen
+                  }
+                } catch (e) {
+                  // Handle any errors
+                  if (context.mounted) {
+                    Navigator.pop(context); // Close loading
+                    Navigator.of(context).pop(); // Go back to previous screen
+                  }
+                }
+              },
               tooltip: 'Back',
             ),
           ),
@@ -2257,13 +2287,23 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                     ? {
                         'title': widget.courtData!['name'] ?? 'Court Details',
                         'location': widget.courtData!['location'] ?? 'Location',
-                        'sport': selectedSport ?? (widget.courtData!['sports_available'] as List?)?.first ?? 'Football',
+                        'sport':
+                            selectedSport ??
+                            (widget.courtData!['sports_available'] as List?)
+                                ?.first ??
+                            'Football',
                         'rating': widget.courtData!['rating'] ?? 4.8,
-                        'rate_per_hour': 'Rs. ${widget.courtData!['price_per_hour'] ?? 2500}',
+                        'rate_per_hour':
+                            'Rs. ${widget.courtData!['price_per_hour'] ?? 2500}',
                         'distance': widget.courtData!['distance'] ?? '2.5 km',
-                        'sports_available': widget.courtData!['sports_available'] ?? ['Football'],
-                        'imageUrl': (widget.courtData!['images'] as List?)?.isNotEmpty == true 
-                            ? widget.courtData!['images'][0] 
+                        'sports_available':
+                            widget.courtData!['sports_available'] ??
+                            ['Football'],
+                        'imageUrl':
+                            (widget.courtData!['images'] as List?)
+                                    ?.isNotEmpty ==
+                                true
+                            ? widget.courtData!['images'][0]
                             : null,
                         'phone': widget.courtData!['phone'],
                         'email': widget.courtData!['email'],
@@ -4344,8 +4384,10 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   // Helper method to get only sports that have actual courts available
   List<String> _getAvailableSportsFromCourts() {
     // If court data is provided, prioritize court data sports
-    if (widget.courtData != null && widget.courtData!['sports_available'] != null) {
-      final List<dynamic> sportsFromCourt = widget.courtData!['sports_available'];
+    if (widget.courtData != null &&
+        widget.courtData!['sports_available'] != null) {
+      final List<dynamic> sportsFromCourt =
+          widget.courtData!['sports_available'];
       return sportsFromCourt.map((sport) => sport.toString()).toList();
     }
 
