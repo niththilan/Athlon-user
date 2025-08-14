@@ -80,8 +80,10 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
   int _currentImageIndex = 0;
   int _currentIndex = 0; // For footer navigation
   bool _isLoading = true;
+  bool _showHeader = false; // For showing/hiding the header
   PageController _pageController = PageController();
   late AnimationController _indicatorController;
+  late ScrollController _scrollController;
 
   // Mock court data
   late Map<String, dynamic> _courtDetails;
@@ -90,6 +92,8 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
   void initState() {
     super.initState();
     _initializeCourtData();
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
     _indicatorController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -108,7 +112,17 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
   void dispose() {
     _pageController.dispose();
     _indicatorController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollListener() {
+    final bool shouldShowHeader = _scrollController.offset > 10;
+    if (shouldShowHeader != _showHeader) {
+      setState(() {
+        _showHeader = shouldShowHeader;
+      });
+    }
   }
 
   void _startSlideshow() {
@@ -715,8 +729,11 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
     }
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6F8),
-      body: CustomScrollView(
-        slivers: [
+      body: Stack(
+        children: [
+          CustomScrollView(
+            controller: _scrollController,
+            slivers: [
           // Top Image Carousel
           SliverToBoxAdapter(
             child: SizedBox(
@@ -1262,6 +1279,90 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
                 // ...existing code...
                 const SizedBox(height: 100), // Space for bottom nav
               ],
+            ),
+          ),
+        ],
+      ),
+          
+          // Navy blue header that appears when scrolling
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            height: _showHeader ? MediaQuery.of(context).padding.top + 50 : 0,
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 300),
+              opacity: _showHeader ? 1.0 : 0.0,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1B2C4F),
+                  boxShadow: _showHeader ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ] : null,
+                ),
+                child: SafeArea(
+                  child: Container(
+                    height: 50,
+                    child: Row(
+                      children: [
+                        // Back button with exact same styling as history.dart
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.chevron_left,
+                              color: Colors.white,
+                              size: 28,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            tooltip: 'Back',
+                          ),
+                        ),
+                        
+                        // Court name with exact same text styling as history.dart
+                        Expanded(
+                          child: Text(
+                            _courtDetails['name'],
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'Poppins',
+                              color: Colors.white,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        
+                        // Heart icon with proper padding to match the layout
+                        Padding(
+                          padding: const EdgeInsets.only(right: 16),
+                          child: GestureDetector(
+                            onTap: _toggleFavorite,
+                            child: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: const BoxDecoration(
+                                color: Colors.transparent,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                _isFavorite ? Icons.favorite : Icons.favorite_border,
+                                color: _isFavorite ? Colors.red : Colors.white,
+                                size: 24,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
         ],
