@@ -163,6 +163,7 @@ class SlotsPage extends StatefulWidget {
 
 class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   DateTime selectedDate = DateTime.now();
+  Set<String> selectedSlots = {}; // For new reservations (available slots)
   String? selectedBookingId; // Track the currently selected booking for removal
   int currentFooterIndex = 0;
   bool showCalendar = false;
@@ -590,7 +591,10 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
 
   void _initializeSelectedSlots() {
     // Now this will result in an empty set since no slots are pre-selected
-    // Initialize with no pre-selected slots since reservations are removed
+    selectedSlots = timeSlots
+        .where((slot) => slot.status == SlotStatus.selected)
+        .map((slot) => slot.time)
+        .toSet();
   }
 
   // Load venue opening hours - using mock data instead of Supabase
@@ -925,7 +929,8 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
         } else {
           // Select this booking group
           selectedBookingId = slot.bookingId;
-          // Clear any selections when selecting a booking
+          // Clear any selected available slots when selecting a booking
+          selectedSlots.clear();
           _updateSlotStatuses();
         }
       }
@@ -938,7 +943,10 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       if (slot.status == SlotStatus.occupied) {
         // Keep occupied slots as occupied - the UI will handle the styling based on selectedBookingId
         continue;
-      } else if (slot.status == SlotStatus.selected) {
+      } else if (selectedSlots.contains(slot.time)) {
+        slot.status = SlotStatus.selected;
+      } else if (slot.status == SlotStatus.selected &&
+          !selectedSlots.contains(slot.time)) {
         slot.status = SlotStatus.available;
       }
     }
@@ -946,7 +954,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
 
   // Helper method to clear all selections
   void _clearAllSelections() {
-    // Clear slot selections
+    selectedSlots.clear();
     selectedBookingId = null;
     _updateSlotStatuses();
   }
@@ -987,15 +995,184 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       // Clear any selected booking when working with available slots
       selectedBookingId = null;
 
-      // Available slots can no longer be selected for reservation
-      // Only allow interaction with occupied slots for removal
-      return;
+      // If clicking a selected slot, deselect it
+      if (slot.status == SlotStatus.selected) {
+        slot.status = SlotStatus.available;
+        selectedSlots.remove(slot.time);
+        return;
+      }
+
+      // Regular selection logic for unselected slots
+      if (selectedSlots.isEmpty) {
+        slot.status = SlotStatus.selected;
+        selectedSlots.add(slot.time);
+      } else {
+        // Simple continuous selection without splitting
+        List<String> allTimes = timeSlots.map((s) => s.time).toList();
+        int startIdx = allTimes.indexOf(selectedSlots.first);
+        int currentIdx = allTimes.indexOf(slot.time);
+        int start = startIdx < currentIdx ? startIdx : currentIdx;
+        int end = startIdx < currentIdx ? currentIdx : startIdx;
+
+        // Clear previous selections
+        selectedSlots.clear();
+        for (var s in timeSlots) {
+          if (s.status == SlotStatus.selected) {
+            s.status = SlotStatus.available;
+          }
+        }
+
+        // Select continuous range only if all slots are available
+        bool canSelectRange = true;
+        for (int i = start; i <= end; i++) {
+          if (timeSlots[i].status != SlotStatus.available) {
+            canSelectRange = false;
+            break;
+          }
+        }
+
+        if (canSelectRange) {
+          for (int i = start; i <= end; i++) {
+            timeSlots[i].status = SlotStatus.selected;
+            selectedSlots.add(timeSlots[i].time);
+          }
+        } else {
+          // If can't select range, just select the clicked slot
+          slot.status = SlotStatus.selected;
+          selectedSlots.add(slot.time);
+        }
+      }
     });
   }
 
+  // Updated to return more details including calculation of separate time ranges
+  Map<String, dynamic> _getSelectedDuration() {
+    if (selectedSlots.isEmpty) {
+      return {'formatted': '', 'minutes': 0, 'splits': []};
+    }
 
-  // Get duration for selected booking only (reservations removed)
+    // Get only the actually selected slots (green ones)
+    var actuallySelectedTimes =
+        timeSlots
+            .where((slot) => slot.status == SlotStatus.selected)
+            .map((slot) => slot.time)
+            .toList()
+          ..sort((a, b) => _parseTimeString(a).compareTo(_parseTimeString(b)));
+
+    if (actuallySelectedTimes.isEmpty) {
+      return {'formatted': '', 'minutes': 0, 'splits': []};
+    }
+
+    // Helper function to parse time strings
+    DateTime parseTime(String timeStr) {
+      try {
+        final parsedTime = DateFormat('h:mm a').parse(timeStr);
+        final now = DateTime.now();
+        return DateTime(
+          now.year,
+          now.month,
+          now.day,
+          parsedTime.hour,
+          parsedTime.minute,
+        );
+      } catch (e) {
+        final now = DateTime.now();
+        return DateTime(now.year, now.month, now.day, 0, 0);
+      }
+    }
+
+    // Find continuous ranges in selected slots
+    List<List<String>> timeRanges = [];
+    List<String> currentRange = [];
+
+    for (int i = 0; i < timeSlots.length; i++) {
+      if (timeSlots[i].status == SlotStatus.selected) {
+        if (currentRange.isEmpty ||
+            _parseTimeString(
+                  timeSlots[i].time,
+                ).difference(_parseTimeString(currentRange.last)).inMinutes ==
+                30) {
+          currentRange.add(timeSlots[i].time);
+        } else {
+          if (currentRange.isNotEmpty) {
+            timeRanges.add([...currentRange]);
+            currentRange = [timeSlots[i].time];
+          }
+        }
+      }
+    }
+
+    if (currentRange.isNotEmpty) {
+      timeRanges.add([...currentRange]);
+    }
+
+    // Format each range
+    List<String> formattedRanges = [];
+    for (var range in timeRanges) {
+      final startDateTime = parseTime(range.first);
+      final endTimeDateTime = parseTime(
+        range.last,
+      ).add(const Duration(minutes: 30));
+
+      final startTimeStr = DateFormat('h:mm a').format(startDateTime);
+      final endTimeStr = DateFormat('h:mm a').format(endTimeDateTime);
+
+      formattedRanges.add('$startTimeStr - $endTimeStr');
+    }
+
+    // Calculate total minutes
+    final totalMinutes = actuallySelectedTimes.length * 30;
+    final hours = totalMinutes ~/ 60;
+    final minutes = totalMinutes % 60;
+
+    String durationText;
+    if (hours > 0) {
+      durationText = '$hours hour${hours > 1 ? 's' : ''}';
+      if (minutes > 0) {
+        durationText += ' $minutes min';
+      }
+    } else {
+      durationText = '$minutes min';
+    }
+
+    // For a simple non-split slot
+    if (timeRanges.length == 1) {
+      final startDateTime = parseTime(actuallySelectedTimes.first);
+      final endDateTime = parseTime(
+        actuallySelectedTimes.last,
+      ).add(const Duration(minutes: 30));
+
+      final startTimeStr = DateFormat('h:mm a').format(startDateTime);
+      final endTimeStr = DateFormat(
+        'h:mm a',
+      ).format(endDateTime); // Change from endTimeDateTime to endDateTime
+
+      return {
+        'formatted': '$startTimeStr - $endTimeStr ($durationText)',
+        'minutes': totalMinutes,
+        'splits': formattedRanges,
+        'isSplit': false,
+      };
+    }
+    // For split slots - only show duration part without time ranges
+    else {
+      return {
+        'formatted':
+            '($durationText)', // Only show duration in brackets for split slots
+        'minutes': totalMinutes,
+        'splits': formattedRanges,
+        'isSplit': true,
+      };
+    }
+  }
+
+  // Get duration for any type of selection (free slots or selected booking)
   Map<String, dynamic> _getAnySelectedDuration() {
+    // If there are free slots selected, show those
+    if (selectedSlots.isNotEmpty) {
+      return _getSelectedDuration();
+    }
+
     // If a booking is selected
     if (selectedBookingId != null) {
       return _getSelectedBookingDuration();
@@ -1181,9 +1358,696 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     );
   }
 
+  // NEW METHOD: Show customer details dialog
+  void _showCustomerDetailsDialog() {
+    final TextEditingController nameController = TextEditingController();
+    final TextEditingController phoneController = TextEditingController();
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.4),
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          backgroundColor: Colors.white,
+          elevation: 8,
+          child: Container(
+            // Make width responsive based on screen size
+            width: MediaQuery.of(context).size.width > 500
+                ? 480
+                : MediaQuery.of(context).size.width * 0.9,
+            constraints: BoxConstraints(
+              maxWidth: 480,
+              minWidth: 280,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            padding: EdgeInsets.all(
+              MediaQuery.of(context).size.width < 400 ? 16 : 24,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Customer Details',
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width < 400
+                          ? 16
+                          : 18,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1B2C4F),
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.width < 400 ? 12 : 16,
+                  ),
+                  Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildStyledTextField(
+                          controller: nameController,
+                          label: 'Customer Name',
+                          obscureText: false,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter customer name';
+                            }
+                            return null;
+                          },
+                          prefixIcon: Icons.person_outline,
+                          textCapitalization: TextCapitalization.words,
+                        ),
+                        const SizedBox(height: 14),
+                        _buildStyledTextField(
+                          controller: phoneController,
+                          label: 'Contact Number *',
+                          obscureText: false,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter contact number';
+                            }
+                            if (!RegExp(
+                              r'^[\+]?[0-9\-\(\)\s]{8,15}$',
+                            ).hasMatch(value.trim())) {
+                              return 'Please enter valid contact number';
+                            }
+                            return null;
+                          },
+                          prefixIcon: Icons.phone_outlined,
+                          keyboardType: TextInputType.phone,
+                          hintText: '+94XXXXXXXXX',
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Please ensure customer details are accurate for booking confirmation.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.width < 400 ? 16 : 24,
+                  ),
+
+                  // Responsive button layout
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      if (constraints.maxWidth < 300) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                if (formKey.currentState!.validate()) {
+                                  final customerName = nameController.text
+                                      .trim();
+                                  final customerPhone = phoneController.text
+                                      .trim();
+
+                                  Navigator.pop(context);
+
+                                  _showReservationDialog(
+                                    customerName: customerName,
+                                    customerPhone: customerPhone,
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1B2C4F),
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'Continue',
+                                style: TextStyle(
+                                  fontSize:
+                                      MediaQuery.of(context).size.width < 400
+                                      ? 14
+                                      : 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                              ),
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize:
+                                      MediaQuery.of(context).size.width < 400
+                                      ? 14
+                                      : 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Flexible(
+                              child: TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize:
+                                        MediaQuery.of(context).size.width < 400
+                                        ? 14
+                                        : 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (formKey.currentState!.validate()) {
+                                    final customerName = nameController.text
+                                        .trim();
+                                    final customerPhone = phoneController.text
+                                        .trim();
+
+                                    Navigator.of(context).pop();
+
+                                    _showReservationDialog(
+                                      customerName: customerName,
+                                      customerPhone: customerPhone,
+                                    );
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF1B2C4F),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    'Continue',
+                                    style: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width <
+                                              400
+                                          ? 14
+                                          : 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // UPDATED METHOD: Show reservation dialog with customer details
+  void _showReservationDialog({String? customerName, String? customerPhone}) {
+    final court = selectedCourt;
+    if (court == null) return;
+
+    final durationDetails = _getSelectedDuration();
+    final totalMinutes = durationDetails['minutes'] as int;
+    final totalHours = totalMinutes / 60;
+    final totalRate = totalHours * court.hourlyRate;
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withOpacity(0.4),
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          backgroundColor: Colors.white,
+          elevation: 8,
+          child: Container(
+            width: MediaQuery.of(context).size.width > 500
+                ? 480
+                : MediaQuery.of(context).size.width * 0.9,
+            constraints: BoxConstraints(
+              maxWidth: 480,
+              minWidth: 280,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            padding: EdgeInsets.all(
+              MediaQuery.of(context).size.width < 400 ? 16 : 24,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Confirm Reservation',
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width < 400
+                          ? 16
+                          : 18,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1B2C4F),
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.width < 400 ? 12 : 16,
+                  ),
+
+                  // Customer Details Section
+                  if (customerName != null && customerPhone != null) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8F9FA),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFE9ECEF)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Customer Details',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                              color: Color(0xFF495057),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.person,
+                                size: 16,
+                                color: Color(0xFF6C757D),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  customerName,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.phone,
+                                size: 16,
+                                color: Color(0xFF6C757D),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  customerPhone,
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+
+                  // Booking Details Section
+                  Text(
+                    'Court: ${selectedCourt!.name}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF2D3142),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Date: ${DateFormat('EEEE, MMMM d, y').format(selectedDate)}',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF2D3142),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  if (durationDetails['isSplit'] == true) ...[
+                    Text(
+                      'Selected Time Slots',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF2D3142),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    ...durationDetails['splits']
+                        .map(
+                          (slot) => Padding(
+                            padding: const EdgeInsets.only(left: 8, bottom: 2),
+                            child: Text(
+                              '• $slot',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF495057),
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Total Duration: $totalMinutes minutes',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF2D3142),
+                      ),
+                    ),
+                  ] else ...[
+                    Text(
+                      'Duration: ${durationDetails['formatted']}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF2D3142),
+                      ),
+                    ),
+                  ],
+
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1B5E20).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: const Color(0xFF1B5E20).withOpacity(0.2),
+                      ),
+                    ),
+                    child: Text(
+                      'Total Amount: LKR ${totalRate.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Color(0xFF1B5E20),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(
+                    height: MediaQuery.of(context).size.width < 400 ? 16 : 24,
+                  ),
+
+                  // Responsive button layout
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      if (constraints.maxWidth < 300) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _confirmBooking(
+                                  rate: totalRate,
+                                  customerName:
+                                      customerName ?? 'Walk-in Customer',
+                                  customerPhone:
+                                      customerPhone ?? '+94000000000',
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1B5E20),
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'Confirm',
+                                style: TextStyle(
+                                  fontSize:
+                                      MediaQuery.of(context).size.width < 400
+                                      ? 14
+                                      : 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                              ),
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize:
+                                      MediaQuery.of(context).size.width < 400
+                                      ? 14
+                                      : 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Flexible(
+                              child: TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize:
+                                        MediaQuery.of(context).size.width < 400
+                                        ? 14
+                                        : 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  _confirmBooking(
+                                    rate: totalRate,
+                                    customerName:
+                                        customerName ?? 'Walk-in Customer',
+                                    customerPhone:
+                                        customerPhone ?? '+94000000000',
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF1B5E20),
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    'Confirm',
+                                    style: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width <
+                                              400
+                                          ? 14
+                                          : 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   // UPDATED METHOD: Confirm booking with customer details (using mock storage)
+  void _confirmBooking({
+    double? rate,
+    String? customerName,
+    String? customerPhone,
+  }) async {
+    if (selectedCourt == null) return; // Guard clause
+
+    // Check if the selected date is in the past
+    final isPastDate = _isPastDate(selectedDate);
+
+    // Prevent bookings for past dates
+    if (isPastDate) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Bookings cannot be made for past dates'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    try {
+      // Get selected time slots data
+      final selectedTimeSlots = selectedSlots.toList();
+      if (selectedTimeSlots.isEmpty) return;
+
+      // Parse first and last time slots to get start and end times
+      selectedTimeSlots.sort(
+        (a, b) => _parseTimeString(a).compareTo(_parseTimeString(b)),
+      );
+      // final startTime = _parseTimeString(selectedTimeSlots.first);
+      // final endTime = _parseTimeString(selectedTimeSlots.last).add(const Duration(minutes: 30));
+
+      // Calculate duration and price
+      // final duration = selectedTimeSlots.length * 30; // 30 minutes per slot
+      // final totalPrice = (rate ?? selectedCourt!.hourlyRate) * (duration / 60.0);
+
+      // Note: DateTime objects would be used for database storage
+      // final bookingStartTime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, startTime.hour, startTime.minute);
+      // final bookingEndTime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, endTime.hour, endTime.minute);
+
+      // Generate booking ID
+      final bookingId = 'booking_${DateTime.now().millisecondsSinceEpoch}';
+
+      // Store booking in mock storage
+      final courtId = selectedCourt!.id;
+      final dateStr = selectedDate.toIso8601String().split('T')[0];
+
+      if (mockBookings[courtId] == null) {
+        mockBookings[courtId] = {};
+      }
+      if (mockBookings[courtId]![dateStr] == null) {
+        mockBookings[courtId]![dateStr] = {};
+      }
+
+      // Store booking details for each time slot
+      for (final timeSlot in selectedTimeSlots) {
+        mockBookings[courtId]![dateStr]![timeSlot] = bookingId;
+      }
+
+      // Update UI
+      setState(() {
+        // Convert selected slots to occupied (red) status
+        for (var slot in timeSlots) {
+          if (selectedSlots.contains(slot.time)) {
+            slot.status = SlotStatus.occupied;
+            slot.bookingId = bookingId;
+          }
+        }
+        // Clear selected slots
+        selectedSlots.clear();
+      });
+
+      // Show success dialog with rate and customer details
+      _showSuccessDialog(rate: rate, customerName: customerName);
+    } catch (e) {
+      print('Error confirming booking: $e');
+      // Still update UI even if storage fails
+      setState(() {
+        // Convert selected slots to occupied (red) status
+        for (var slot in timeSlots) {
+          if (selectedSlots.contains(slot.time)) {
+            slot.status = SlotStatus.occupied;
+          }
+        }
+        // Clear selected slots
+        selectedSlots.clear();
+      });
+
+      // Show success dialog with rate and customer details
+      _showSuccessDialog(rate: rate, customerName: customerName);
+    }
+  }
 
   // Helper method to parse time strings for sorting
   DateTime _parseTimeString(String timeStr) {
@@ -1237,7 +2101,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
           }
 
           // Clear any existing selections
-          // Clear slot selections
+          selectedSlots.clear();
           selectedBookingId = null;
         });
       }
@@ -1253,7 +2117,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
           }
 
           // Clear any existing selections
-          // Clear slot selections
+          selectedSlots.clear();
           selectedBookingId = null;
         });
       }
@@ -1484,7 +2348,8 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
             _buildCallButton(),
             const SizedBox(height: 20),
             // Single button that changes based on context with info button for bookings
-            if (courts.isNotEmpty && selectedBookingId != null)
+            if (courts.isNotEmpty &&
+                (selectedSlots.isNotEmpty || selectedBookingId != null))
               Center(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -1493,20 +2358,25 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                     if (!_isPastDate(selectedDate)) ...[
                       ElevatedButton(
                         onPressed: () {
-                          if (selectedBookingId != null) {
+                          if (selectedSlots.isNotEmpty) {
+                            // Free slots selected - show reservation dialog
+                            _showCustomerDetailsDialog();
+                          } else if (selectedBookingId != null) {
                             // Existing booking selected - show remove dialog
                             _showBulkRemoveDialog();
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFB71C1C), // Red for Remove
+                          backgroundColor: selectedSlots.isNotEmpty
+                              ? const Color(0xFF1B5E20) // Green for Reserve
+                              : const Color(0xFFB71C1C), // Red for Remove
                           minimumSize: const Size(200, 50),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                         child: Text(
-                          'Remove',
+                          selectedSlots.isNotEmpty ? 'Reserve' : 'Remove',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -2385,7 +3255,9 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
         _buildLegend(), // Now uses the responsive version
         const SizedBox(height: 20),
         _buildTimeSlotGrid(), // Now uses the responsive version
-        if (selectedBookingId != null)
+        if (selectedSlots.isNotEmpty ||
+            selectedSlots.isNotEmpty ||
+            selectedBookingId != null)
           Align(
             alignment: Alignment.center,
             child: Padding(
@@ -2664,6 +3536,151 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     );
   }
 
+  // UPDATED METHOD: Show success dialog with customer details
+  void _showSuccessDialog({double? rate, String? customerName}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black.withOpacity(0.4),
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          backgroundColor: Colors.white,
+          elevation: 8,
+          child: Container(
+            width: MediaQuery.of(context).size.width > 500
+                ? 400
+                : MediaQuery.of(context).size.width * 0.9,
+            constraints: const BoxConstraints(maxWidth: 400, minWidth: 280),
+            padding: EdgeInsets.all(
+              MediaQuery.of(context).size.width < 400 ? 20 : 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF1B2C4F).withOpacity(0.1),
+                    border: Border.all(
+                      color: const Color(0xFF1B2C4F),
+                      width: 3,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.check,
+                    color: Color(0xFF1B2C4F),
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Successfully Booked!',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1B2C4F),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Show customer name if provided
+                if (customerName != null &&
+                    customerName != 'Walk-in Customer') ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8F9FA),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFE9ECEF)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.person,
+                          size: 20,
+                          color: Color(0xFF6C757D),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Booked for: $customerName',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+
+                if (rate != null) ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E8),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: const Color(0xFF1B5E20).withOpacity(0.2),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Amount to collect: LKR ${rate.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1B5E20),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Don\'t forget to collect the cash!',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                ],
+
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1B2C4F),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Done',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   // Helper method to get formatted time ranges for removal
   List<String> _getRemovalTimeRanges() {
@@ -3324,7 +4341,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
         }
       }
 
-      // selectedSlots no longer used since reservations are removed
+      allSelectedTimes.addAll(selectedSlots);
 
       // Remove bookings from mock storage
       final courtId = selectedCourt!.id;
