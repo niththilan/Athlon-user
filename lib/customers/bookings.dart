@@ -2348,8 +2348,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
             _buildCallButton(),
             const SizedBox(height: 20),
             // Single button that changes based on context with info button for bookings
-            if (courts.isNotEmpty &&
-                (selectedSlots.isNotEmpty || selectedBookingId != null))
+            if (courts.isNotEmpty && selectedBookingId != null)
               Center(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -2358,25 +2357,20 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                     if (!_isPastDate(selectedDate)) ...[
                       ElevatedButton(
                         onPressed: () {
-                          if (selectedSlots.isNotEmpty) {
-                            // Free slots selected - show reservation dialog
-                            _showCustomerDetailsDialog();
-                          } else if (selectedBookingId != null) {
+                          if (selectedBookingId != null) {
                             // Existing booking selected - show remove dialog
                             _showBulkRemoveDialog();
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: selectedSlots.isNotEmpty
-                              ? const Color(0xFF1B5E20) // Green for Reserve
-                              : const Color(0xFFB71C1C), // Red for Remove
+                          backgroundColor: const Color(0xFFB71C1C), // Red for Remove
                           minimumSize: const Size(200, 50),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                         child: Text(
-                          selectedSlots.isNotEmpty ? 'Reserve' : 'Remove',
+                          'Remove',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
