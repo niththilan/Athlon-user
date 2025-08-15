@@ -1394,7 +1394,24 @@ class _SportsCard extends StatelessWidget {
       padding: const EdgeInsets.only(right: 16.0),
       child: GestureDetector(
         onTap: () {
-          // You can add navigation logic here if needed
+          // Get court data from the parent widget
+          final courtDetailsState = context.findAncestorStateOfType<_CourtDetailScreenState>();
+          if (courtDetailsState != null) {
+            // Create court data with selected sport
+            final Map<String, dynamic> courtDataWithSport = Map.from(courtDetailsState._courtDetails);
+            // Update the sports_available to prioritize the selected sport
+            courtDataWithSport['sports_available'] = [sport];
+            
+            // Navigate to SlotsPage with the court data
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SlotsPage(
+                  courtData: courtDataWithSport,
+                ),
+              ),
+            );
+          }
         },
         child: Container(
           decoration: BoxDecoration(
