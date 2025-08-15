@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, prefer_const_constructors, use_build_context_synchronously, prefer_const_literals_to_create_immutables, avoid_print
+// ignore_for_file: deprecated_member_use, prefer_const_constructors, use_build_context_synchronously, prefer_const_literals_to_create_immutables, avoid_print, prefer_final_fields
 
 import 'package:flutter/material.dart';
 import 'dart:async'; // Add Timer for debouncing
@@ -84,25 +84,42 @@ class _MessagesScreenState extends State<MessagesScreen> {
   List<ChatMessage> _filteredMessages = [];
   String _selectedCategory = 'All';
   bool _isSearching = false;
-  bool _isRefreshing = false;
-  bool _isDisposed = false; // Track widget disposal state
-  int _currentIndex = 3; // Add current index for footer
+  bool _isLoading = true; // FIXED: Changed from _isRefreshing to _isLoading
+  bool _isDisposed = false;
+  int _currentIndex = 3; // Messages tab index
 
   @override
   void initState() {
     super.initState();
     // Initialize with some mock data for testing
-    _initializeMockData();
+    //_initializeMockData();
     // _loadConversationsFromDatabase();
 
     // Ensure loading state is false after initialization
-    setState(() {
-      _isRefreshing = false;
-    });
+    _loadData();
   }
 
-  // Add mock data for testing categories
+  Future<void> _loadData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    // Simulate loading time to show the football loader
+    await Future.delayed(const Duration(milliseconds: 800));
+
+    if (!_isDisposed) {
+      _initializeMockData();
+
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   void _initializeMockData() {
+    // FIXED: Don't call setState here since it's called from _loadData
     setState(() {
       _messages = [
         ChatMessage(
@@ -288,120 +305,201 @@ class _MessagesScreenState extends State<MessagesScreen> {
     });
   }
 
-  // Load conversations from database instead of mock data
-  /*
-  Future<void> _loadConversationsFromDatabase() async {
-    if (_isDisposed) return;
-
-    setState(() {
-      _isRefreshing = true;
-    });
-
-    try {
-      final conversationsData = await SupabaseService.getChatConversations();
-
-      List<ChatMessage> loadedMessages = [];
-
-      for (var conversationData in conversationsData) {
-        // Get messages for this conversation
-        final messagesData = await SupabaseService.getChatMessages(
-          conversationData['id'],
-        );
-
-        // Convert database messages to Message objects
-        List<Message> messages = messagesData
-            .map(
-              (messageData) => Message(
-                content: messageData['message'] ?? messageData['content'] ?? '',
-                time:
-                    messageData['time'] ??
-                    _formatTime(messageData['created_at']),
-                isSentByMe: messageData['sender_type'] == 'vendor',
-              ),
-            )
-            .toList();
-
-        // Create ChatMessage object
-        ChatMessage chatMessage = ChatMessage(
-          conversationId: conversationData['id'],
-          name: conversationData['customer']?['name'] ?? 'Unknown Customer',
-          lastMessage: conversationData['last_message'] ?? 'No messages yet',
-          time: _formatTime(conversationData['last_message_time']),
-          unreadCount: (conversationData['is_read_by_vendor'] == false) ? 1 : 0,
-          avatarUrl: "",
-          messages: messages,
-          isArchived: false,
-          isPinned: false,
-          isMuted: false,
-        );
-
-        loadedMessages.add(chatMessage);
-      }
-
-      if (!_isDisposed) {
-        setState(() {
-          _messages = loadedMessages;
-          _filteredMessages = List.from(_messages);
-          _isRefreshing = false;
-        });
-      }
-    } catch (e) {
-      print('Error loading conversations: $e');
-      if (!_isDisposed) {
-        setState(() {
-          _messages = []; // Empty list instead of mock data
-          _filteredMessages = [];
-          _isRefreshing = false;
-        });
-
-        // Show error message to user
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to load conversations: ${e.toString()}'),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    }
-  }
-  */
-
-  // Helper method to format timestamp
-  // String _formatTime(dynamic timestamp) {
-  //   if (timestamp == null) return 'Unknown';
-
-  //   try {
-  //     DateTime dateTime;
-  //     if (timestamp is String) {
-  //       dateTime = DateTime.parse(timestamp);
-  //     } else {
-  //       dateTime = timestamp as DateTime;
-  //     }
-
-  //     final now = DateTime.now();
-  //     final today = DateTime(now.year, now.month, now.day);
-  //     final messageDate = DateTime(dateTime.year, dateTime.month, dateTime.day);
-
-  //     if (messageDate == today) {
-  //       // Today - show time
-  //       final hour = dateTime.hour > 12
-  //           ? dateTime.hour - 12
-  //           : (dateTime.hour == 0 ? 12 : dateTime.hour);
-  //       final minute = dateTime.minute.toString().padLeft(2, '0');
-  //       final period = dateTime.hour >= 12 ? 'PM' : 'AM';
-  //       return '$hour:$minute $period';
-  //     } else if (messageDate == today.subtract(Duration(days: 1))) {
-  //       // Yesterday
-  //       return 'Yesterday';
-  //     } else {
-  //       // Older dates
-  //       return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
-  //     }
-  //   } catch (e) {
-  //     return 'Unknown';
-  //   }
+  // Add mock data for testing categories
+  // void _initializeMockData() {
+  //   setState(() {
+  //     _messages = [
+  //       ChatMessage(
+  //         name: 'John Doe',
+  //         lastMessage:
+  //             'Hi, I need help with booking a football court for tomorrow',
+  //         time: '2:30 PM',
+  //         unreadCount: 2,
+  //         avatarUrl: '',
+  //         messages: [
+  //           Message(
+  //             content:
+  //                 'Hi, I need help with booking a football court for tomorrow',
+  //             time: '2:30 PM',
+  //             isSentByMe: false,
+  //           ),
+  //           Message(
+  //             content: 'What time do you prefer?',
+  //             time: '2:35 PM',
+  //             isSentByMe: true,
+  //           ),
+  //         ],
+  //       ),
+  //       ChatMessage(
+  //         name: 'Sarah Wilson',
+  //         lastMessage: 'Is the court available this evening?',
+  //         time: '1:45 PM',
+  //         unreadCount: 1,
+  //         avatarUrl: '',
+  //         messages: [
+  //           Message(
+  //             content: 'Is the court available this evening?',
+  //             time: '1:45 PM',
+  //             isSentByMe: false,
+  //           ),
+  //         ],
+  //         isPinned: true,
+  //       ),
+  //       ChatMessage(
+  //         name: 'Mike Johnson',
+  //         lastMessage: 'Thank you for the excellent service!',
+  //         time: 'Yesterday',
+  //         unreadCount: 0,
+  //         avatarUrl: '',
+  //         messages: [
+  //           Message(
+  //             content: 'Thank you for the excellent service!',
+  //             time: 'Yesterday',
+  //             isSentByMe: false,
+  //           ),
+  //           Message(
+  //             content: 'Thank you! We appreciate your feedback.',
+  //             time: 'Yesterday',
+  //             isSentByMe: true,
+  //           ),
+  //         ],
+  //       ),
+  //       ChatMessage(
+  //         name: 'Emma Davis',
+  //         lastMessage: 'Can I reschedule my booking?',
+  //         time: 'Monday',
+  //         unreadCount: 3,
+  //         avatarUrl: '',
+  //         messages: [
+  //           Message(
+  //             content: 'Can I reschedule my booking?',
+  //             time: 'Monday',
+  //             isSentByMe: false,
+  //           ),
+  //         ],
+  //       ),
+  //       ChatMessage(
+  //         name: 'Alex Thompson',
+  //         lastMessage: 'What are your rates for group bookings?',
+  //         time: '12:15 PM',
+  //         unreadCount: 1,
+  //         avatarUrl: '',
+  //         messages: [
+  //           Message(
+  //             content: 'What are your rates for group bookings?',
+  //             time: '12:15 PM',
+  //             isSentByMe: false,
+  //           ),
+  //         ],
+  //       ),
+  //       ChatMessage(
+  //         name: 'Lisa Brown',
+  //         lastMessage: 'Great facility, will book again',
+  //         time: 'Sunday',
+  //         unreadCount: 0,
+  //         avatarUrl: '',
+  //         messages: [
+  //           Message(
+  //             content: 'Great facility, will book again',
+  //             time: 'Sunday',
+  //             isSentByMe: false,
+  //           ),
+  //           Message(
+  //             content: 'Thank you for choosing us!',
+  //             time: 'Sunday',
+  //             isSentByMe: true,
+  //           ),
+  //         ],
+  //         isArchived: true,
+  //       ),
+  //       ChatMessage(
+  //         name: 'David Miller',
+  //         lastMessage: 'Is parking available at your venue?',
+  //         time: 'Friday',
+  //         unreadCount: 0,
+  //         avatarUrl: '',
+  //         messages: [
+  //           Message(
+  //             content: 'Is parking available at your venue?',
+  //             time: 'Friday',
+  //             isSentByMe: false,
+  //           ),
+  //           Message(
+  //             content: 'Yes, we have free parking available.',
+  //             time: 'Friday',
+  //             isSentByMe: true,
+  //           ),
+  //         ],
+  //         isArchived: true,
+  //       ),
+  //       ChatMessage(
+  //         name: 'Jessica Taylor',
+  //         lastMessage: 'Do you have equipment rental?',
+  //         time: '11:30 AM',
+  //         unreadCount: 1,
+  //         avatarUrl: '',
+  //         messages: [
+  //           Message(
+  //             content: 'Do you have equipment rental?',
+  //             time: '11:30 AM',
+  //             isSentByMe: false,
+  //           ),
+  //         ],
+  //         isMuted: true,
+  //       ),
+  //       ChatMessage(
+  //         name: 'Robert Anderson',
+  //         lastMessage: 'Booking confirmed for 6 PM',
+  //         time: 'Yesterday',
+  //         unreadCount: 0,
+  //         avatarUrl: '',
+  //         messages: [
+  //           Message(
+  //             content: 'Booking confirmed for 6 PM',
+  //             time: 'Yesterday',
+  //             isSentByMe: true,
+  //           ),
+  //           Message(
+  //             content: 'Perfect, see you then!',
+  //             time: 'Yesterday',
+  //             isSentByMe: false,
+  //           ),
+  //         ],
+  //         isPinned: true,
+  //       ),
+  //       ChatMessage(
+  //         name: 'Maria Garcia',
+  //         lastMessage: 'Can I bring my own ball?',
+  //         time: 'Thursday',
+  //         unreadCount: 0,
+  //         avatarUrl: '',
+  //         messages: [
+  //           Message(
+  //             content: 'Can I bring my own ball?',
+  //             time: 'Thursday',
+  //             isSentByMe: false,
+  //           ),
+  //           Message(
+  //             content: 'Of course! You can bring your own equipment.',
+  //             time: 'Thursday',
+  //             isSentByMe: true,
+  //           ),
+  //         ],
+  //         isArchived: true,
+  //       ),
+  //     ];
+  //     _filteredMessages = _filterMessagesByCategory(_selectedCategory);
+  //   });
   // }
+
+  // Footer navigation to handle all tabs - FIXED
+  void _onTabSelected(int index) {
+    print('Navigation selected: index $index'); // Debug output
+
+    // Just update the current index for UI state
+    // Let the footer handle the actual navigation
+    setState(() {});
+  }
 
   // Add debounce for better performance
   void _filterMessages(String query) {
@@ -488,8 +586,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isRefreshing) {
-      return const Scaffold(body: Center(child: FootballLoadingWidget()));
+    // FIXED: Only show loading during initial load or refresh, not always
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFF5F6FA),
+        body: Center(child: FootballLoadingWidget()),
+      );
     }
 
     return Scaffold(
@@ -512,17 +614,40 @@ class _MessagesScreenState extends State<MessagesScreen> {
           margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
           child: IconButton(
             icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-            onPressed: () {
-              Navigator.pop(context);
-              // Navigator.push(
-              //   context,
-              //   PageRouteBuilder(
-              //     pageBuilder: (context, animation, secondaryAnimation) =>
-              //         const HomeScreen(),
-              //     transitionDuration: Duration.zero,
-              //     reverseTransitionDuration: Duration.zero,
-              //   ),
-              // );
+            onPressed: () async {
+              try {
+                // Show loading indicator - SAME AS FAVOURITES
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  barrierColor: Colors.black.withOpacity(
+                    0.3,
+                  ), // FIXED: Use semi-transparent overlay
+                  builder: (BuildContext context) {
+                    return const Center(child: FootballLoadingWidget());
+                  },
+                );
+
+                // Simulate loading time
+                await Future.delayed(const Duration(milliseconds: 300));
+
+                // Close loading dialog and navigate back
+                // FIXED: Close loading dialog first, then navigate
+                if (mounted) {
+                  Navigator.of(context).pop(); // Close loading dialog
+                  Navigator.of(context).pop(); // Go back to previous screen
+                }
+              } catch (e) {
+                // Handle any errors
+                if (mounted) {
+                  // Try to close loading dialog if it exists
+                  try {
+                    Navigator.of(context).pop();
+                  } catch (_) {}
+                  // Then go back
+                  Navigator.of(context).pop();
+                }
+              }
             },
             tooltip: 'Back',
           ),
@@ -542,12 +667,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
       ),
       bottomNavigationBar: AppFooter(
-        currentIndex: _currentIndex,
-        onTabSelected: (int index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        currentIndex: _currentIndex, // Messages tab index
+        onTabSelected: _onTabSelected, // FIXED callback
       ),
     );
   }
@@ -847,7 +968,19 @@ class _MessagesScreenState extends State<MessagesScreen> {
             child: Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                barrierColor: Colors.white,
+                builder: (BuildContext context) {
+                  return const FootballLoadingWidget();
+                },
+              );
+
+              // Loading delay
+              await Future.delayed(const Duration(milliseconds: 300));
+
               Navigator.pop(context);
               setState(() {
                 _messages.remove(message);

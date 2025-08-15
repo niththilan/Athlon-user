@@ -379,22 +379,26 @@ class HistoryScreenState extends State<HistoryScreen> {
                   size: 28,
                 ),
                 onPressed: () {
-                  // Navigate to home page with no animation
-                  Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          home.HomeScreen(),
-                      transitionDuration: Duration.zero,
-                      reverseTransitionDuration: Duration.zero,
-                    ),
-                  );
+                  // Check if there's a previous page to go back to
+                  if (Navigator.canPop(context)) {
+                    Navigator.pop(context);
+                  } else {
+                    // Only navigate to home if there's no previous page
+                    Navigator.pushReplacement(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            home.HomeScreen(),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
+                      ),
+                    );
+                  }
                 },
                 tooltip: 'Back',
               ),
             ),
           ),
-
           SliverToBoxAdapter(
             child: Column(
               children: [
@@ -414,21 +418,27 @@ class HistoryScreenState extends State<HistoryScreen> {
             // Home = 0, Favorites = 1, Bookings = 2, Chat = 3
             switch (index) {
               case 0:
-                Navigator.pushReplacement(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        home.HomeScreen(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
+                // For home, use pop if possible, otherwise push
+                if (Navigator.canPop(context)) {
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                } else {
+                  Navigator.pushReplacement(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder: (context, animation, secondaryAnimation) =>
+                          home.HomeScreen(),
+                      transitionDuration: Duration.zero,
+                      reverseTransitionDuration: Duration.zero,
+                    ),
+                  );
+                }
                 break;
               case 1:
                 // Let the AppFooter handle navigation to favorites
                 break;
               case 3:
-                Navigator.pushReplacement(
+                // For messages, use push instead of pushReplacement
+                Navigator.push(
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
@@ -549,8 +559,8 @@ class HistoryScreenState extends State<HistoryScreen> {
                 ],
               ),
               // Status box (right, below price, aligned with court details/time)
-              if (booking.status.toLowerCase() != 'confirmed' && 
-                  booking.status.toLowerCase() != 'completed' && 
+              if (booking.status.toLowerCase() != 'confirmed' &&
+                  booking.status.toLowerCase() != 'completed' &&
                   booking.status.toLowerCase() != 'cancelled')
                 Container(
                   margin: EdgeInsets.only(top: 6),
@@ -574,7 +584,6 @@ class HistoryScreenState extends State<HistoryScreen> {
       ),
     );
   }
-
 
   void _showBookingDetails(BookingHistoryItem booking) {
     showDialog(

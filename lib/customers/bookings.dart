@@ -2170,10 +2170,12 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                   // Close loading dialog and navigate back
                   if (context.mounted) {
                     Navigator.pop(context); // Close loading
-                    Navigator.of(context).pop(); // Go back to previous screen
+                    Navigator.of(context).pop();
+                    // Go back to previous screen
                   }
                 } catch (e) {
                   // Handle any errors
+                  print('Navigation error: $e');
                   if (context.mounted) {
                     Navigator.pop(context); // Close loading
                     Navigator.of(context).pop(); // Go back to previous screen
@@ -2241,12 +2243,33 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
           margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
           child: IconButton(
             icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-            onPressed: () {
-              if (Navigator.canPop(context)) {
-                Navigator.pop(context);
-              } else {
-                // If there's no previous route, just pop the current route
-                Navigator.of(context).pop();
+            onPressed: () async {
+              try {
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  barrierColor: Colors.white,
+                  builder: (BuildContext context) {
+                    return const FootballLoadingWidget();
+                  },
+                );
+
+                // Simulate loading time
+                await Future.delayed(const Duration(milliseconds: 200));
+
+                // Close loading dialog and navigate back
+                if (context.mounted) {
+                  Navigator.pop(context); // Close loading
+                  Navigator.of(context).pop(); // Go back to previous screen
+                }
+              } catch (e) {
+                // Handle any errors
+                print('Navigation error: $e');
+                if (context.mounted) {
+                  Navigator.pop(context); // Close loading
+                  Navigator.of(context).pop(); // Go back to previous screen
+                }
               }
             },
             tooltip: 'Back',
@@ -2363,7 +2386,9 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFB71C1C), // Red for Remove
+                          backgroundColor: const Color(
+                            0xFFB71C1C,
+                          ), // Red for Remove
                           minimumSize: const Size(200, 50),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),

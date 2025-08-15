@@ -1,5 +1,6 @@
-// ignore_for_file: deprecated_member_use, file_names
+// ignore_for_file: deprecated_member_use, file_names, duplicate_import, use_build_context_synchronously, avoid_print
 
+import 'package:athlon_user/customers/bookings.dart';
 import 'package:flutter/material.dart';
 import 'home.dart' as home;
 import 'favourites.dart';
@@ -85,7 +86,8 @@ class AppFooter extends StatelessWidget {
     }
   }
 
-  Future<void> _navigateToHistory(BuildContext context) async {
+  Future<void> _navigateToBookings(BuildContext context) async {
+    print('Attempting to navigate to bookings...');
     try {
       // Show loading indicator
       showDialog(
@@ -97,55 +99,66 @@ class AppFooter extends StatelessWidget {
         },
       );
 
-      // Simulate loading time
       await Future.delayed(const Duration(milliseconds: 300));
 
-      // Close loading dialog
       if (Navigator.canPop(context)) {
         Navigator.pop(context);
       }
 
-      // Navigate to history screen with push instead of pushReplacement
+      print('Navigating to Bookings...');
       Navigator.push(
         context,
         PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const HistoryScreen(),
+          pageBuilder: (context, animation, secondaryAnimation) {
+            print('Building BookingScreen...');
+            return const HistoryScreen();
+          },
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
       );
+      print('History navigation completed');
     } catch (e) {
-      // Handle any errors
+      print('Error in history navigation: $e');
+
       if (Navigator.canPop(context)) {
         Navigator.pop(context);
       }
 
-      // Still navigate to history screen
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const HistoryScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+      // Show error to user
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error navigating to bookings: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
   Future<void> _navigateToMessages(BuildContext context) async {
-    // Direct navigation without loading indicator for fastest performance
-    if (context.mounted) {
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const MessagesScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-      );
+    print('Attempting to navigate to messages...');
+    try {
+      if (context.mounted) {
+        print('Context is mounted, navigating...');
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) {
+              print('Building MessagesScreen...');
+              return const MessagesScreen();
+            },
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+        print('Navigation completed');
+      } else {
+        print('Context is not mounted!');
+      }
+    } catch (e) {
+      print('Error navigating to messages: $e');
     }
   }
 
@@ -204,7 +217,7 @@ class AppFooter extends StatelessWidget {
                 _navigateToFavorites(context);
                 break;
               case 2:
-                _navigateToHistory(context);
+                _navigateToBookings(context);
                 break;
               case 3:
                 _navigateToMessages(context);
