@@ -191,115 +191,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
             ),
           ],
         ),
-        ChatMessage(
-          name: 'Alex Thompson',
-          lastMessage: 'What are your rates for group bookings?',
-          time: '12:15 PM',
-          unreadCount: 1,
-          avatarUrl: '',
-          messages: [
-            Message(
-              content: 'What are your rates for group bookings?',
-              time: '12:15 PM',
-              isSentByMe: false,
-            ),
-          ],
-        ),
-        ChatMessage(
-          name: 'Lisa Brown',
-          lastMessage: 'Great facility, will book again',
-          time: 'Sunday',
-          unreadCount: 0,
-          avatarUrl: '',
-          messages: [
-            Message(
-              content: 'Great facility, will book again',
-              time: 'Sunday',
-              isSentByMe: false,
-            ),
-            Message(
-              content: 'Thank you for choosing us!',
-              time: 'Sunday',
-              isSentByMe: true,
-            ),
-          ],
-          isArchived: true,
-        ),
-        ChatMessage(
-          name: 'David Miller',
-          lastMessage: 'Is parking available at your venue?',
-          time: 'Friday',
-          unreadCount: 0,
-          avatarUrl: '',
-          messages: [
-            Message(
-              content: 'Is parking available at your venue?',
-              time: 'Friday',
-              isSentByMe: false,
-            ),
-            Message(
-              content: 'Yes, we have free parking available.',
-              time: 'Friday',
-              isSentByMe: true,
-            ),
-          ],
-          isArchived: true,
-        ),
-        ChatMessage(
-          name: 'Jessica Taylor',
-          lastMessage: 'Do you have equipment rental?',
-          time: '11:30 AM',
-          unreadCount: 1,
-          avatarUrl: '',
-          messages: [
-            Message(
-              content: 'Do you have equipment rental?',
-              time: '11:30 AM',
-              isSentByMe: false,
-            ),
-          ],
-          isMuted: true,
-        ),
-        ChatMessage(
-          name: 'Robert Anderson',
-          lastMessage: 'Booking confirmed for 6 PM',
-          time: 'Yesterday',
-          unreadCount: 0,
-          avatarUrl: '',
-          messages: [
-            Message(
-              content: 'Booking confirmed for 6 PM',
-              time: 'Yesterday',
-              isSentByMe: true,
-            ),
-            Message(
-              content: 'Perfect, see you then!',
-              time: 'Yesterday',
-              isSentByMe: false,
-            ),
-          ],
-          isPinned: true,
-        ),
-        ChatMessage(
-          name: 'Maria Garcia',
-          lastMessage: 'Can I bring my own ball?',
-          time: 'Thursday',
-          unreadCount: 0,
-          avatarUrl: '',
-          messages: [
-            Message(
-              content: 'Can I bring my own ball?',
-              time: 'Thursday',
-              isSentByMe: false,
-            ),
-            Message(
-              content: 'Of course! You can bring your own equipment.',
-              time: 'Thursday',
-              isSentByMe: true,
-            ),
-          ],
-          isArchived: true,
-        ),
       ];
       _filteredMessages = _filterMessagesByCategory(_selectedCategory);
     });
@@ -1148,9 +1039,6 @@ class ChatTile extends StatelessWidget {
 
     return GestureDetector(
       onTap: onTap,
-      onLongPress: () {
-        _showActionMenu(context);
-      },
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
@@ -1247,21 +1135,151 @@ class ChatTile extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    message.time,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: hasUnread
-                          ? const Color(0xFF1B2C4F)
-                          : const Color(0xFF2D3142).withOpacity(0.7),
-                      fontWeight: hasUnread ? FontWeight.w500 : null,
-                    ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        message.time,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: hasUnread
+                              ? const Color(0xFF1B2C4F)
+                              : const Color(0xFF2D3142).withOpacity(0.7),
+                          fontWeight: hasUnread ? FontWeight.w500 : null,
+                        ),
+                      ),
+                      if (hasUnread) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF1B2C4F),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            message.unreadCount.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                  IconButton(
+                  PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert, color: Color(0xFF1B2C4F)),
-                    onPressed: () => _showActionMenu(context),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 8,
+                    color: Colors.white,
+                    onSelected: (value) {
+                      switch (value) {
+                        case 'archive':
+                          onArchive();
+                          break;
+                        case 'unarchive':
+                          onUnarchive();
+                          break;
+                        case 'pin':
+                          onPin();
+                          break;
+                        case 'mute':
+                          onMute();
+                          break;
+                        case 'delete':
+                          onMore();
+                          break;
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      if (!message.isArchived) ...[
+                        PopupMenuItem<String>(
+                          value: 'archive',
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.archive_outlined,
+                                color: Colors.green,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              const Text('Archive Chat'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'pin',
+                          child: Row(
+                            children: [
+                              Icon(
+                                message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                                color: const Color(0xFF1B2C4F),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(message.isPinned ? 'Unpin Chat' : 'Pin Chat'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          value: 'mute',
+                          child: Row(
+                            children: [
+                              Icon(
+                                message.isMuted
+                                    ? Icons.volume_up
+                                    : Icons.notifications_off_outlined,
+                                color: const Color(0xFF1B2C4F),
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                message.isMuted
+                                    ? 'Unmute Notifications'
+                                    : 'Mute Notifications',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ] else ...[
+                        PopupMenuItem<String>(
+                          value: 'unarchive',
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.unarchive_outlined,
+                                color: Colors.blue,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 12),
+                              const Text('Unarchive Chat'),
+                            ],
+                          ),
+                        ),
+                      ],
+                      PopupMenuItem<String>(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.delete_outline,
+                              color: Colors.red,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            const Text('Delete Chat'),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -1272,83 +1290,6 @@ class ChatTile extends StatelessWidget {
     );
   }
 
-  void _showActionMenu(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (!message.isArchived) ...[
-              ListTile(
-                leading: const Icon(
-                  Icons.archive_outlined,
-                  color: Colors.green,
-                ),
-                title: const Text('Archive Chat'),
-                onTap: () {
-                  Navigator.pop(context);
-                  onArchive();
-                },
-              ),
-              ListTile(
-                leading: Icon(
-                  message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                  color: const Color(0xFF1B2C4F),
-                ),
-                title: Text(message.isPinned ? 'Unpin Chat' : 'Pin Chat'),
-                onTap: () {
-                  Navigator.pop(context);
-                  onPin();
-                },
-              ),
-              ListTile(
-                leading: Icon(
-                  message.isMuted
-                      ? Icons.volume_up
-                      : Icons.notifications_off_outlined,
-                  color: const Color(0xFF1B2C4F),
-                ),
-                title: Text(
-                  message.isMuted
-                      ? 'Unmute Notifications'
-                      : 'Mute Notifications',
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  onMute();
-                },
-              ),
-            ] else ...[
-              ListTile(
-                leading: const Icon(
-                  Icons.unarchive_outlined,
-                  color: Colors.blue,
-                ),
-                title: const Text('Unarchive Chat'),
-                onTap: () {
-                  Navigator.pop(context);
-                  onUnarchive();
-                },
-              ),
-            ],
-            ListTile(
-              leading: const Icon(Icons.delete_outline, color: Colors.red),
-              title: const Text('Delete Chat'),
-              onTap: () {
-                Navigator.pop(context);
-                onMore();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildAvatar(ChatMessage message) {
     return Container(
