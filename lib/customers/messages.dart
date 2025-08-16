@@ -1473,10 +1473,11 @@ class _ChatScreenState extends State<ChatScreen> {
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
       backgroundColor: const Color(0xFF1B2C4F),
-      elevation: 2,
+      elevation: 0,
       toolbarHeight: 50,
+      centerTitle: false,
       leading: Container(
-        margin: const EdgeInsets.fromLTRB(8, 3, 0, 8),
+        margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
         child: IconButton(
           icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
           onPressed: () {
@@ -1491,38 +1492,17 @@ class _ChatScreenState extends State<ChatScreen> {
             //   ),
             // );
           },
+          tooltip: 'Back',
         ),
       ),
-      title: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: Colors.white.withOpacity(0.2),
-            radius: 16,
-            child: Text(
-              widget.chatMessage.name.isNotEmpty
-                  ? widget.chatMessage.name[0]
-                  : '?',
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              widget.chatMessage.name,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Poppins',
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
+      title: Text(
+        widget.chatMessage.name,
+        style: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          fontFamily: 'Poppins',
+          color: Colors.white,
+        ),
       ),
       actions: [
         IconButton(
