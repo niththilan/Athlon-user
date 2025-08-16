@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'bookings.dart'; // Import the bookings.dart file
 import 'nearbyVenues.dart'; // Import for VenueModel
 import 'footer.dart'; // Import footer
+import 'widgets/football_spinner.dart'; // Import football spinner
 
 void main() {
   runApp(const MyApp());
@@ -423,15 +424,9 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SizedBox(
-              width: 50,
-              height: 50,
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  const Color(0xFF1B2C4F),
-                ),
-                strokeWidth: 3,
-              ),
+            const FootballSpinner(
+              size: 50.0,
+              color: Color(0xFF1B2C4F),
             ),
             const SizedBox(height: 24),
             Text(
