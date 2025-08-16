@@ -592,39 +592,32 @@ class HistoryScreenState extends State<HistoryScreen> {
       builder: (BuildContext context) {
         return Dialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Container(
-            padding: EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
+            padding: EdgeInsets.all(20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header with close button
+                // Simple header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Booking Details',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: textPrimary,
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.of(context).pop(),
-                      child: Container(
-                        padding: EdgeInsets.all(4),
-                        child: Icon(
-                          Icons.close,
-                          size: 24,
-                          color: textSecondary,
-                        ),
+                      child: Icon(
+                        Icons.close,
+                        size: 24,
+                        color: textSecondary,
                       ),
                     ),
                   ],
@@ -632,27 +625,47 @@ class HistoryScreenState extends State<HistoryScreen> {
 
                 SizedBox(height: 20),
 
-                // Facility Information
-                _buildDetailRow('Facility Name', booking.facilityName),
-                _buildDetailRow('Court Name', booking.courtName),
-                _buildDetailRow('Court Type', booking.courtType),
+                // Court info
+                Text(
+                  booking.courtName,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: textPrimary,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Text(
+                  booking.facilityName,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: textSecondary,
+                  ),
+                ),
 
                 SizedBox(height: 16),
 
-                // Booking Information
-                _buildDetailRow(
-                  'Date',
+                // Date and time
+                Text(
                   DateFormat('EEEE, MMM d, yyyy').format(booking.date),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: textPrimary,
+                  ),
                 ),
-                _buildDetailRow(
-                  'Time',
+                SizedBox(height: 4),
+                Text(
                   '${booking.startTime} - ${booking.endTime}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: textSecondary,
+                  ),
                 ),
-                _buildDetailRow('Duration', '${booking.duration} minutes'),
 
-                SizedBox(height: 16),
+                SizedBox(height: 20),
 
-                // Price Information
+                // Price
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(16),
@@ -661,13 +674,15 @@ class HistoryScreenState extends State<HistoryScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         'Total Amount',
-                        style: TextStyle(fontSize: 14, color: textSecondary),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: textSecondary,
+                        ),
                       ),
-                      SizedBox(height: 4),
+                      SizedBox(height: 8),
                       Text(
                         'LKR ${booking.price.toStringAsFixed(0)}',
                         style: TextStyle(
@@ -678,43 +693,6 @@ class HistoryScreenState extends State<HistoryScreen> {
                       ),
                     ],
                   ),
-                ),
-
-                SizedBox(height: 20),
-
-                // Action buttons in popup
-                Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: primaryColor,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.close, size: 18, color: Colors.white),
-                              SizedBox(width: 8),
-                              Text(
-                                'Close',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
