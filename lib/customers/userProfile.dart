@@ -816,7 +816,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
-                          vertical: 16,
+                          vertical: 14,
                         ),
                         decoration: BoxDecoration(
                           color: primaryColor,
@@ -829,7 +829,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             const Text(
                               'Edit Profile',
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
                               ),
@@ -1658,41 +1658,79 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ],
           ),
 
-          // USER NAME AND LOCATION SECTION
+          // USER NAME AND LOCATION SECTION - Matching home.dart styling
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(32.0, 16.0, 16.0, 16.0),
+              padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // User name
-                  Text(
-                    "Sam Johnson",
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1B2C4F),
+                  const SizedBox(height: 6),
+                  // Welcome text - matching home.dart
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Text(
+                      "${name.split(' ').first} here",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1B2C4F),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  // Location row
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.location_on,
-                        color: Color(0xFF1B2C4F),
-                        size: 18,
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        location,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Color(0xFF1B2C4F),
-                          fontWeight: FontWeight.w500,
+                  const SizedBox(height: 8),
+                  // Location card - matching home.dart style
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1B2C4F),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on,
+                          color: Colors.white,
+                          size: 30,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                location,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Current Location",
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white.withOpacity(0.8),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
