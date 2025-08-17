@@ -372,38 +372,25 @@ class _FilterScreenState extends State<FilterScreen> {
               ),
               child: Column(
                 children: [
-                  // Handle bar
-                  Container(
-                    margin: const EdgeInsets.only(top: 8),
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  
                   // Header with close button
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       children: [
+                        const SizedBox(width: 10),
+                        const Text(
+                          "Choose Location",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1B2C4F),
+                          ),
+                        ),
+                        const Spacer(),
                         IconButton(
                           onPressed: () => Navigator.pop(context),
                           icon: const Icon(Icons.close, size: 24),
                         ),
-                        const Expanded(
-                          child: Text(
-                            "Choose Location",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1B2C4F),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 40), // Balance for close button
                       ],
                     ),
                   ),
