@@ -143,7 +143,7 @@ class _FilterScreenState extends State<FilterScreen> {
                   const Icon(
                     Icons.keyboard_arrow_down,
                     color: Color(0xFF1B2C4F),
-                    size: 24,
+                    size: 28,
                   ),
                 ],
                 ),
