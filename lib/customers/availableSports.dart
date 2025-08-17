@@ -712,24 +712,76 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
                                 _favoriteStatus[venue['id']] ?? false;
 
                             return GestureDetector(
-                              onTap: () {
-                                // Convert venue data to VenueModel and pass to SlotsPage
-                                final venueModel = _convertToVenueModel(venue);
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    pageBuilder:
-                                        (
-                                          context,
-                                          animation,
-                                          secondaryAnimation,
-                                        ) => SlotsPage(
-                                          selectedVenue: venueModel,
-                                        ),
-                                    transitionDuration: Duration.zero,
-                                    reverseTransitionDuration: Duration.zero,
-                                  ),
+                              onTap: () async {
+                                // Show loading screen immediately
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  barrierColor: Colors.white,
+                                  builder: (BuildContext context) {
+                                    return const FootballLoadingWidget();
+                                  },
                                 );
+
+                                // Loading delay
+                                await Future.delayed(
+                                  const Duration(milliseconds: 300),
+                                );
+
+                                // Navigate to court details page without animation
+                                if (context.mounted) {
+                                  Navigator.pop(context); // Close loading dialog
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      pageBuilder:
+                                          (
+                                            context,
+                                            animation,
+                                            secondaryAnimation,
+                                          ) => court.CourtDetailScreen(
+                                            courtData: {
+                                              'id': venue['id'],
+                                              'name': venue['title'],
+                                              'type': venue['sport'],
+                                              'location': venue['location'],
+                                              'distance': venue['distance'],
+                                              'rating': venue['rating'],
+                                              'total_reviews': 124,
+                                              'price_per_hour':
+                                                  double.tryParse(
+                                                    venue['rate_per_hour']
+                                                            ?.toString()
+                                                            .replaceAll(
+                                                              RegExp(r'[^\d.]'),
+                                                              '',
+                                                            ) ??
+                                                        '0',
+                                                  ) ??
+                                                  0.0,
+                                              'opening_hours':
+                                                  venue['opening_hours'] ??
+                                                      'Open Now',
+                                              'closing_time':
+                                                  'Closes at 11:00 PM',
+                                              'phone': '+94 77 123 4567',
+                                              'email': 'info@venue.lk',
+                                              'website': 'www.venue.lk',
+                                              'description':
+                                                  'Premium sports facility with state-of-the-art equipment.',
+                                              'images': [
+                                                venue['image_path'] ?? '',
+                                              ],
+                                              'sports_available': [
+                                                venue['sport'],
+                                              ],
+                                            },
+                                          ),
+                                      transitionDuration: Duration.zero,
+                                      reverseTransitionDuration: Duration.zero,
+                                    ),
+                                  );
+                                }
                               },
                               child: Container(
                                 margin: const EdgeInsets.only(bottom: 20.0),
