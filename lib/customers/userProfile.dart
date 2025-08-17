@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, file_names, avoid_print, use_build_context_synchronously, sized_box_for_whitespace, unnecessary_to_list_in_spreads
+// ignore_for_file: deprecated_member_use, file_names, avoid_print, use_build_context_synchronously, sized_box_for_whitespace, unnecessary_to_list_in_spreads, unused_local_variable
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -134,6 +134,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   // Mock repositories
   final MockAuthService _authRepository = MockAuthService();
   final MockUserService _userRepository = MockUserService();
+
+  bool _isRecentActivitiesExpanded = false;
+  bool _isFavoriteVenuesExpanded = false;
 
   // User data and loading state
   Map<String, dynamic>? _user;
@@ -334,43 +337,58 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     return _countryCodes.firstWhere((c) => c.code == '+94');
   }
 
-  // Helper method to build profile detail items
-  Widget _buildProfileDetailItem(IconData icon, String label, String value) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 20, color: primaryColor),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
+  // Updated profile detail item to match the screenshot format
+  Widget _buildProfileDetailItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 0),
+        child: Row(
+          children: [
+            Container(
+              width: 24,
+              height: 24,
+              child: Icon(icon, size: 20, color: textDarkColor),
+            ),
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: textDarkColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    value.isNotEmpty ? value : "Not specified",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: value.isNotEmpty
+                          ? Colors.grey[600]
+                          : Colors.grey[500],
+                      fontStyle: value.isNotEmpty
+                          ? FontStyle.normal
+                          : FontStyle.italic,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 2),
-              Text(
-                value.isNotEmpty ? value : "Not specified",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: value.isNotEmpty ? textDarkColor : Colors.grey[500],
-                  fontWeight: value.isNotEmpty
-                      ? FontWeight.w500
-                      : FontWeight.normal,
-                  fontStyle: value.isNotEmpty
-                      ? FontStyle.normal
-                      : FontStyle.italic,
-                ),
-              ),
-            ],
-          ),
+            ),
+            if (trailing != null) trailing,
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -1555,6 +1573,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     // Extract user data to variables for easy access
     final name = _user!['full_name'] ?? 'User';
     final status = _user!['status'] ?? 'Sports Enthusiast';
+    final location = _user!['location'] ?? 'Location not set';
     final address = _user!['address'] ?? 'Address not set';
     final email = _user!['email'] ?? 'email@example.com';
     final phone = _user!['phone'] ?? 'Phone not set';
@@ -1639,14 +1658,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ],
           ),
 
-          // PROFILE DETAILS BOX (MOVED UP)
+          // MAIN PROFILE CARD - Updated to match the screenshot format
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
@@ -1659,134 +1677,134 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Profile Header with name
+                    Text(
+                      name,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    // const SizedBox(height: 4),
+                    // Text(
+                    //   'Managed by ${name.split(' ').first.toLowerCase()}',
+                    //   style: TextStyle(
+                    //     fontSize: 16,
+                    //     color: Colors.white.withOpacity(0.8),
+                    //     fontWeight: FontWeight.w400,
+                    //   ),
+                    // ),
+                    //const SizedBox(height: 12),
+                    // Location row
                     Row(
                       children: [
-                        // Profile Image with status indicator
-                        Stack(
-                          children: [
-                            Container(
-                              width: 90,
-                              height: 90,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: primaryColor,
-                                  width: 2,
-                                ),
-                                color: primaryColor.withOpacity(0.1),
-                              ),
-                              child: const Icon(
-                                Icons.person,
-                                size: 45,
-                                color: primaryColor,
-                              ),
-                            ),
-                            // Online status indicator
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 3,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                        Icon(
+                          Icons.location_on,
+                          color: Colors.white.withOpacity(0.9),
+                          size: 18,
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                name,
-                                style: const TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                  color: textDarkColor,
-                                  letterSpacing: 0.3,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                status,
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                        const SizedBox(width: 6),
+                        Text(
+                          location,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white.withOpacity(0.9),
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+          ),
 
-                    // Action buttons row (Settings, Help & Support, Logout)
-                    Row(
-                      children: [
-                        _buildActionButton(
-                          icon: Icons.settings,
-                          label: "Settings",
-                          onPressed: _showSettings,
-                        ),
-                        _buildActionButton(
-                          icon: Icons.help_outline,
-                          label: "Help & Support",
-                          onPressed: _showHelpAndSupport,
-                        ),
-                        _buildActionButton(
-                          icon: Icons.logout,
-                          label: "Logout",
-                          onPressed: _showLogoutConfirmation,
-                          iconColor: Colors.red,
-                        ),
-                      ],
+          // ACTION BUTTONS ROW
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  _buildActionButton(
+                    icon: Icons.settings,
+                    label: "Settings",
+                    onPressed: _showSettings,
+                  ),
+                  _buildActionButton(
+                    icon: Icons.help_outline,
+                    label: "Help & Support",
+                    onPressed: _showHelpAndSupport,
+                  ),
+                  _buildActionButton(
+                    icon: Icons.logout,
+                    label: "Logout",
+                    onPressed: _showLogoutConfirmation,
+                    iconColor: Colors.red,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 20)),
+
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                padding: const EdgeInsets.all(16), // Reduced from 20
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
                     ),
-                    const SizedBox(height: 20),
-
-                    // Additional Profile Details
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: backgroundColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          _buildProfileDetailItem(
-                            Icons.home,
-                            "Address",
-                            address,
-                          ),
-                          const Divider(height: 20, thickness: 1),
-                          _buildProfileDetailItem(
-                            Icons.email_outlined,
-                            "Email",
-                            email,
-                          ),
-                          const Divider(height: 20, thickness: 1),
-                          _buildProfileDetailItem(
-                            Icons.phone_outlined,
-                            "Phone",
-                            phone,
-                          ),
-                          const Divider(height: 20, thickness: 1),
-                          _buildProfileDetailItem(
-                            Icons.calendar_today_outlined,
-                            "Member Since",
-                            memberSince,
-                          ),
-                        ],
-                      ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    _buildCompactProfileDetailItem(
+                      icon: Icons.person, 
+                      label: "Owner",
+                      value: name.split(' ').first.toLowerCase(),
+                      //iconColor: Colors.red,
+                    ),
+                    Divider(
+                      color: Colors.grey[200],
+                      height: 12,
+                    ), // Reduced height
+                    _buildCompactProfileDetailItem(
+                      icon: Icons.home,
+                      //color: primaryColor,
+                      label: "Address",
+                      value: location,
+                    ),
+                    Divider(color: Colors.grey[200], height: 12),
+                    _buildCompactProfileDetailItem(
+                      icon: Icons.sports_soccer,
+                      //color: primaryColor,
+                      label: "Status Controller",
+                      value: status, // or get from your data
+                    ),
+                    Divider(color: Colors.grey[200], height: 12),
+                    _buildCompactProfileDetailItem(
+                      icon: Icons.phone_outlined,
+                      //color: primaryColor,
+                      label: "Phone",
+                      value: phone,
+                      showPhoneFormatted: true,
+                    ),
+                    Divider(color: Colors.grey[200], height: 12),
+                    _buildCompactProfileDetailItem(
+                      icon: Icons.email_outlined,
+                      //color: primaryColor,
+                      label: "Email Address",
+                      value: email,
                     ),
                   ],
                 ),
@@ -1797,11 +1815,66 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
           // Recent Activities Section - Always visible, up to 3 activities
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          //     child: Container(
+          //       padding: const EdgeInsets.all(20),
+          //       decoration: BoxDecoration(
+          //         color: Colors.white,
+          //         borderRadius: BorderRadius.circular(16),
+          //         boxShadow: [
+          //           BoxShadow(
+          //             color: Colors.black.withOpacity(0.08),
+          //             blurRadius: 12,
+          //             offset: const Offset(0, 4),
+          //           ),
+          //         ],
+          //       ),
+          //       child: Column(
+          //         crossAxisAlignment: CrossAxisAlignment.start,
+          //         children: [
+          //           const Text(
+          //             "Recent Activities",
+          //             style: TextStyle(
+          //               fontSize: 18,
+          //               fontWeight: FontWeight.w600,
+          //               color: textDarkColor,
+          //             ),
+          //           ),
+          //           const SizedBox(height: 16),
+          //           if (recentActivities.isEmpty)
+          //             _buildEmptyState(
+          //               "No recent activities found",
+          //               Icons.history,
+          //             )
+          //           else
+          //             ...recentActivities.take(3).map((activity) {
+          //               final index = recentActivities.indexOf(activity);
+          //               return Column(
+          //                 children: [
+          //                   if (index > 0) const SizedBox(height: 12),
+          //                   _buildActivityItem(
+          //                     activity['title'] ?? '',
+          //                     activity['location'] ?? '',
+          //                     activity['time'] ?? '',
+          //                     activity['icon'] ?? Icons.sports,
+          //                   ),
+          //                 ],
+          //               );
+          //             }).toList(),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
+
+          // const SliverToBoxAdapter(child: SizedBox(height: 20)),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16), // Reduced padding
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -1816,35 +1889,57 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Recent Activities",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: textDarkColor,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Recent Activities",
+                          style: TextStyle(
+                            fontSize: 16, // Reduced font size
+                            fontWeight: FontWeight.w600,
+                            color: textDarkColor,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isRecentActivitiesExpanded =
+                                  !_isRecentActivitiesExpanded;
+                            });
+                          },
+                          child: Icon(
+                            _isRecentActivitiesExpanded
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            color: Colors.grey[600],
+                            size: 24,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    if (recentActivities.isEmpty)
-                      _buildEmptyState(
-                        "No recent activities found",
-                        Icons.history,
-                      )
-                    else
-                      ...recentActivities.take(3).map((activity) {
-                        final index = recentActivities.indexOf(activity);
-                        return Column(
-                          children: [
-                            if (index > 0) const SizedBox(height: 12),
-                            _buildActivityItem(
-                              activity['title'] ?? '',
-                              activity['location'] ?? '',
-                              activity['time'] ?? '',
-                              activity['icon'] ?? Icons.sports,
-                            ),
-                          ],
-                        );
-                      }).toList(),
+                    if (_isRecentActivitiesExpanded) ...[
+                      const SizedBox(height: 16),
+                      if (recentActivities.isEmpty)
+                        _buildEmptyState(
+                          "No recent activities found",
+                          Icons.history,
+                        )
+                      else
+                        ...recentActivities.take(3).map((activity) {
+                          final index = recentActivities.indexOf(activity);
+                          return Column(
+                            children: [
+                              if (index > 0) const SizedBox(height: 12),
+                              _buildActivityItem(
+                                activity['title'] ?? '',
+                                activity['location'] ?? '',
+                                activity['time'] ?? '',
+                                activity['icon'] ?? Icons.sports,
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                    ],
                   ],
                 ),
               ),
@@ -1854,11 +1949,68 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
           // Favorite Venues Section - Always visible with images
+          // SliverToBoxAdapter(
+          //   child: Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          //     child: Container(
+          //       padding: const EdgeInsets.all(20),
+          //       decoration: BoxDecoration(
+          //         color: Colors.white,
+          //         borderRadius: BorderRadius.circular(16),
+          //         boxShadow: [
+          //           BoxShadow(
+          //             color: Colors.black.withOpacity(0.08),
+          //             blurRadius: 12,
+          //             offset: const Offset(0, 4),
+          //           ),
+          //         ],
+          //       ),
+          //       child: Column(
+          //         crossAxisAlignment: CrossAxisAlignment.start,
+          //         children: [
+          //           const Text(
+          //             "Favorite Venues",
+          //             style: TextStyle(
+          //               fontSize: 18,
+          //               fontWeight: FontWeight.w600,
+          //               color: textDarkColor,
+          //             ),
+          //           ),
+          //           const SizedBox(height: 16),
+          //           if (favoriteVenues.isEmpty)
+          //             _buildEmptyState(
+          //               "No favorite venues added yet",
+          //               Icons.location_on,
+          //             )
+          //           else
+          //             SingleChildScrollView(
+          //               scrollDirection: Axis.horizontal,
+          //               child: Row(
+          //                 children: favoriteVenues.map((venue) {
+          //                   final index = favoriteVenues.indexOf(venue);
+          //                   return Row(
+          //                     children: [
+          //                       if (index > 0) const SizedBox(width: 12),
+          //                       _buildVenueCard(
+          //                         venue['name'] ?? '',
+          //                         venue['rating'] ?? '0.0',
+          //                         venue['image'] ?? '',
+          //                       ),
+          //                     ],
+          //                   );
+          //                 }).toList(),
+          //               ),
+          //             ),
+          //         ],
+          //       ),
+          //     ),
+          //   ),
+          // ),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16), // Reduced padding
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
@@ -1873,39 +2025,61 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Favorite Venues",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: textDarkColor,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    if (favoriteVenues.isEmpty)
-                      _buildEmptyState(
-                        "No favorite venues added yet",
-                        Icons.location_on,
-                      )
-                    else
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: favoriteVenues.map((venue) {
-                            final index = favoriteVenues.indexOf(venue);
-                            return Row(
-                              children: [
-                                if (index > 0) const SizedBox(width: 12),
-                                _buildVenueCard(
-                                  venue['name'] ?? '',
-                                  venue['rating'] ?? '0.0',
-                                  venue['image'] ?? '',
-                                ),
-                              ],
-                            );
-                          }).toList(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Favorite Venues",
+                          style: TextStyle(
+                            fontSize: 16, // Reduced font size
+                            fontWeight: FontWeight.w600,
+                            color: textDarkColor,
+                          ),
                         ),
-                      ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _isFavoriteVenuesExpanded =
+                                  !_isFavoriteVenuesExpanded;
+                            });
+                          },
+                          child: Icon(
+                            _isFavoriteVenuesExpanded
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            color: Colors.grey[600],
+                            size: 24,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (_isFavoriteVenuesExpanded) ...[
+                      const SizedBox(height: 16),
+                      if (favoriteVenues.isEmpty)
+                        _buildEmptyState(
+                          "No favorite venues added yet",
+                          Icons.location_on,
+                        )
+                      else
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: favoriteVenues.map((venue) {
+                              final index = favoriteVenues.indexOf(venue);
+                              return Row(
+                                children: [
+                                  if (index > 0) const SizedBox(width: 12),
+                                  _buildVenueCard(
+                                    venue['name'] ?? '',
+                                    venue['rating'] ?? '0.0',
+                                    venue['image'] ?? '',
+                                  ),
+                                ],
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                    ],
                   ],
                 ),
               ),
@@ -1916,5 +2090,97 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildCompactProfileDetailItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    bool showPhoneFormatted = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0), // Reduced padding
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 20, // Slightly smaller icon
+            color: Colors.grey[600],
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 13, // Reduced font size
+                    fontWeight: FontWeight.w500,
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                if (showPhoneFormatted && value.isNotEmpty)
+                  _buildPhoneDisplay(value)
+                else
+                  Text(
+                    value,
+                    style: const TextStyle(
+                      fontSize: 14, // Reduced font size
+                      fontWeight: FontWeight.w500,
+                      color: textDarkColor,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Method to display phone number with country flag
+  Widget _buildPhoneDisplay(String phoneNumber) {
+    if (phoneNumber.startsWith('+44')) {
+      return Row(
+        children: [
+          const Text('🇬🇧', style: TextStyle(fontSize: 16)),
+          const SizedBox(width: 8),
+          Text(
+            phoneNumber.replaceFirst('+44 ', ''),
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: textDarkColor,
+            ),
+          ),
+        ],
+      );
+    } else if (phoneNumber.startsWith('+94')) {
+      return Row(
+        children: [
+          const Text('🇱🇰', style: TextStyle(fontSize: 16)),
+          const SizedBox(width: 8),
+          Text(
+            phoneNumber.replaceFirst('+94 ', ''),
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: textDarkColor,
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Text(
+        phoneNumber,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: textDarkColor,
+        ),
+      );
+    }
   }
 }
