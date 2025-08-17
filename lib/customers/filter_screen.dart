@@ -27,6 +27,15 @@ class _FilterScreenState extends State<FilterScreen> {
   late String _activeFilter;
   late double _distanceRadius;
   String _selectedLocation = "Current Location";
+  
+  final TextEditingController _searchController = TextEditingController();
+  final List<String> _pastSearchLocations = [
+    "Downtown Sports Complex",
+    "Central Park Area", 
+    "University District",
+    "Shopping Mall Area",
+    "Riverside Stadium"
+  ];
 
   @override
   void initState() {
@@ -350,75 +359,129 @@ class _FilterScreenState extends State<FilterScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.7,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 4,
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.9,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                children: [
+                  // Handle bar
+                  Container(
+                    margin: const EdgeInsets.only(top: 8),
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  
+                  // Header with close button
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close, size: 24),
+                        ),
+                        const Expanded(
+                          child: Text(
+                            "Choose Location",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1B2C4F),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 40), // Balance for close button
+                      ],
+                    ),
+                  ),
+                  
+                  // Search bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(2),
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: "Search for area, street name...",
+                          hintStyle: TextStyle(color: Colors.grey[600]),
+                          prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        ),
+                        onChanged: (value) {
+                          setModalState(() {});
+                        },
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    const Text(
-                      "Select Location",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF1B2C4F),
-                      ),
+                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Current Location option
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: _buildCurrentLocationOption(),
+                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Past searches section
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            children: [
+                              Icon(Icons.history, size: 20, color: Colors.grey[600]),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Recent searches",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Expanded(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            itemCount: _pastSearchLocations.length,
+                            itemBuilder: (context, index) {
+                              final location = _pastSearchLocations[index];
+                              return _buildPastLocationOption(location);
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  children: [
-                    _buildLocationOption(
-                      "Current Location",
-                      "Use my current location",
-                      Icons.my_location,
-                    ),
-                    _buildLocationOption(
-                      "Downtown Sports Complex",
-                      "123 Main St, Downtown",
-                      Icons.location_city,
-                    ),
-                    _buildLocationOption(
-                      "Central Park Area",
-                      "456 Park Ave, Central",
-                      Icons.park,
-                    ),
-                    _buildLocationOption(
-                      "University District",
-                      "789 College Rd, University",
-                      Icons.school,
-                    ),
-                    _buildLocationOption(
-                      "Shopping Mall Area",
-                      "321 Mall Dr, Shopping District",
-                      Icons.shopping_bag,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -473,6 +536,112 @@ class _FilterScreenState extends State<FilterScreen> {
                     ),
                   ),
                 ],
+              ),
+            ),
+            if (isSelected)
+              const Icon(
+                Icons.check_circle,
+                color: Color(0xFF1B2C4F),
+                size: 20,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCurrentLocationOption() {
+    final isSelected = _selectedLocation == "Current Location";
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedLocation = "Current Location";
+        });
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey[300]!),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1B2C4F).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.my_location,
+                color: Color(0xFF1B2C4F),
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Use current location",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1B2C4F),
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "Enable precise location",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              const Icon(
+                Icons.check_circle,
+                color: Color(0xFF1B2C4F),
+                size: 20,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPastLocationOption(String location) {
+    final isSelected = _selectedLocation == location;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedLocation = location;
+        });
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        child: Row(
+          children: [
+            Icon(
+              Icons.history,
+              color: Colors.grey[600],
+              size: 20,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                location,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected ? const Color(0xFF1B2C4F) : Colors.black87,
+                ),
               ),
             ),
             if (isSelected)
