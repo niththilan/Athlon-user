@@ -44,14 +44,35 @@ class _FilterScreenState extends State<FilterScreen> {
         toolbarHeight: 50,
         backgroundColor: const Color(0xFF1B2C4F),
         centerTitle: false,
-        title: const Text(
-          "Sort & Filter",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            fontFamily: 'Poppins',
-            color: Colors.white,
-          ),
+        title: Row(
+          children: [
+            const Text(
+              "Sort & Filter",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Poppins',
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(width: 180),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _distanceRadius = 10.0;
+                  _sortingMode = 'Nearest';
+                  _activeFilter = 'All';
+                });
+              },
+              child: const Text(
+                'Reset',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
         ),
         leading: Container(
           margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
@@ -61,122 +82,66 @@ class _FilterScreenState extends State<FilterScreen> {
             tooltip: 'Back',
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _distanceRadius = 10.0;
-                _sortingMode = 'Nearest';
-                _activeFilter = 'All';
-              });
-            },
-            child: const Text(
-              'Reset',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Distance Range Section
+            // Distance Range Section - Simplified
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Distance Range",
+                    "Distance",
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1B2C4F),
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Text(
-                        "0 km",
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                      ),
-                      Expanded(
-                        child: Slider(
-                          value: _distanceRadius,
-                          min: 0.0,
-                          max: 20.0,
-                          divisions: 20,
-                          label: "${_distanceRadius.round()} km",
-                          activeColor: const Color(0xFF1B2C4F),
-                          onChanged: (value) {
-                            setState(() {
-                              _distanceRadius = value;
-                            });
-                          },
-                        ),
-                      ),
-                      Text(
-                        "20 km",
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                      ),
-                    ],
+                  const SizedBox(height: 20),
+                  Slider(
+                    value: _distanceRadius,
+                    min: 0.0,
+                    max: 20.0,
+                    divisions: 20,
+                    label: "${_distanceRadius.round()} km",
+                    activeColor: const Color(0xFF1B2C4F),
+                    inactiveColor: Colors.grey[300],
+                    onChanged: (value) {
+                      setState(() {
+                        _distanceRadius = value;
+                      });
+                    },
                   ),
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1B2C4F).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        "Within ${_distanceRadius.round()} km",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF1B2C4F),
-                        ),
-                      ),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("0 km", style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                      Text("Within ${_distanceRadius.round()} km", 
+                           style: const TextStyle(fontWeight: FontWeight.w500, color: Color(0xFF1B2C4F))),
+                      Text("20 km", style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                    ],
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            // Sorting Options Section
+            // Sorting Options Section - Simplified
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -184,43 +149,36 @@ class _FilterScreenState extends State<FilterScreen> {
                   const Text(
                     "Sort By",
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1B2C4F),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  _buildSortingOption("Nearest", "Distance: Low to High"),
-                  _buildSortingOption("Farthest", "Distance: High to Low"),
-                  _buildSortingOption("Highest Rated", "Rating: High to Low"),
-                  _buildSortingOption("Sports (A-Z)", "Alphabetical Order"),
+                  const SizedBox(height: 16),
+                  _buildSimpleSortingOption("Nearest"),
+                  _buildSimpleSortingOption("Farthest"),
+                  _buildSimpleSortingOption("Highest Rated"),
+                  _buildSimpleSortingOption("Sports (A-Z)"),
                 ],
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            // Sports Filter Section
+            // Sports Filter Section - Simplified
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Filter by Sport",
+                    "Sports",
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1B2C4F),
                     ),
@@ -231,38 +189,30 @@ class _FilterScreenState extends State<FilterScreen> {
                     runSpacing: 8.0,
                     children: widget.filterOptions.keys.map((sport) {
                       final isSelected = _activeFilter == sport;
-                      return FilterChip(
-                        label: Text(
-                          sport,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isSelected
-                                ? Colors.white
-                                : const Color(0xFF1B2C4F),
-                            fontWeight: isSelected
-                                ? FontWeight.w600
-                                : FontWeight.w500,
-                          ),
-                        ),
-                        backgroundColor: isSelected
-                            ? const Color(0xFF1B2C4F)
-                            : Colors.grey[100],
-                        selectedColor: const Color(0xFF1B2C4F),
-                        side: BorderSide(
-                          color: isSelected
-                              ? const Color(0xFF1B2C4F)
-                              : Colors.grey[300]!,
-                        ),
-                        selected: isSelected,
-                        showCheckmark: false,
-                        onSelected: (selected) {
+                      return GestureDetector(
+                        onTap: () {
                           setState(() {
-                            _activeFilter = selected ? sport : 'All';
+                            _activeFilter = isSelected ? 'All' : sport;
                           });
                         },
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[300]!,
+                              width: 1,
+                            ),
+                          ),
+                          child: Text(
+                            sport,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: isSelected ? Colors.white : const Color(0xFF1B2C4F),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
                       );
                     }).toList(),
@@ -274,25 +224,18 @@ class _FilterScreenState extends State<FilterScreen> {
         ),
       ),
       bottomNavigationBar: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
           color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              offset: const Offset(0, -2),
-            ),
-          ],
         ),
         child: SafeArea(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1B2C4F),
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
               ),
               elevation: 0,
             ),
@@ -338,7 +281,7 @@ class _FilterScreenState extends State<FilterScreen> {
             },
             child: const Text(
               "Apply Filters",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -346,46 +289,50 @@ class _FilterScreenState extends State<FilterScreen> {
     );
   }
 
-  Widget _buildSortingOption(String value, String description) {
-    return InkWell(
+  Widget _buildSimpleSortingOption(String value) {
+    final isSelected = _sortingMode == value;
+    return GestureDetector(
       onTap: () {
         setState(() {
           _sortingMode = value;
         });
       },
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF1B2C4F).withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[300]!,
+            width: 1,
+          ),
+        ),
         child: Row(
           children: [
-            Radio<String>(
-              value: value,
-              groupValue: _sortingMode,
-              activeColor: const Color(0xFF1B2C4F),
-              onChanged: (newValue) {
-                setState(() {
-                  _sortingMode = newValue!;
-                });
-              },
+            Container(
+              width: 16,
+              height: 16,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSelected ? const Color(0xFF1B2C4F) : Colors.transparent,
+                border: Border.all(
+                  color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[400]!,
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? const Icon(Icons.check, size: 10, color: Colors.white)
+                  : null,
             ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    value,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: Color(0xFF1B2C4F),
-                    ),
-                  ),
-                  Text(
-                    description,
-                    style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                  ),
-                ],
+            const SizedBox(width: 12),
+            Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[700],
               ),
             ),
           ],
