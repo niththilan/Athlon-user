@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, file_names, prefer_final_fields, use_build_context_synchronously, sized_box_for_whitespace
+// ignore_for_file: deprecated_member_use, file_names
 
 import 'package:flutter/material.dart';
 import 'footer.dart';
@@ -369,18 +369,18 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
     // Safely get sports available, ensuring it's a List<String>
     final dynamic sportsData = _courtDetails['sports_available'];
     final List<String> sportsAvailable;
-
+    
     if (sportsData is List) {
       sportsAvailable = sportsData.cast<String>();
     } else {
       sportsAvailable = [];
     }
-
+    
     // Return empty list if no sports available
     if (sportsAvailable.isEmpty) {
       return [];
     }
-
+    
     // Sports image mapping
     final Map<String, String> sportsImages = {
       'Futsal': 'assets/football.jpg',
@@ -412,7 +412,10 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
     // Create cards only for the sports in the list, in the exact order
     return sportsAvailable.map((sport) {
       final imagePath = sportsImages[sport] ?? 'assets/football.jpg';
-      return _SportsCard(sport: sport, imagePath: imagePath);
+      return _SportsCard(
+        sport: sport,
+        imagePath: imagePath,
+      );
     }).toList();
   }
 
@@ -686,7 +689,9 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
                   context,
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) =>
-                        SlotsPage(courtData: _courtDetails),
+                        SlotsPage(
+                          courtData: _courtDetails,
+                        ),
                     transitionDuration: Duration.zero,
                     reverseTransitionDuration: Duration.zero,
                   ),
@@ -729,562 +734,556 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
           CustomScrollView(
             controller: _scrollController,
             slivers: [
-              // Top Image Carousel
-              SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 350,
-                  child: Stack(
-                    children: [
-                      // Image Carousel
-                      PageView.builder(
-                        controller: _pageController,
-                        itemCount: _courtDetails['images'].length,
-                        physics: const BouncingScrollPhysics(),
-                        onPageChanged: (index) {
-                          setState(() {
-                            _currentImageIndex = index;
-                          });
-                          _indicatorController.reset();
-                          _indicatorController.forward();
-                        },
-                        itemBuilder: (context, index) {
-                          return Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+          // Top Image Carousel
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 350,
+              child: Stack(
+                children: [
+                  // Image Carousel
+                  PageView.builder(
+                    controller: _pageController,
+                    itemCount: _courtDetails['images'].length,
+                    physics: const BouncingScrollPhysics(),
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentImageIndex = index;
+                      });
+                      _indicatorController.reset();
+                      _indicatorController.forward();
+                    },
+                    itemBuilder: (context, index) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(0),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
                             ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(0),
-                              child: Image.network(
-                                _courtDetails['images'][index],
-                                fit: BoxFit.cover,
-                                width: double.infinity,
-                                height: double.infinity,
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Container(
-                                        color: Colors.white,
-                                        child: Center(
-                                          child: CircularProgressIndicator(
-                                            value:
-                                                loadingProgress
-                                                        .expectedTotalBytes !=
-                                                    null
-                                                ? loadingProgress
-                                                          .cumulativeBytesLoaded /
-                                                      loadingProgress
-                                                          .expectedTotalBytes!
-                                                : null,
-                                            color: const Color(0xFF1B2C4F),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: Colors.white,
-                                    child: const Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.sports_soccer,
-                                          size: 50,
-                                          color: Color(0xFF1B2C4F),
-                                        ),
-                                        SizedBox(height: 8),
-                                        Text(
-                                          'ARK SPORTS',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFF1B2C4F),
-                                          ),
-                                        ),
-                                        Text(
-                                          'Indoor Sports Facility',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Color(0xFF1B2C4F),
-                                          ),
-                                        ),
-                                      ],
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(0),
+                          child: Image.network(
+                            _courtDetails['images'][index],
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                color: Colors.white,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes!
+                                        : null,
+                                    color: const Color(0xFF1B2C4F),
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.white,
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.sports_soccer,
+                                      size: 50,
+                                      color: Color(0xFF1B2C4F),
                                     ),
-                                  );
-                                },
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-
-                      // Back arrow on top left - Go back to previous page
-                      Positioned(
-                        top: MediaQuery.of(context).padding.top + 4,
-                        left: 16,
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            decoration: const BoxDecoration(
-                              color: Colors.transparent,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.arrow_back_ios,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Top overlay heart icon for favorite and favorites navigation
-                      Positioned(
-                        top: MediaQuery.of(context).padding.top + 4,
-                        right: 16,
-                        child: GestureDetector(
-                          onTap:
-                              _toggleFavorite, // <-- This adds/removes from favorites
-                          child: Container(
-                            width: 40,
-                            height: 40,
-                            // Remove background color and boxShadow for transparent background
-                            decoration: const BoxDecoration(
-                              color: Color.fromARGB(0, 0, 0, 0),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              _isFavorite
-                                  ? Icons.favorite
-                                  : Icons.favorite_border,
-                              color: _isFavorite
-                                  ? Colors.red
-                                  : const Color.fromARGB(255, 255, 255, 255),
-                              size: 24,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Bottom indicators with enhanced animation
-                      Positioned(
-                        bottom: 20,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: List.generate(
-                              _courtDetails['images'].length,
-                              (index) => AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 4,
-                                ),
-                                width: index == _currentImageIndex ? 24 : 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: index == _currentImageIndex
-                                      ? Colors.white
-                                      : Colors.white.withOpacity(0.4),
-                                  borderRadius: BorderRadius.circular(4),
-                                  boxShadow: index == _currentImageIndex
-                                      ? [
-                                          BoxShadow(
-                                            color: Colors.black.withOpacity(
-                                              0.3,
-                                            ),
-                                            blurRadius: 4,
-                                            offset: const Offset(0, 2),
-                                          ),
-                                        ]
-                                      : [],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // Swipe hint overlay (appears briefly on first load)
-                      if (_currentImageIndex == 0)
-                        Positioned(
-                          bottom: 60,
-                          right: 20,
-                          child: AnimatedBuilder(
-                            animation: _indicatorController,
-                            builder: (context, child) {
-                              return Opacity(
-                                opacity: 1.0 - _indicatorController.value,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.6),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        Icons.swipe,
-                                        color: Colors.white,
-                                        size: 16,
+                                    SizedBox(height: 8),
+                                    Text(
+                                      'ARK SPORTS',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF1B2C4F),
                                       ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'Swipe',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                    ),
+                                    Text(
+                                      'Indoor Sports Facility',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF1B2C4F),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               );
                             },
                           ),
                         ),
+                      );
+                    },
+                  ),
+
+                  // Back arrow on top left - Go back to previous page
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 4,
+                    left: 16,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          color: Colors.transparent,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Top overlay heart icon for favorite and favorites navigation
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 4,
+                    right: 16,
+                    child: GestureDetector(
+                      onTap:
+                          _toggleFavorite, // <-- This adds/removes from favorites
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        // Remove background color and boxShadow for transparent background
+                        decoration: const BoxDecoration(
+                          color: Color.fromARGB(0, 0, 0, 0),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          _isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: _isFavorite
+                              ? Colors.red
+                              : const Color.fromARGB(255, 255, 255, 255),
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Bottom indicators with enhanced animation
+                  Positioned(
+                    bottom: 20,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          _courtDetails['images'].length,
+                          (index) => AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: index == _currentImageIndex ? 24 : 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: index == _currentImageIndex
+                                  ? Colors.white
+                                  : Colors.white.withOpacity(0.4),
+                              borderRadius: BorderRadius.circular(4),
+                              boxShadow: index == _currentImageIndex
+                                  ? [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.3),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ]
+                                  : [],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // Swipe hint overlay (appears briefly on first load)
+                  if (_currentImageIndex == 0)
+                    Positioned(
+                      bottom: 60,
+                      right: 20,
+                      child: AnimatedBuilder(
+                        animation: _indicatorController,
+                        builder: (context, child) {
+                          return Opacity(
+                            opacity: 1.0 - _indicatorController.value,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.6),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.swipe,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Swipe',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+
+          // Content Section
+          SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title and Rating Section
+                // Remove the outer Container, keep only the inner content
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _courtDetails['name'],
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1B2C4F),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              ...List.generate(5, (index) {
+                                return Icon(
+                                  Icons.star,
+                                  size: 16,
+                                  color: index < _courtDetails['rating'].floor()
+                                      ? const Color(0xFFFBBF24)
+                                      : const Color(0xFFE5E7EB),
+                                );
+                              }),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Action Buttons
+                      Row(
+                        children: [
+                          _buildActionButton(
+                            'Directions',
+                            Icons.directions,
+                            const Color(0xFF1B2C4F),
+                            Colors.white,
+                            () {},
+                          ),
+                          const SizedBox(width: 12),
+                          _buildActionButton(
+                            'Call',
+                            Icons.phone,
+                            Colors.white,
+                            const Color(0xFF1B2C4F),
+                            () {},
+                          ),
+                          const SizedBox(width: 12),
+                          _buildActionButton(
+                            'Share',
+                            Icons.share,
+                            Colors.white,
+                            const Color(0xFF1B2C4F),
+                            () {},
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
-              ),
+                const SizedBox(height: 8),
 
-              // Content Section
-              SliverToBoxAdapter(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title and Rating Section
-                    // Remove the outer Container, keep only the inner content
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  _courtDetails['name'],
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF1B2C4F),
-                                  ),
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  ...List.generate(5, (index) {
-                                    return Icon(
-                                      Icons.star,
-                                      size: 16,
-                                      color:
-                                          index <
-                                              _courtDetails['rating'].floor()
-                                          ? const Color(0xFFFBBF24)
-                                          : const Color(0xFFE5E7EB),
-                                    );
-                                  }),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-
-                          // Action Buttons
-                          Row(
-                            children: [
-                              _buildActionButton(
-                                'Directions',
-                                Icons.directions,
-                                const Color(0xFF1B2C4F),
-                                Colors.white,
-                                () {},
-                              ),
-                              const SizedBox(width: 12),
-                              _buildActionButton(
-                                'Call',
-                                Icons.phone,
-                                Colors.white,
-                                const Color(0xFF1B2C4F),
-                                () {},
-                              ),
-                              const SizedBox(width: 12),
-                              _buildActionButton(
-                                'Share',
-                                Icons.share,
-                                Colors.white,
-                                const Color(0xFF1B2C4F),
-                                () {},
-                              ),
-                            ],
-                          ),
-                        ],
+                // Info Cards combined in one box
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF3F4F6),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.location_on,
+                            color: Color(0xFF1B2C4F),
+                            size: 20,
+                          ),
+                        ),
+                        title: Text(
+                          _courtDetails['location'],
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1B2C4F),
+                          ),
+                        ),
+                        subtitle: Text(
+                          _courtDetails['distance'],
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Color(0xFF6B7280),
+                          size: 16,
+                        ),
+                      ),
+                      const Divider(
+                        color: Color(0xFFE5E7EB),
+                        thickness: 1,
+                        height: 0,
+                        indent: 16,
+                        endIndent: 16,
+                      ),
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF3F4F6),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.access_time,
+                            color: Color(0xFF1B2C4F),
+                            size: 20,
+                          ),
+                        ),
+                        title: Text(
+                          _courtDetails['opening_hours'],
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1B2C4F),
+                          ),
+                        ),
+                        subtitle: Text(
+                          _courtDetails['closing_time'],
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Color(0xFF6B7280),
+                          size: 16,
+                        ),
+                        onTap: _showOpeningHoursDialog,
+                      ),
+                      const Divider(
+                        color: Color(0xFFE5E7EB),
+                        thickness: 1,
+                        height: 0,
+                        indent: 16,
+                        endIndent: 16,
+                      ),
+                      ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 4,
+                        ),
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF3F4F6),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.star,
+                            color: Color(0xFF1B2C4F),
+                            size: 20,
+                          ),
+                        ),
+                        title: const Text(
+                          'Write a Review',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1B2C4F),
+                          ),
+                        ),
+                        subtitle: const Text(
+                          'Share your experience',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF6B7280),
+                          ),
+                        ),
+                        trailing: const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Color(0xFF6B7280),
+                          size: 16,
+                        ),
+                        onTap: _showReviewDialog,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                // Book Now Button (moved above Available Sports)
+                _buildBookNowButton(),
+
+                const SizedBox(height: 5),
+
+                // Available Sports Section
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white,
+                        const Color(0xFFF8FAFC),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-
-                    // Info Cards combined in one box
-                    Container(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 4,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF1B2C4F).withOpacity(0.08),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                        spreadRadius: 0,
                       ),
-                      decoration: BoxDecoration(
+                      BoxShadow(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        blurRadius: 0,
+                        offset: const Offset(0, 1),
+                        spreadRadius: 0,
                       ),
-                      child: Column(
-                        children: [
-                          ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 4,
-                            ),
-                            leading: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF3F4F6),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.location_on,
-                                color: Color(0xFF1B2C4F),
-                                size: 20,
-                              ),
-                            ),
-                            title: Text(
-                              _courtDetails['location'],
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1B2C4F),
-                              ),
-                            ),
-                            subtitle: Text(
-                              _courtDetails['distance'],
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF6B7280),
-                              ),
-                            ),
-                            trailing: const Icon(
-                              Icons.arrow_forward_ios,
-                              color: Color(0xFF6B7280),
-                              size: 16,
-                            ),
-                          ),
-                          const Divider(
-                            color: Color(0xFFE5E7EB),
-                            thickness: 1,
-                            height: 0,
-                            indent: 16,
-                            endIndent: 16,
-                          ),
-                          ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 4,
-                            ),
-                            leading: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF3F4F6),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.access_time,
-                                color: Color(0xFF1B2C4F),
-                                size: 20,
-                              ),
-                            ),
-                            title: Text(
-                              _courtDetails['opening_hours'],
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1B2C4F),
-                              ),
-                            ),
-                            subtitle: Text(
-                              _courtDetails['closing_time'],
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF6B7280),
-                              ),
-                            ),
-                            trailing: const Icon(
-                              Icons.arrow_forward_ios,
-                              color: Color(0xFF6B7280),
-                              size: 16,
-                            ),
-                            onTap: _showOpeningHoursDialog,
-                          ),
-                          const Divider(
-                            color: Color(0xFFE5E7EB),
-                            thickness: 1,
-                            height: 0,
-                            indent: 16,
-                            endIndent: 16,
-                          ),
-                          ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 4,
-                            ),
-                            leading: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF3F4F6),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Icon(
-                                Icons.star,
-                                color: Color(0xFF1B2C4F),
-                                size: 20,
-                              ),
-                            ),
-                            title: const Text(
-                              'Write a Review',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF1B2C4F),
-                              ),
-                            ),
-                            subtitle: const Text(
-                              'Share your experience',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF6B7280),
-                              ),
-                            ),
-                            trailing: const Icon(
-                              Icons.arrow_forward_ios,
-                              color: Color(0xFF6B7280),
-                              size: 16,
-                            ),
-                            onTap: _showReviewDialog,
-                          ),
-                        ],
-                      ),
+                    ],
+                    border: Border.all(
+                      color: const Color(0xFFE5E7EB).withOpacity(0.5),
+                      width: 0.5,
                     ),
-
-                    const SizedBox(height: 5),
-
-                    // Book Now Button (moved above Available Sports)
-                    _buildBookNowButton(),
-
-                    const SizedBox(height: 5),
-
-                    // Available Sports Section
-                    Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Colors.white, const Color(0xFFF8FAFC)],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF1B2C4F).withOpacity(0.08),
-                            blurRadius: 20,
-                            offset: const Offset(0, 4),
-                            spreadRadius: 0,
-                          ),
-                          BoxShadow(
-                            color: Colors.white,
-                            blurRadius: 0,
-                            offset: const Offset(0, 1),
-                            spreadRadius: 0,
-                          ),
-                        ],
-                        border: Border.all(
-                          color: const Color(0xFFE5E7EB).withOpacity(0.5),
-                          width: 0.5,
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-                        child: Column(
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Available Sports",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                    color: const Color(0xFF1B2C4F),
-                                    letterSpacing: -0.5,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  "Sports offered at this venue",
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w500,
-                                    color: const Color(0xFF6B7280),
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-                              ],
+                            Text(
+                              "Available Sports",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF1B2C4F),
+                                letterSpacing: -0.5,
+                              ),
                             ),
-                            const SizedBox(height: 20),
-                            SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              physics: const BouncingScrollPhysics(),
-                              child: Row(children: _buildSportsCards()),
+                            const SizedBox(height: 2),
+                            Text(
+                              "Sports offered at this venue",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF6B7280),
+                                letterSpacing: 0.2,
+                              ),
                             ),
                           ],
                         ),
-                      ),
+                        const SizedBox(height: 20),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          physics: const BouncingScrollPhysics(),
+                          child: Row(
+                            children: _buildSportsCards(),
+                          ),
+                        ),
+                      ],
                     ),
-
-                    const SizedBox(height: 24),
-
-                    // ...existing code...
-                    const SizedBox(height: 100), // Space for bottom nav
-                  ],
+                  ),
                 ),
-              ),
-            ],
-          ),
 
+                const SizedBox(height: 24),
+
+                // ...existing code...
+                const SizedBox(height: 100), // Space for bottom nav
+              ],
+            ),
+          ),
+        ],
+      ),
+          
           // Navy blue header that appears when scrolling
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
@@ -1296,15 +1295,13 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
               child: Container(
                 decoration: BoxDecoration(
                   color: const Color(0xFF1B2C4F),
-                  boxShadow: _showHeader
-                      ? [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ]
-                      : null,
+                  boxShadow: _showHeader ? [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ] : null,
                 ),
                 child: SafeArea(
                   child: Container(
@@ -1326,7 +1323,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
                             tooltip: 'Back',
                           ),
                         ),
-
+                        
                         // Court name with exact same text styling as history.dart
                         Expanded(
                           child: Text(
@@ -1340,7 +1337,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-
+                        
                         // Heart icon with proper padding to match the layout
                         Padding(
                           padding: const EdgeInsets.only(right: 16),
@@ -1354,9 +1351,7 @@ class _CourtDetailScreenState extends State<CourtDetailScreen>
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(
-                                _isFavorite
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
+                                _isFavorite ? Icons.favorite : Icons.favorite_border,
                                 color: _isFavorite ? Colors.red : Colors.white,
                                 size: 24,
                               ),
@@ -1400,21 +1395,20 @@ class _SportsCard extends StatelessWidget {
       child: GestureDetector(
         onTap: () {
           // Get court data from the parent widget
-          final courtDetailsState = context
-              .findAncestorStateOfType<_CourtDetailScreenState>();
+          final courtDetailsState = context.findAncestorStateOfType<_CourtDetailScreenState>();
           if (courtDetailsState != null) {
             // Create court data with selected sport
-            final Map<String, dynamic> courtDataWithSport = Map.from(
-              courtDetailsState._courtDetails,
-            );
+            final Map<String, dynamic> courtDataWithSport = Map.from(courtDetailsState._courtDetails);
             // Update the sports_available to prioritize the selected sport
             courtDataWithSport['sports_available'] = [sport];
-
+            
             // Navigate to SlotsPage with the court data
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => SlotsPage(courtData: courtDataWithSport),
+                builder: (context) => SlotsPage(
+                  courtData: courtDataWithSport,
+                ),
               ),
             );
           }
@@ -1447,7 +1441,10 @@ class _SportsCard extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Colors.white, const Color(0xFFF8FAFC)],
+                    colors: [
+                      Colors.white,
+                      const Color(0xFFF8FAFC),
+                    ],
                   ),
                   border: Border.all(
                     color: const Color(0xFFE5E7EB).withOpacity(0.6),
