@@ -21,6 +21,16 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   bool _isLoading = true;
+  String _selectedLocation = "Current Location";
+  
+  final TextEditingController _searchController = TextEditingController();
+  final List<String> _pastSearchLocations = [
+    "Downtown Sports Complex",
+    "Central Park Area", 
+    "University District",
+    "Shopping Mall Area",
+    "Riverside Stadium"
+  ];
 
   @override
   void initState() {
@@ -212,8 +222,24 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 6),
-                // Welcome/location card
-                _buildWelcomeWithLocationCard(textTheme),
+                // Welcome text
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Text(
+                    "Welcome back, Sam!",
+                    style: textTheme.titleMedium?.copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF1B2C4F),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                // Location card
+                GestureDetector(
+                  onTap: () => _showLocationSelector(),
+                  child: _buildLocationCard(textTheme),
+                ),
                 const SizedBox(height: 16),
                 // Search bar
                 _buildSearchBar(),
@@ -235,13 +261,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildWelcomeWithLocationCard(TextTheme textTheme) {
+  Widget _buildLocationCard(TextTheme textTheme) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 0),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: const Color(0xFF1B2C4F),
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -250,64 +275,275 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          // Welcome text at the top
-          Text(
-            "Welcome back, Sam!",
-            style: textTheme.titleMedium?.copyWith(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
+          const Icon(
+            Icons.location_on,
+            color: Colors.white,
+            size: 30,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _selectedLocation == "Current Location" 
+                      ? 'Colombo, Sri Lanka' 
+                      : _selectedLocation,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _selectedLocation == "Current Location" 
+                      ? "Current Location"
+                      : "Tap to change location",
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.white.withOpacity(0.8),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          // Location section below
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(
-                    255,
-                    172,
-                    172,
-                    172,
-                  ).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.location_on,
-                  size: 20,
-                  color: Colors.white,
+          const Icon(
+            Icons.keyboard_arrow_down,
+            color: Colors.white,
+            size: 28,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLocationSelector() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.9,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
               ),
-              const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
                 children: [
-                  const Text(
-                    'Current Location',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w500,
+                  // Header with close button
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 10),
+                        const Text(
+                          "Choose Location",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1B2C4F),
+                          ),
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close, size: 24),
+                        ),
+                      ],
                     ),
                   ),
-                  const Text(
-                    'Colombo, Sri Lanka',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
+                  
+                  // Search bar
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: "Search for area, street name...",
+                          hintStyle: TextStyle(color: Colors.grey[600]),
+                          prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        ),
+                        onChanged: (value) {
+                          setModalState(() {});
+                        },
+                      ),
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Current Location option
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: _buildCurrentLocationOption(),
+                  ),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // Past searches section
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Row(
+                            children: [
+                              
+                              const SizedBox(width: 8),
+                            
+                              Text(
+                                "Recent searches",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.grey[700],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Expanded(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            itemCount: _pastSearchLocations.length,
+                            itemBuilder: (context, index) {
+                              final location = _pastSearchLocations[index];
+                              return _buildPastLocationOption(location);
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-            ],
-          ),
-        ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildCurrentLocationOption() {
+    final isSelected = _selectedLocation == "Current Location";
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedLocation = "Current Location";
+        });
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey[300]!),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1B2C4F).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.my_location,
+                color: Color(0xFF1B2C4F),
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Use current location",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1B2C4F),
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    "Enable precise location",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              const Icon(
+                Icons.check_circle,
+                color: Color(0xFF1B2C4F),
+                size: 20,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPastLocationOption(String location) {
+    final isSelected = _selectedLocation == location;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedLocation = location;
+        });
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        child: Row(
+          children: [
+            Icon(
+              Icons.history,
+              color: Colors.grey[600],
+              size: 20,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                location,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: isSelected ? const Color(0xFF1B2C4F) : Colors.black87,
+                ),
+              ),
+            ),
+            if (isSelected)
+              const Icon(
+                Icons.check_circle,
+                color: Color(0xFF1B2C4F),
+                size: 20,
+              ),
+          ],
+        ),
       ),
     );
   }
