@@ -1658,65 +1658,43 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ],
           ),
 
-          // MAIN PROFILE CARD - Updated to match the screenshot format
+          // USER NAME AND LOCATION SECTION
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
+              padding: const EdgeInsets.fromLTRB(32.0, 16.0, 16.0, 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // User name
+                  Text(
+                    "Sam Johnson",
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1B2C4F),
                     ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Profile Header with name
-                    Text(
-                      name,
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                  ),
+                  const SizedBox(height: 6),
+                  // Location row
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        color: Color(0xFF1B2C4F),
+                        size: 18,
                       ),
-                    ),
-                    // const SizedBox(height: 4),
-                    // Text(
-                    //   'Managed by ${name.split(' ').first.toLowerCase()}',
-                    //   style: TextStyle(
-                    //     fontSize: 16,
-                    //     color: Colors.white.withOpacity(0.8),
-                    //     fontWeight: FontWeight.w400,
-                    //   ),
-                    // ),
-                    //const SizedBox(height: 12),
-                    // Location row
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.location_on,
-                          color: Colors.white.withOpacity(0.9),
-                          size: 18,
+                      const SizedBox(width: 6),
+                      Text(
+                        location,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFF1B2C4F),
+                          fontWeight: FontWeight.w500,
                         ),
-                        const SizedBox(width: 6),
-                        Text(
-                          location,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white.withOpacity(0.9),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
