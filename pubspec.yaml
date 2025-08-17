@@ -44,6 +44,7 @@ flutter:
     - assets/lolc.webp
     - assets/courts1.jpg
     - assets/courts3.jpg
+    - assets/courts4.jpg
 
 flutter_launcher_icons:
   android: "launcher_icon"
