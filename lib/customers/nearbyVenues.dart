@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, file_names
+// ignore_for_file: deprecated_member_use, file_names, use_build_context_synchronously
 import 'package:athlon_user/customers/courtDetails.dart';
 import 'package:athlon_user/customers/footer.dart';
 import 'package:athlon_user/customers/bookings.dart';

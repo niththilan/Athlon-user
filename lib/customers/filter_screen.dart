@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'widgets/football_spinner.dart';
@@ -325,7 +325,7 @@ class _FilterScreenState extends State<FilterScreen> {
                 if (Navigator.canPop(context)) {
                   Navigator.pop(context);
                 }
-                
+
                 // Still return filter results
                 Navigator.pop(context, {
                   'sortingMode': _sortingMode,

@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'userProfile.dart';
@@ -454,9 +454,7 @@ class FeatureCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           // Navigate to Nearby Venues screen
-          NavigationService.pushInstant(
-            const venues.NearByVenueScreen(),
-          );
+          NavigationService.pushInstant(const venues.NearByVenueScreen());
         },
         borderRadius: BorderRadius.circular(16),
         child: Container(
@@ -503,10 +501,7 @@ class FeatureCard extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.7),
-                    ],
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
                   ),
                 ),
               ),

@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, prefer_const_constructors, use_build_context_synchronously, prefer_const_literals_to_create_immutables, avoid_print, prefer_final_fields
+// ignore_for_file: deprecated_member_use, prefer_const_constructors, use_build_context_synchronously, prefer_const_literals_to_create_immutables, avoid_print, prefer_final_fields, unused_field
 
 import 'package:flutter/material.dart';
 import 'dart:async'; // Add Timer for debouncing
@@ -1220,12 +1220,16 @@ class ChatTile extends StatelessWidget {
                           child: Row(
                             children: [
                               Icon(
-                                message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                                message.isPinned
+                                    ? Icons.push_pin
+                                    : Icons.push_pin_outlined,
                                 color: const Color(0xFF1B2C4F),
                                 size: 20,
                               ),
                               const SizedBox(width: 12),
-                              Text(message.isPinned ? 'Unpin Chat' : 'Pin Chat'),
+                              Text(
+                                message.isPinned ? 'Unpin Chat' : 'Pin Chat',
+                              ),
                             ],
                           ),
                         ),
@@ -1289,7 +1293,6 @@ class ChatTile extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildAvatar(ChatMessage message) {
     return Container(
@@ -1402,7 +1405,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       // Show date header at the top
                       return _buildDateHeader();
                     }
-                    final message = messages[index - 1]; // Adjust index for messages
+                    final message =
+                        messages[index - 1]; // Adjust index for messages
                     return _buildMessageBubble(message);
                   },
                 ),
@@ -1472,9 +1476,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert, color: Colors.white, size: 20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
           elevation: 8,
           color: Colors.white,
           onSelected: (value) {
@@ -1498,11 +1500,7 @@ class _ChatScreenState extends State<ChatScreen> {
               value: 'block',
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.block,
-                    color: Colors.red,
-                    size: 20,
-                  ),
+                  const Icon(Icons.block, color: Colors.red, size: 20),
                   const SizedBox(width: 12),
                   const Text('Block User'),
                 ],
@@ -1526,11 +1524,7 @@ class _ChatScreenState extends State<ChatScreen> {
               value: 'clear',
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.delete_outline,
-                    color: Colors.red,
-                    size: 20,
-                  ),
+                  const Icon(Icons.delete_outline, color: Colors.red, size: 20),
                   const SizedBox(width: 12),
                   const Text('Clear Chat'),
                 ],
@@ -1543,7 +1537,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-
   Widget _buildMessageBubble(Message message) {
     return Container(
       margin: EdgeInsets.only(
@@ -1552,22 +1545,22 @@ class _ChatScreenState extends State<ChatScreen> {
         right: message.isSentByMe ? 0 : 80,
       ),
       child: Column(
-        crossAxisAlignment: message.isSentByMe 
-            ? CrossAxisAlignment.end 
+        crossAxisAlignment: message.isSentByMe
+            ? CrossAxisAlignment.end
             : CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,  // White for both sent and received messages
+              color: Colors.white, // White for both sent and received messages
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(18),
                 topRight: const Radius.circular(18),
-                bottomLeft: message.isSentByMe 
-                    ? const Radius.circular(18) 
-                    : const Radius.circular(4),  // WhatsApp tail effect
-                bottomRight: message.isSentByMe 
-                    ? const Radius.circular(4)   // WhatsApp tail effect
+                bottomLeft: message.isSentByMe
+                    ? const Radius.circular(18)
+                    : const Radius.circular(4), // WhatsApp tail effect
+                bottomRight: message.isSentByMe
+                    ? const Radius.circular(4) // WhatsApp tail effect
                     : const Radius.circular(18),
               ),
               boxShadow: [
@@ -1584,7 +1577,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 Text(
                   message.content,
                   style: const TextStyle(
-                    color: Color(0xFF000000),  // Black text for both
+                    color: Color(0xFF000000), // Black text for both
                     fontSize: 15,
                     fontWeight: FontWeight.w400,
                   ),
@@ -1607,7 +1600,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       Icon(
                         Icons.done_all,
                         size: 14,
-                        color: Colors.blue[600],  // WhatsApp blue check marks
+                        color: Colors.blue[600], // WhatsApp blue check marks
                       ),
                     ],
                   ],
@@ -1625,7 +1618,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
-    
+
     String dateText;
     if (now.difference(today).inHours < 24) {
       dateText = 'Today';
@@ -1634,12 +1627,22 @@ class _ChatScreenState extends State<ChatScreen> {
     } else {
       // Format as "December 15, 2024"
       const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
       ];
       dateText = '${months[now.month - 1]} ${now.day}, ${now.year}';
     }
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 16),
       child: Center(
@@ -1729,7 +1732,7 @@ class _ChatScreenState extends State<ChatScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
           decoration: const BoxDecoration(
-            color: Color(0xFFF0F0F0),  // WhatsApp background color
+            color: Color(0xFFF0F0F0), // WhatsApp background color
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -1755,10 +1758,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.grey.shade300,
-                      width: 0.5,
-                    ),
+                    border: Border.all(color: Colors.grey.shade300, width: 0.5),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -1831,11 +1831,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       : const Color(0xFF25D366), // WhatsApp green
                   radius: 24,
                   child: IconButton(
-                    icon: const Icon(
-                      Icons.send,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+                    icon: const Icon(Icons.send, color: Colors.white, size: 20),
                     onPressed: _messageController.text.trim().isEmpty
                         ? null
                         : _sendMessage,
