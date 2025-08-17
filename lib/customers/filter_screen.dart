@@ -99,44 +99,44 @@ class _FilterScreenState extends State<FilterScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on,
-                      color: Color(0xFF1B2C4F),
-                      size: 30,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _selectedLocation,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1B2C4F),
-                            ),
+                children: [
+                  const Icon(
+                    Icons.location_on,
+                    color: Color(0xFF1B2C4F),
+                    size: 30,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _selectedLocation,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1B2C4F),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _selectedLocation == "Current Location"
-                                ? "Getting your location..."
-                                : "Tap to change location",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _selectedLocation == "Current Location" 
+                              ? "Getting your location..."
+                              : "Tap to change location",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    const Icon(
-                      Icons.keyboard_arrow_down,
-                      color: Color(0xFF1B2C4F),
-                      size: 24,
-                    ),
-                  ],
+                  ),
+                  const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Color(0xFF1B2C4F),
+                    size: 24,
+                  ),
+                ],
                 ),
               ),
             ),
@@ -179,21 +179,10 @@ class _FilterScreenState extends State<FilterScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "0 km",
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      ),
-                      Text(
-                        "Within ${_distanceRadius.round()} km",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF1B2C4F),
-                        ),
-                      ),
-                      Text(
-                        "20 km",
-                        style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                      ),
+                      Text("0 km", style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                      Text("Within ${_distanceRadius.round()} km", 
+                           style: const TextStyle(fontWeight: FontWeight.w500, color: Color(0xFF1B2C4F))),
+                      Text("20 km", style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                     ],
                   ),
                 ],
@@ -262,19 +251,12 @@ class _FilterScreenState extends State<FilterScreen> {
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                           decoration: BoxDecoration(
-                            color: isSelected
-                                ? const Color(0xFF1B2C4F)
-                                : Colors.grey[100],
+                            color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[100],
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: isSelected
-                                  ? const Color(0xFF1B2C4F)
-                                  : Colors.grey[300]!,
+                              color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[300]!,
                               width: 1,
                             ),
                           ),
@@ -282,9 +264,7 @@ class _FilterScreenState extends State<FilterScreen> {
                             sport,
                             style: TextStyle(
                               fontSize: 14,
-                              color: isSelected
-                                  ? Colors.white
-                                  : const Color(0xFF1B2C4F),
+                              color: isSelected ? Colors.white : const Color(0xFF1B2C4F),
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -300,7 +280,9 @@ class _FilterScreenState extends State<FilterScreen> {
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(20),
-        decoration: const BoxDecoration(color: Colors.white),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+        ),
         child: SafeArea(
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -455,9 +437,7 @@ class _FilterScreenState extends State<FilterScreen> {
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF1B2C4F).withOpacity(0.1)
-              : Colors.transparent,
+          color: isSelected ? const Color(0xFF1B2C4F).withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[300]!,
@@ -481,15 +461,16 @@ class _FilterScreenState extends State<FilterScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: isSelected
-                          ? const Color(0xFF1B2C4F)
-                          : Colors.black87,
+                      color: isSelected ? const Color(0xFF1B2C4F) : Colors.black87,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
                   ),
                 ],
               ),
@@ -519,9 +500,7 @@ class _FilterScreenState extends State<FilterScreen> {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF1B2C4F).withOpacity(0.1)
-              : Colors.transparent,
+          color: isSelected ? const Color(0xFF1B2C4F).withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[300]!,
@@ -535,13 +514,9 @@ class _FilterScreenState extends State<FilterScreen> {
               height: 16,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isSelected
-                    ? const Color(0xFF1B2C4F)
-                    : Colors.transparent,
+                color: isSelected ? const Color(0xFF1B2C4F) : Colors.transparent,
                 border: Border.all(
-                  color: isSelected
-                      ? const Color(0xFF1B2C4F)
-                      : Colors.grey[400]!,
+                  color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[400]!,
                   width: 2,
                 ),
               ),
