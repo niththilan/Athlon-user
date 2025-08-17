@@ -26,6 +26,7 @@ class _FilterScreenState extends State<FilterScreen> {
   late String _sortingMode;
   late String _activeFilter;
   late double _distanceRadius;
+  String _selectedLocation = "Current Location";
 
   @override
   void initState() {
@@ -88,6 +89,60 @@ class _FilterScreenState extends State<FilterScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Current Location Section
+            GestureDetector(
+              onTap: () => _showLocationSelector(),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                children: [
+                  const Icon(
+                    Icons.location_on,
+                    color: Color(0xFF1B2C4F),
+                    size: 30,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _selectedLocation,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1B2C4F),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _selectedLocation == "Current Location" 
+                              ? "Getting your location..."
+                              : "Tap to change location",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Color(0xFF1B2C4F),
+                    size: 24,
+                  ),
+                ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
             // Distance Range Section - Simplified
             Container(
               padding: const EdgeInsets.all(20),
@@ -284,6 +339,149 @@ class _FilterScreenState extends State<FilterScreen> {
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  void _showLocationSelector() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.7,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Select Location",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1B2C4F),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  children: [
+                    _buildLocationOption(
+                      "Current Location",
+                      "Use my current location",
+                      Icons.my_location,
+                    ),
+                    _buildLocationOption(
+                      "Downtown Sports Complex",
+                      "123 Main St, Downtown",
+                      Icons.location_city,
+                    ),
+                    _buildLocationOption(
+                      "Central Park Area",
+                      "456 Park Ave, Central",
+                      Icons.park,
+                    ),
+                    _buildLocationOption(
+                      "University District",
+                      "789 College Rd, University",
+                      Icons.school,
+                    ),
+                    _buildLocationOption(
+                      "Shopping Mall Area",
+                      "321 Mall Dr, Shopping District",
+                      Icons.shopping_bag,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildLocationOption(String title, String subtitle, IconData icon) {
+    final isSelected = _selectedLocation == title;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedLocation = title;
+        });
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF1B2C4F).withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[300]!,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? const Color(0xFF1B2C4F) : Colors.grey[600],
+              size: 24,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected ? const Color(0xFF1B2C4F) : Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              const Icon(
+                Icons.check_circle,
+                color: Color(0xFF1B2C4F),
+                size: 20,
+              ),
+          ],
         ),
       ),
     );
