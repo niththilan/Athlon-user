@@ -35,6 +35,7 @@ class HistoryScreenState extends State<HistoryScreen> {
   static const Color cardColor = Colors.white;
   static const Color successColor = Color(0xFF10B981);
   static const Color darkGreenColor = Color(0xFF065F46); // Added dark green
+  static const Color callColor = Color(0xFF065F46); // Darker green color for call button
   static const Color errorColor = Color(0xFFEF4444);
   static const Color warningColor = Color(0xFFF59E0B);
   static const Color textPrimary = Color(0xFF111827);
@@ -520,7 +521,7 @@ class HistoryScreenState extends State<HistoryScreen> {
               ],
             ),
           ),
-          // ...existing code for right side (price, icons)...
+          // Right: Price and action buttons
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -536,6 +537,29 @@ class HistoryScreenState extends State<HistoryScreen> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  // Call button
+                  SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: GestureDetector(
+                      onTap: () => _makeCall(booking),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: callColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Icon(
+                            Icons.phone,
+                            size: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  // Details button
                   SizedBox(
                     width: 40,
                     height: 40,
@@ -600,7 +624,7 @@ class HistoryScreenState extends State<HistoryScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Simple header
+                // Header
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -625,74 +649,300 @@ class HistoryScreenState extends State<HistoryScreen> {
 
                 SizedBox(height: 20),
 
-                // Court info
-                Text(
-                  booking.courtName,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: textPrimary,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  booking.facilityName,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: textSecondary,
-                  ),
-                ),
+                // Booking ID
+                _buildDetailRow('Booking ID', booking.id),
+                
+                // Court and facility info
+                _buildDetailRow('Court', booking.courtName),
+                _buildDetailRow('Court Type', booking.courtType),
+                _buildDetailRow('Facility', booking.facilityName),
 
+                SizedBox(height: 12),
+
+                // Date and time details
+                _buildDetailRow('Date', DateFormat('EEEE, MMM d, yyyy').format(booking.date)),
+                _buildDetailRow('Start Time', booking.startTime),
+                _buildDetailRow('End Time', booking.endTime),
+                _buildDetailRow('Duration', '${booking.duration} minutes'),
+
+                SizedBox(height: 12),
+
+                // Status and price
+                _buildDetailRow('Status', booking.status.toUpperCase()),
+                _buildDetailRow('Total Amount', 'LKR ${booking.price.toStringAsFixed(0)}'),
+
+                SizedBox(height: 24),
+
+                // Action buttons
+                Row(
+                  children: [
+                    // Cancel booking button (only show for confirmed/pending bookings)
+                    if (booking.status.toLowerCase() == 'confirmed' || 
+                        booking.status.toLowerCase() == 'pending')
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            _showCancelConfirmation(booking);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: errorColor,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Text('Cancel Booking'),
+                        ),
+                      ),
+                    
+                    // Add spacing if cancel button exists
+                    if (booking.status.toLowerCase() == 'confirmed' || 
+                        booking.status.toLowerCase() == 'pending')
+                      SizedBox(width: 12),
+                    
+                    // Close button
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: primaryColor),
+                          foregroundColor: primaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text('Close'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showCancelConfirmation(BookingHistoryItem booking) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  size: 48,
+                  color: warningColor,
+                ),
                 SizedBox(height: 16),
-
-                // Date and time
                 Text(
-                  DateFormat('EEEE, MMM d, yyyy').format(booking.date),
+                  'Cancel Booking',
                   style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                     color: textPrimary,
                   ),
                 ),
-                SizedBox(height: 4),
+                SizedBox(height: 8),
                 Text(
-                  '${booking.startTime} - ${booking.endTime}',
+                  'Are you sure you want to cancel this booking?',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
                     color: textSecondary,
                   ),
                 ),
-
-                SizedBox(height: 20),
-
-                // Price
+                SizedBox(height: 12),
                 Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(16),
+                  padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
+                    color: Colors.grey[100],
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Total Amount',
+                        booking.courtName,
                         style: TextStyle(
                           fontSize: 14,
-                          color: textSecondary,
+                          fontWeight: FontWeight.w600,
+                          color: textPrimary,
                         ),
                       ),
-                      SizedBox(height: 8),
+                      SizedBox(height: 2),
                       Text(
-                        'LKR ${booking.price.toStringAsFixed(0)}',
+                        '${DateFormat('MMM d, yyyy').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
                         style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: primaryColor,
+                          fontSize: 12,
+                          color: textSecondary,
                         ),
                       ),
                     ],
                   ),
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'This action cannot be undone. Refund policies may apply.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: textSecondary,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: textSecondary),
+                          foregroundColor: textSecondary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text('Keep Booking'),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _cancelBooking(booking);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: errorColor,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text('Yes, Cancel'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _cancelBooking(BookingHistoryItem booking) {
+    // Find the booking in the list and update its status
+    setState(() {
+      final index = bookingHistory.indexWhere((b) => b.id == booking.id);
+      if (index != -1) {
+        // Create a new booking item with cancelled status
+        bookingHistory[index] = BookingHistoryItem(
+          id: booking.id,
+          courtName: booking.courtName,
+          courtType: booking.courtType,
+          facilityName: booking.facilityName,
+          date: booking.date,
+          startTime: booking.startTime,
+          endTime: booking.endTime,
+          duration: booking.duration,
+          price: booking.price,
+          status: 'cancelled',
+        );
+      }
+    });
+
+    // Show success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Booking cancelled successfully'),
+        backgroundColor: successColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+    );
+
+    // In a real app, you would also make an API call here to cancel the booking
+    // await SupabaseService.cancelBooking(booking.id);
+  }
+
+  void _makeCall(BookingHistoryItem booking) {
+    // For now, show a simple dialog. In a real app, you would use url_launcher
+    // to make an actual phone call: launch('tel:+1234567890')
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.phone,
+                  size: 48,
+                  color: callColor,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Contact Facility',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: textPrimary,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  booking.facilityName,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: textSecondary,
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(color: textSecondary),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        // Here you would implement the actual call functionality
+                        // For example: launch('tel:+1234567890')
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: callColor,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: Text('Call Now'),
+                    ),
+                  ],
                 ),
               ],
             ),

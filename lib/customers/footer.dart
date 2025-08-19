@@ -43,8 +43,8 @@ class AppFooter extends StatelessWidget {
         Navigator.pop(context);
       }
 
-      // Navigate to favorites screen with push instead of pushReplacement
-      Navigator.push(
+      // Always push and remove all previous routes to refresh
+      Navigator.pushAndRemoveUntil(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) => FavoritesScreen(
@@ -56,6 +56,7 @@ class AppFooter extends StatelessWidget {
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
+        (route) => false,
       );
     } catch (e) {
       // Handle any errors in the main try block
@@ -70,8 +71,8 @@ class AppFooter extends StatelessWidget {
         ),
       );
 
-      // Navigate to empty favorites as fallback
-      Navigator.push(
+      // Navigate to empty favorites as fallback, always removing previous routes
+      Navigator.pushAndRemoveUntil(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) =>
@@ -82,6 +83,7 @@ class AppFooter extends StatelessWidget {
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
+        (route) => false,
       );
     }
   }
@@ -106,7 +108,8 @@ class AppFooter extends StatelessWidget {
       }
 
       print('Navigating to Bookings...');
-      Navigator.push(
+      // Always push and remove all previous routes to refresh
+      Navigator.pushAndRemoveUntil(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) {
@@ -116,6 +119,7 @@ class AppFooter extends StatelessWidget {
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
+        (route) => false,
       );
       print('History navigation completed');
     } catch (e) {
@@ -142,7 +146,8 @@ class AppFooter extends StatelessWidget {
     try {
       if (context.mounted) {
         print('Context is mounted, navigating...');
-        Navigator.push(
+        // Always push and remove all previous routes to refresh
+        Navigator.pushAndRemoveUntil(
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) {
@@ -152,6 +157,7 @@ class AppFooter extends StatelessWidget {
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ),
+          (route) => false,
         );
         print('Navigation completed');
       } else {
@@ -195,34 +201,30 @@ class AppFooter extends StatelessWidget {
           // First call the original callback
           onTabSelected(index);
 
-          // Handle navigation if index is different from current
-          if (index != currentIndex) {
-            switch (index) {
-              case 0:
-                // For home, we might want to pop back to home instead of pushing
-                // This prevents building up a large navigation stack
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const home.HomeScreen(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                  (route) => false, // This removes all previous routes
-                );
-                break;
-              case 1:
-                // Navigate to favorites
-                _navigateToFavorites(context);
-                break;
-              case 2:
-                _navigateToBookings(context);
-                break;
-              case 3:
-                _navigateToMessages(context);
-                break;
-            }
+          // Always navigate and refresh, even if already on the same screen
+          switch (index) {
+            case 0:
+              // Home: always push and remove all previous routes
+              Navigator.pushAndRemoveUntil(
+                context,
+                PageRouteBuilder(
+                  pageBuilder: (context, animation, secondaryAnimation) =>
+                      const home.HomeScreen(),
+                  transitionDuration: Duration.zero,
+                  reverseTransitionDuration: Duration.zero,
+                ),
+                (route) => false,
+              );
+              break;
+            case 1:
+              _navigateToFavorites(context);
+              break;
+            case 2:
+              _navigateToBookings(context);
+              break;
+            case 3:
+              _navigateToMessages(context);
+              break;
           }
         },
         child: Padding(
