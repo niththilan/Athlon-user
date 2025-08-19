@@ -36,7 +36,7 @@ class HistoryScreenState extends State<HistoryScreen> {
   static const Color successColor = Color(0xFF10B981);
   static const Color darkGreenColor = Color(0xFF065F46); // Added dark green
   static const Color callColor = Color(0xFF065F46); // Darker green color for call button
-  static const Color errorColor = Color(0xFFEF4444);
+  static const Color errorColor = Color(0xFFB91C1C); // Much darker red color
   static const Color warningColor = Color(0xFFF59E0B);
   static const Color textPrimary = Color(0xFF111827);
   static const Color textSecondary = Color(0xFF6B7280);
@@ -680,19 +680,30 @@ class HistoryScreenState extends State<HistoryScreen> {
                     if (booking.status.toLowerCase() == 'confirmed' || 
                         booking.status.toLowerCase() == 'pending')
                       Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            _showCancelConfirmation(booking);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: errorColor,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          height: 44,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              _showCancelConfirmation(booking);
+                            },
+                            child: Text(
+                              'Cancel Booking',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: errorColor,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             ),
                           ),
-                          child: Text('Cancel Booking'),
                         ),
                       ),
                     
@@ -703,16 +714,26 @@ class HistoryScreenState extends State<HistoryScreen> {
                     
                     // Close button
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: primaryColor),
-                          foregroundColor: primaryColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        height: 44,
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: primaryColor, width: 1.5),
+                            foregroundColor: primaryColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
+                          child: Text(
+                            'Close',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                        child: Text('Close'),
                       ),
                     ),
                   ],
@@ -805,33 +826,54 @@ class HistoryScreenState extends State<HistoryScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: textSecondary),
-                          foregroundColor: textSecondary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        height: 44,
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: Colors.grey[400]!, width: 1.5),
+                            foregroundColor: textSecondary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          ),
+                          child: Text(
+                            'Keep Booking',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
-                        child: Text('Keep Booking'),
                       ),
                     ),
                     SizedBox(width: 12),
                     Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          _cancelBooking(booking);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: errorColor,
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        height: 44,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            _cancelBooking(booking);
+                          },
+                          label: Text(
+                            'Yes, Cancel',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: errorColor,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
                         ),
-                        child: Text('Yes, Cancel'),
                       ),
                     ),
                   ],
@@ -1422,3 +1464,4 @@ class BookingHistoryItem {
     required this.status,
   });
 }
+   
