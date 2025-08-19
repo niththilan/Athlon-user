@@ -123,35 +123,38 @@ class _MessagesScreenState extends State<MessagesScreen> {
     setState(() {
       _messages = [
         ChatMessage(
-          name: 'John Doe',
-          lastMessage:
-              'Hi, I need help with booking a football court for tomorrow',
-          time: '2:30 PM',
-          unreadCount: 2,
-          avatarUrl: '',
-          messages: [
-            Message(
-              content:
-                  'Hi, I need help with booking a football court for tomorrow',
-              time: '2:30 PM',
-              isSentByMe: false,
-            ),
-            Message(
-              content: 'What time do you prefer?',
-              time: '2:35 PM',
-              isSentByMe: true,
-            ),
-          ],
-        ),
-        ChatMessage(
-          name: 'Sarah Wilson',
-          lastMessage: 'Is the court available this evening?',
-          time: '1:45 PM',
+          name: 'Arena Football Court',
+          lastMessage: 'We have slots available at 6 PM and 8 PM.',
+          time: '2:35 PM',
           unreadCount: 1,
           avatarUrl: '',
           messages: [
             Message(
-              content: 'Is the court available this evening?',
+              content: 'Hi, is the football court available for tomorrow evening?',
+              time: '2:30 PM',
+              isSentByMe: true, // Customer asks
+            ),
+            Message(
+              content: 'We have slots available at 6 PM and 8 PM.',
+              time: '2:35 PM',
+              isSentByMe: false, // Vendor replies
+            ),
+          ],
+        ),
+        ChatMessage(
+          name: 'City Sports Complex',
+          lastMessage: 'Yes, you can reschedule up to 24 hours before your booking.',
+          time: '1:45 PM',
+          unreadCount: 0,
+          avatarUrl: '',
+          messages: [
+            Message(
+              content: 'Can I reschedule my booking for next week?',
+              time: '1:44 PM',
+              isSentByMe: true,
+            ),
+            Message(
+              content: 'Yes, you can reschedule up to 24 hours before your booking.',
               time: '1:45 PM',
               isSentByMe: false,
             ),
@@ -159,33 +162,38 @@ class _MessagesScreenState extends State<MessagesScreen> {
           isPinned: true,
         ),
         ChatMessage(
-          name: 'Mike Johnson',
-          lastMessage: 'Thank you for the excellent service!',
+          name: 'Greenfield Arena',
+          lastMessage: 'Thank you! Looking forward to seeing you.',
           time: 'Yesterday',
           unreadCount: 0,
           avatarUrl: '',
           messages: [
             Message(
-              content: 'Thank you for the excellent service!',
-              time: 'Yesterday',
-              isSentByMe: false,
-            ),
-            Message(
-              content: 'Thank you! We appreciate your feedback.',
+              content: 'Thanks for confirming my booking!',
               time: 'Yesterday',
               isSentByMe: true,
+            ),
+            Message(
+              content: 'Thank you! Looking forward to seeing you.',
+              time: 'Yesterday',
+              isSentByMe: false,
             ),
           ],
         ),
         ChatMessage(
-          name: 'Emma Davis',
-          lastMessage: 'Can I reschedule my booking?',
+          name: 'Downtown Turf',
+          lastMessage: 'Yes, we provide footballs and bibs for rent.',
           time: 'Monday',
-          unreadCount: 3,
+          unreadCount: 2,
           avatarUrl: '',
           messages: [
             Message(
-              content: 'Can I reschedule my booking?',
+              content: 'Do you provide footballs and bibs for rent?',
+              time: 'Monday',
+              isSentByMe: true,
+            ),
+            Message(
+              content: 'Yes, we provide footballs and bibs for rent.',
               time: 'Monday',
               isSentByMe: false,
             ),
@@ -1559,15 +1567,17 @@ class _ChatScreenState extends State<ChatScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,  // White for both sent and received messages
+              color: message.isSentByMe
+                  ? const Color(0xFF25D366).withOpacity(0.15) // Light green for customer
+                  : Colors.white,  // White for vendor
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(18),
                 topRight: const Radius.circular(18),
                 bottomLeft: message.isSentByMe 
                     ? const Radius.circular(18) 
-                    : const Radius.circular(4),  // WhatsApp tail effect
+                    : const Radius.circular(4),
                 bottomRight: message.isSentByMe 
-                    ? const Radius.circular(4)   // WhatsApp tail effect
+                    ? const Radius.circular(4)
                     : const Radius.circular(18),
               ),
               boxShadow: [
@@ -1583,8 +1593,10 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Text(
                   message.content,
-                  style: const TextStyle(
-                    color: Color(0xFF000000),  // Black text for both
+                  style: TextStyle(
+                    color: message.isSentByMe
+                        ? const Color(0xFF1B2C4F)
+                        : const Color(0xFF000000),
                     fontSize: 15,
                     fontWeight: FontWeight.w400,
                   ),
@@ -1607,7 +1619,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       Icon(
                         Icons.done_all,
                         size: 14,
-                        color: Colors.blue[600],  // WhatsApp blue check marks
+                        color: Colors.blue[600],
                       ),
                     ],
                   ],
