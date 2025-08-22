@@ -130,7 +130,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
           avatarUrl: '',
           messages: [
             Message(
-              content: 'Hi, is the football court available for tomorrow evening?',
+              content:
+                  'Hi, is the football court available for tomorrow evening?',
               time: '2:30 PM',
               isSentByMe: true, // Customer asks
             ),
@@ -143,7 +144,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
         ),
         ChatMessage(
           name: 'City Sports Complex',
-          lastMessage: 'Yes, you can reschedule up to 24 hours before your booking.',
+          lastMessage:
+              'Yes, you can reschedule up to 24 hours before your booking.',
           time: '1:45 PM',
           unreadCount: 0,
           avatarUrl: '',
@@ -154,7 +156,8 @@ class _MessagesScreenState extends State<MessagesScreen> {
               isSentByMe: true,
             ),
             Message(
-              content: 'Yes, you can reschedule up to 24 hours before your booking.',
+              content:
+                  'Yes, you can reschedule up to 24 hours before your booking.',
               time: '1:45 PM',
               isSentByMe: false,
             ),
@@ -513,39 +516,10 @@ class _MessagesScreenState extends State<MessagesScreen> {
           margin: const EdgeInsets.fromLTRB(16, 3, 8, 8),
           child: IconButton(
             icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
-            onPressed: () async {
-              try {
-                // Show loading indicator - SAME AS FAVOURITES
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  barrierColor: Colors.black.withOpacity(
-                    0.3,
-                  ), // FIXED: Use semi-transparent overlay
-                  builder: (BuildContext context) {
-                    return const Center(child: FootballLoadingWidget());
-                  },
-                );
-
-                // Simulate loading time
-                await Future.delayed(const Duration(milliseconds: 300));
-
-                // Close loading dialog and navigate back
-                // FIXED: Close loading dialog first, then navigate
-                if (mounted) {
-                  Navigator.of(context).pop(); // Close loading dialog
-                  Navigator.of(context).pop(); // Go back to previous screen
-                }
-              } catch (e) {
-                // Handle any errors
-                if (mounted) {
-                  // Try to close loading dialog if it exists
-                  try {
-                    Navigator.of(context).pop();
-                  } catch (_) {}
-                  // Then go back
-                  Navigator.of(context).pop();
-                }
+            onPressed: () {
+              // Simply pop back - no loading dialogs needed for back navigation
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
               }
             },
             tooltip: 'Back',
@@ -567,7 +541,12 @@ class _MessagesScreenState extends State<MessagesScreen> {
       ),
       bottomNavigationBar: AppFooter(
         currentIndex: _currentIndex, // Messages tab index
-        onTabSelected: _onTabSelected, // FIXED callback
+        onTabSelected: (int index) {
+          // Let the AppFooter handle all navigation logic
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
     );
   }
@@ -1228,12 +1207,16 @@ class ChatTile extends StatelessWidget {
                           child: Row(
                             children: [
                               Icon(
-                                message.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                                message.isPinned
+                                    ? Icons.push_pin
+                                    : Icons.push_pin_outlined,
                                 color: const Color(0xFF1B2C4F),
                                 size: 20,
                               ),
                               const SizedBox(width: 12),
-                              Text(message.isPinned ? 'Unpin Chat' : 'Pin Chat'),
+                              Text(
+                                message.isPinned ? 'Unpin Chat' : 'Pin Chat',
+                              ),
                             ],
                           ),
                         ),
@@ -1297,7 +1280,6 @@ class ChatTile extends StatelessWidget {
       ),
     );
   }
-
 
   Widget _buildAvatar(ChatMessage message) {
     return Container(
@@ -1410,7 +1392,8 @@ class _ChatScreenState extends State<ChatScreen> {
                       // Show date header at the top
                       return _buildDateHeader();
                     }
-                    final message = messages[index - 1]; // Adjust index for messages
+                    final message =
+                        messages[index - 1]; // Adjust index for messages
                     return _buildMessageBubble(message);
                   },
                 ),
@@ -1480,9 +1463,7 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert, color: Colors.white, size: 20),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
           elevation: 8,
           color: Colors.white,
           onSelected: (value) {
@@ -1506,11 +1487,7 @@ class _ChatScreenState extends State<ChatScreen> {
               value: 'block',
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.block,
-                    color: Colors.red,
-                    size: 20,
-                  ),
+                  const Icon(Icons.block, color: Colors.red, size: 20),
                   const SizedBox(width: 12),
                   const Text('Block User'),
                 ],
@@ -1534,11 +1511,7 @@ class _ChatScreenState extends State<ChatScreen> {
               value: 'clear',
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.delete_outline,
-                    color: Colors.red,
-                    size: 20,
-                  ),
+                  const Icon(Icons.delete_outline, color: Colors.red, size: 20),
                   const SizedBox(width: 12),
                   const Text('Clear Chat'),
                 ],
@@ -1551,7 +1524,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-
   Widget _buildMessageBubble(Message message) {
     return Container(
       margin: EdgeInsets.only(
@@ -1560,23 +1532,25 @@ class _ChatScreenState extends State<ChatScreen> {
         right: message.isSentByMe ? 0 : 80,
       ),
       child: Column(
-        crossAxisAlignment: message.isSentByMe 
-            ? CrossAxisAlignment.end 
+        crossAxisAlignment: message.isSentByMe
+            ? CrossAxisAlignment.end
             : CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: message.isSentByMe
-                  ? const Color(0xFF25D366).withOpacity(0.15) // Light green for customer
-                  : Colors.white,  // White for vendor
+                  ? const Color(0xFF25D366).withOpacity(
+                      0.15,
+                    ) // Light green for customer
+                  : Colors.white, // White for vendor
               borderRadius: BorderRadius.only(
                 topLeft: const Radius.circular(18),
                 topRight: const Radius.circular(18),
-                bottomLeft: message.isSentByMe 
-                    ? const Radius.circular(18) 
+                bottomLeft: message.isSentByMe
+                    ? const Radius.circular(18)
                     : const Radius.circular(4),
-                bottomRight: message.isSentByMe 
+                bottomRight: message.isSentByMe
                     ? const Radius.circular(4)
                     : const Radius.circular(18),
               ),
@@ -1616,11 +1590,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                     if (message.isSentByMe) ...[
                       const SizedBox(width: 4),
-                      Icon(
-                        Icons.done_all,
-                        size: 14,
-                        color: Colors.blue[600],
-                      ),
+                      Icon(Icons.done_all, size: 14, color: Colors.blue[600]),
                     ],
                   ],
                 ),
@@ -1637,7 +1607,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
-    
+
     String dateText;
     if (now.difference(today).inHours < 24) {
       dateText = 'Today';
@@ -1646,12 +1616,22 @@ class _ChatScreenState extends State<ChatScreen> {
     } else {
       // Format as "December 15, 2024"
       const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
       ];
       dateText = '${months[now.month - 1]} ${now.day}, ${now.year}';
     }
-    
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 16),
       child: Center(
@@ -1741,7 +1721,7 @@ class _ChatScreenState extends State<ChatScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
           decoration: const BoxDecoration(
-            color: Color(0xFFF0F0F0),  // WhatsApp background color
+            color: Color(0xFFF0F0F0), // WhatsApp background color
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -1767,10 +1747,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.grey.shade300,
-                      width: 0.5,
-                    ),
+                    border: Border.all(color: Colors.grey.shade300, width: 0.5),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -1843,11 +1820,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       : const Color(0xFF25D366), // WhatsApp green
                   radius: 24,
                   child: IconButton(
-                    icon: const Icon(
-                      Icons.send,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+                    icon: const Icon(Icons.send, color: Colors.white, size: 20),
                     onPressed: _messageController.text.trim().isEmpty
                         ? null
                         : _sendMessage,

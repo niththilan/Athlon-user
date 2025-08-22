@@ -24,9 +24,9 @@ class AppFooter extends StatelessWidget {
       showDialog(
         context: context,
         barrierDismissible: false,
-        barrierColor: Colors.white,
+        barrierColor: Colors.black.withOpacity(0.3),
         builder: (BuildContext context) {
-          return const FootballLoadingWidget();
+          return const Center(child: FootballLoadingWidget());
         },
       );
 
@@ -43,8 +43,8 @@ class AppFooter extends StatelessWidget {
         Navigator.pop(context);
       }
 
-      // Always push and remove all previous routes to refresh
-      Navigator.pushAndRemoveUntil(
+      // Navigate using regular push instead of pushAndRemoveUntil
+      Navigator.push(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) => FavoritesScreen(
@@ -56,7 +56,6 @@ class AppFooter extends StatelessWidget {
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
-        (route) => false,
       );
     } catch (e) {
       // Handle any errors in the main try block
@@ -64,27 +63,28 @@ class AppFooter extends StatelessWidget {
         Navigator.pop(context);
       }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error loading favorites: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading favorites: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
 
-      // Navigate to empty favorites as fallback, always removing previous routes
-      Navigator.pushAndRemoveUntil(
-        context,
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              FavoritesScreen(
-                favoriteVenues: const <Map<String, dynamic>>[],
-                onRemoveFavorite: (_) {},
-              ),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-        (route) => false,
-      );
+        // Navigate to empty favorites as fallback
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                FavoritesScreen(
+                  favoriteVenues: const <Map<String, dynamic>>[],
+                  onRemoveFavorite: (_) {},
+                ),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+        );
+      }
     }
   }
 
@@ -95,9 +95,9 @@ class AppFooter extends StatelessWidget {
       showDialog(
         context: context,
         barrierDismissible: false,
-        barrierColor: Colors.white,
+        barrierColor: Colors.black.withOpacity(0.3),
         builder: (BuildContext context) {
-          return const FootballLoadingWidget();
+          return const Center(child: FootballLoadingWidget());
         },
       );
 
@@ -108,8 +108,8 @@ class AppFooter extends StatelessWidget {
       }
 
       print('Navigating to Bookings...');
-      // Always push and remove all previous routes to refresh
-      Navigator.pushAndRemoveUntil(
+      // Use regular push instead of pushAndRemoveUntil
+      Navigator.push(
         context,
         PageRouteBuilder(
           pageBuilder: (context, animation, secondaryAnimation) {
@@ -119,7 +119,6 @@ class AppFooter extends StatelessWidget {
           transitionDuration: Duration.zero,
           reverseTransitionDuration: Duration.zero,
         ),
-        (route) => false,
       );
       print('History navigation completed');
     } catch (e) {
@@ -146,8 +145,8 @@ class AppFooter extends StatelessWidget {
     try {
       if (context.mounted) {
         print('Context is mounted, navigating...');
-        // Always push and remove all previous routes to refresh
-        Navigator.pushAndRemoveUntil(
+        // Use regular push instead of pushAndRemoveUntil
+        Navigator.push(
           context,
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) {
@@ -157,7 +156,6 @@ class AppFooter extends StatelessWidget {
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ),
-          (route) => false,
         );
         print('Navigation completed');
       } else {
@@ -201,30 +199,32 @@ class AppFooter extends StatelessWidget {
           // First call the original callback
           onTabSelected(index);
 
-          // Always navigate and refresh, even if already on the same screen
-          switch (index) {
-            case 0:
-              // Home: always push and remove all previous routes
-              Navigator.pushAndRemoveUntil(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      const home.HomeScreen(),
-                  transitionDuration: Duration.zero,
-                  reverseTransitionDuration: Duration.zero,
-                ),
-                (route) => false,
-              );
-              break;
-            case 1:
-              _navigateToFavorites(context);
-              break;
-            case 2:
-              _navigateToBookings(context);
-              break;
-            case 3:
-              _navigateToMessages(context);
-              break;
+          // Only navigate if not already on the same screen
+          if (currentIndex != index) {
+            switch (index) {
+              case 0:
+                // Home: Use pushAndRemoveUntil to clear stack and go to home
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) =>
+                        const home.HomeScreen(),
+                    transitionDuration: Duration.zero,
+                    reverseTransitionDuration: Duration.zero,
+                  ),
+                  (route) => false,
+                );
+                break;
+              case 1:
+                _navigateToFavorites(context);
+                break;
+              case 2:
+                _navigateToBookings(context);
+                break;
+              case 3:
+                _navigateToMessages(context);
+                break;
+            }
           }
         },
         child: Padding(

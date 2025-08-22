@@ -35,7 +35,9 @@ class HistoryScreenState extends State<HistoryScreen> {
   static const Color cardColor = Colors.white;
   static const Color successColor = Color(0xFF10B981);
   static const Color darkGreenColor = Color(0xFF065F46); // Added dark green
-  static const Color callColor = Color(0xFF065F46); // Darker green color for call button
+  static const Color callColor = Color(
+    0xFF065F46,
+  ); // Darker green color for call button
   static const Color errorColor = Color(0xFFB91C1C); // Much darker red color
   static const Color warningColor = Color(0xFFF59E0B);
   static const Color textPrimary = Color(0xFF111827);
@@ -380,20 +382,9 @@ class HistoryScreenState extends State<HistoryScreen> {
                   size: 28,
                 ),
                 onPressed: () {
-                  // Check if there's a previous page to go back to
+                  // Simply pop back - no complex logic needed
                   if (Navigator.canPop(context)) {
                     Navigator.pop(context);
-                  } else {
-                    // Only navigate to home if there's no previous page
-                    Navigator.pushReplacement(
-                      context,
-                      PageRouteBuilder(
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            home.HomeScreen(),
-                        transitionDuration: Duration.zero,
-                        reverseTransitionDuration: Duration.zero,
-                      ),
-                    );
                   }
                 },
                 tooltip: 'Back',
@@ -415,42 +406,8 @@ class HistoryScreenState extends State<HistoryScreen> {
       bottomNavigationBar: AppFooter(
         currentIndex: 2,
         onTabSelected: (int index) {
-          if (index != 2) {
-            // Home = 0, Favorites = 1, Bookings = 2, Chat = 3
-            switch (index) {
-              case 0:
-                // For home, use pop if possible, otherwise push
-                if (Navigator.canPop(context)) {
-                  Navigator.popUntil(context, (route) => route.isFirst);
-                } else {
-                  Navigator.pushReplacement(
-                    context,
-                    PageRouteBuilder(
-                      pageBuilder: (context, animation, secondaryAnimation) =>
-                          home.HomeScreen(),
-                      transitionDuration: Duration.zero,
-                      reverseTransitionDuration: Duration.zero,
-                    ),
-                  );
-                }
-                break;
-              case 1:
-                // Let the AppFooter handle navigation to favorites
-                break;
-              case 3:
-                // For messages, use push instead of pushReplacement
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) =>
-                        const MessagesScreen(),
-                    transitionDuration: Duration.zero,
-                    reverseTransitionDuration: Duration.zero,
-                  ),
-                );
-                break;
-            }
-          }
+          // Let the AppFooter handle all navigation
+          // Remove the complex switch logic and just let footer handle it
         },
       ),
     );
@@ -638,11 +595,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                     ),
                     GestureDetector(
                       onTap: () => Navigator.of(context).pop(),
-                      child: Icon(
-                        Icons.close,
-                        size: 24,
-                        color: textSecondary,
-                      ),
+                      child: Icon(Icons.close, size: 24, color: textSecondary),
                     ),
                   ],
                 ),
@@ -651,7 +604,7 @@ class HistoryScreenState extends State<HistoryScreen> {
 
                 // Booking ID
                 _buildDetailRow('Booking ID', booking.id),
-                
+
                 // Court and facility info
                 _buildDetailRow('Court', booking.courtName),
                 _buildDetailRow('Court Type', booking.courtType),
@@ -660,7 +613,10 @@ class HistoryScreenState extends State<HistoryScreen> {
                 SizedBox(height: 12),
 
                 // Date and time details
-                _buildDetailRow('Date', DateFormat('EEEE, MMM d, yyyy').format(booking.date)),
+                _buildDetailRow(
+                  'Date',
+                  DateFormat('EEEE, MMM d, yyyy').format(booking.date),
+                ),
                 _buildDetailRow('Start Time', booking.startTime),
                 _buildDetailRow('End Time', booking.endTime),
                 _buildDetailRow('Duration', '${booking.duration} minutes'),
@@ -669,7 +625,10 @@ class HistoryScreenState extends State<HistoryScreen> {
 
                 // Status and price
                 _buildDetailRow('Status', booking.status.toUpperCase()),
-                _buildDetailRow('Total Amount', 'LKR ${booking.price.toStringAsFixed(0)}'),
+                _buildDetailRow(
+                  'Total Amount',
+                  'LKR ${booking.price.toStringAsFixed(0)}',
+                ),
 
                 SizedBox(height: 24),
 
@@ -677,7 +636,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                 Row(
                   children: [
                     // Cancel booking button (only show for confirmed/pending bookings)
-                    if (booking.status.toLowerCase() == 'confirmed' || 
+                    if (booking.status.toLowerCase() == 'confirmed' ||
                         booking.status.toLowerCase() == 'pending')
                       Expanded(
                         child: Container(
@@ -701,17 +660,20 @@ class HistoryScreenState extends State<HistoryScreen> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    
+
                     // Add spacing if cancel button exists
-                    if (booking.status.toLowerCase() == 'confirmed' || 
+                    if (booking.status.toLowerCase() == 'confirmed' ||
                         booking.status.toLowerCase() == 'pending')
                       SizedBox(width: 12),
-                    
+
                     // Close button
                     Expanded(
                       child: Container(
@@ -724,7 +686,10 @@ class HistoryScreenState extends State<HistoryScreen> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
                           child: Text(
                             'Close',
@@ -778,10 +743,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                 Text(
                   'Are you sure you want to cancel this booking?',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: textSecondary,
-                  ),
+                  style: TextStyle(fontSize: 14, color: textSecondary),
                 ),
                 SizedBox(height: 12),
                 Container(
@@ -804,10 +766,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                       SizedBox(height: 2),
                       Text(
                         '${DateFormat('MMM d, yyyy').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: textSecondary,
-                        ),
+                        style: TextStyle(fontSize: 12, color: textSecondary),
                       ),
                     ],
                   ),
@@ -831,12 +790,18 @@ class HistoryScreenState extends State<HistoryScreen> {
                         child: OutlinedButton(
                           onPressed: () => Navigator.of(context).pop(),
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Colors.grey[400]!, width: 1.5),
+                            side: BorderSide(
+                              color: Colors.grey[400]!,
+                              width: 1.5,
+                            ),
                             foregroundColor: textSecondary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
                           child: Text(
                             'Keep Booking',
@@ -871,7 +836,10 @@ class HistoryScreenState extends State<HistoryScreen> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
                         ),
                       ),
@@ -913,9 +881,7 @@ class HistoryScreenState extends State<HistoryScreen> {
         content: Text('Booking cancelled successfully'),
         backgroundColor: successColor,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
 
@@ -939,11 +905,7 @@ class HistoryScreenState extends State<HistoryScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.phone,
-                  size: 48,
-                  color: callColor,
-                ),
+                Icon(Icons.phone, size: 48, color: callColor),
                 SizedBox(height: 16),
                 Text(
                   'Contact Facility',
@@ -956,10 +918,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                 SizedBox(height: 8),
                 Text(
                   booking.facilityName,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: textSecondary,
-                  ),
+                  style: TextStyle(fontSize: 16, color: textSecondary),
                 ),
                 SizedBox(height: 20),
                 Row(
@@ -1464,4 +1423,3 @@ class BookingHistoryItem {
     required this.status,
   });
 }
-   

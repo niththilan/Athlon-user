@@ -140,29 +140,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
             onPressed: () async {
               try {
-                // Show loading indicator
-                showDialog(
-                  context: context,
-                  barrierDismissible: false,
-                  barrierColor: Colors.white,
-                  builder: (BuildContext context) {
-                    return const FootballLoadingWidget();
-                  },
-                );
-
-                // Simulate loading time
-                await Future.delayed(const Duration(milliseconds: 200));
-
-                // Close loading dialog and navigate back
-                if (context.mounted) {
-                  Navigator.pop(context); // Close loading
-                  Navigator.of(context).pop(); // Go back
+                // Close any existing dialogs first
+                if (Navigator.canPop(context)) {
+                  // Simply pop back to previous screen
+                  Navigator.pop(context);
                 }
               } catch (e) {
                 // Handle any errors
                 if (context.mounted) {
-                  Navigator.pop(context); // Close loading
-                  Navigator.of(context).pop(); // Go back
+                  Navigator.pop(context);
                 }
               }
             },
@@ -194,7 +180,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             ),
       bottomNavigationBar: AppFooter(
         currentIndex: 1, // Favorites tab index
-        onTabSelected: _onTabSelected,
+        onTabSelected: (int index) {
+          // Let the footer handle all navigation logic
+          // Don't add any custom logic here
+        },
       ),
     );
   }

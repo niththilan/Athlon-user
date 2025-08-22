@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'help_support.dart';
 import 'settings.dart'; // Import the settings screen
 import 'widgets/football_spinner.dart';
+import 'home.dart';
 
 // Constants for consistent styling - matching vendor screen
 const Color primaryColor = Color(0xFF1B2C4F);
@@ -1614,31 +1615,34 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   size: 28,
                 ),
                 onPressed: () async {
-                  try {
-                    // Show loading indicator
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      barrierColor: Colors.white,
-                      builder: (BuildContext context) {
-                        return const FootballLoadingWidget();
-                      },
+                  // Show loading screen
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    barrierColor: Colors.black.withOpacity(0.3),
+                    builder: (BuildContext context) {
+                      return const Center(child: FootballLoadingWidget());
+                    },
+                  );
+
+                  // Loading delay
+                  await Future.delayed(const Duration(milliseconds: 200));
+
+                  // Navigate back to home and reset footer index
+                  if (context.mounted) {
+                    Navigator.pop(context); // Close loading dialog
+
+                    // Use pushAndRemoveUntil to ensure home screen is fresh
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            const HomeScreen(),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
+                      ),
+                      (route) => false, // Remove all previous routes
                     );
-
-                    // Simulate loading time
-                    await Future.delayed(const Duration(milliseconds: 200));
-
-                    // Close loading dialog and navigate back
-                    if (context.mounted) {
-                      Navigator.pop(context); // Close loading
-                      Navigator.pop(context); // Go back
-                    }
-                  } catch (e) {
-                    // Handle any errors
-                    if (context.mounted) {
-                      Navigator.pop(context); // Close loading
-                      Navigator.pop(context); // Go back
-                    }
                   }
                 },
                 tooltip: 'Back',
@@ -1785,7 +1789,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: Column(
                   children: [
                     _buildCompactProfileDetailItem(
-                      icon: Icons.person, 
+                      icon: Icons.person,
                       label: "Owner",
                       value: name.split(' ').first.toLowerCase(),
                       //iconColor: Colors.red,

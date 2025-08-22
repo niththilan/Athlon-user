@@ -22,14 +22,14 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   bool _isLoading = true;
   String _selectedLocation = "Current Location";
-  
+
   final TextEditingController _searchController = TextEditingController();
   final List<String> _pastSearchLocations = [
     "Downtown Sports Complex",
-    "Central Park Area", 
+    "Central Park Area",
     "University District",
     "Shopping Mall Area",
-    "Riverside Stadium"
+    "Riverside Stadium",
   ];
 
   @override
@@ -40,6 +40,20 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         setState(() {
           _isLoading = false;
+        });
+      }
+    });
+  }
+
+  // ADD THIS METHOD - Reset current index when returning to home
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reset current index to 0 when home screen is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _currentIndex != 0) {
+        setState(() {
+          _currentIndex = 0;
         });
       }
     });
@@ -255,8 +269,11 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       bottomNavigationBar: AppFooter(
-        currentIndex: _currentIndex,
-        onTabSelected: _onTabSelected,
+        currentIndex: 0,
+        onTabSelected: (int index) {
+          // Let the AppFooter handle all navigation
+          // Remove the complex switch logic and just let footer handle it
+        },
       ),
     );
   }
@@ -277,19 +294,15 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.location_on,
-            color: Colors.white,
-            size: 30,
-          ),
+          const Icon(Icons.location_on, color: Colors.white, size: 30),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _selectedLocation == "Current Location" 
-                      ? 'Colombo, Sri Lanka' 
+                  _selectedLocation == "Current Location"
+                      ? 'Colombo, Sri Lanka'
                       : _selectedLocation,
                   style: const TextStyle(
                     fontSize: 14,
@@ -299,7 +312,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  _selectedLocation == "Current Location" 
+                  _selectedLocation == "Current Location"
                       ? "Current Location"
                       : "Tap to change location",
                   style: TextStyle(
@@ -310,11 +323,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          const Icon(
-            Icons.keyboard_arrow_down,
-            color: Colors.white,
-            size: 28,
-          ),
+          const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 28),
         ],
       ),
     );
@@ -361,7 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
-                  
+
                   // Search bar
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -375,9 +384,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration: InputDecoration(
                           hintText: "Search for area, street name...",
                           hintStyle: TextStyle(color: Colors.grey[600]),
-                          prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Colors.grey[600],
+                          ),
                           border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 16,
+                          ),
                         ),
                         onChanged: (value) {
                           setModalState(() {});
@@ -385,17 +400,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Current Location option
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: _buildCurrentLocationOption(),
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Past searches section
                   Expanded(
                     child: Column(
@@ -405,9 +420,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: Row(
                             children: [
-                              
                               const SizedBox(width: 8),
-                            
+
                               Text(
                                 "Recent searches",
                                 style: TextStyle(
@@ -487,10 +501,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   SizedBox(height: 4),
                   Text(
                     "Enable precise location",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],
               ),
@@ -520,11 +531,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
         child: Row(
           children: [
-            Icon(
-              Icons.history,
-              color: Colors.grey[600],
-              size: 20,
-            ),
+            Icon(Icons.history, color: Colors.grey[600], size: 20),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
@@ -613,19 +620,30 @@ class NotificationScreenState extends State<NotificationScreen> {
                   showDialog(
                     context: context,
                     barrierDismissible: false,
-                    barrierColor: Colors.white,
+                    barrierColor: Colors.black.withOpacity(0.3),
                     builder: (BuildContext context) {
-                      return const FootballLoadingWidget();
+                      return const Center(child: FootballLoadingWidget());
                     },
                   );
 
                   // Loading delay
                   await Future.delayed(const Duration(milliseconds: 200));
 
-                  // Navigate back to home
+                  // Navigate back to home and reset footer index
                   if (context.mounted) {
                     Navigator.pop(context); // Close loading dialog
-                    Navigator.pop(context); // Go back to home
+
+                    // Use pushAndRemoveUntil to ensure home screen is fresh
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      PageRouteBuilder(
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            const HomeScreen(),
+                        transitionDuration: Duration.zero,
+                        reverseTransitionDuration: Duration.zero,
+                      ),
+                      (route) => false, // Remove all previous routes
+                    );
                   }
                 },
                 tooltip: 'Back',
@@ -690,9 +708,7 @@ class FeatureCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           // Navigate to Nearby Venues screen
-          NavigationService.pushInstant(
-            const venues.NearByVenueScreen(),
-          );
+          NavigationService.pushInstant(const venues.NearByVenueScreen());
         },
         borderRadius: BorderRadius.circular(16),
         child: Container(
@@ -739,10 +755,7 @@ class FeatureCard extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.7),
-                    ],
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
                   ),
                 ),
               ),
