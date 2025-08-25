@@ -1728,11 +1728,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                             ],
                           ),
                         ),
-                        const Icon(
-                          Icons.keyboard_arrow_down,
-                          color: Colors.white,
-                          size: 28,
-                        ),
+                        
                       ],
                     ),
                   ),
