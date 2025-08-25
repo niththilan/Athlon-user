@@ -5,6 +5,7 @@ import 'bookings.dart'; // Import the bookings.dart file
 import 'nearbyVenues.dart'; // Import for VenueModel
 import 'footer.dart'; // Import footer
 import 'widgets/football_spinner.dart'; // Import football spinner
+import 'courtDetails.dart' as court_details; // Import court details page
 
 void main() {
   runApp(const MyApp());
@@ -475,19 +476,32 @@ class _SearchScreenState extends State<SearchScreen> {
         itemCount: _searchResults.length,
         itemBuilder: (context, index) {
           final venue = _searchResults[index];
-          return Container(
-            margin: const EdgeInsets.only(bottom: 20.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.02),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+          return GestureDetector(
+            onTap: () {
+              // Convert VenueResult to court data format and navigate to CourtDetailScreen
+              final courtData = _convertToCourtData(venue);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => court_details.CourtDetailScreen(
+                    courtData: courtData,
+                  ),
                 ),
-              ],
-            ),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 20.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -760,6 +774,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               ],
             ),
+            ),
           );
         },
       ),
@@ -784,6 +799,32 @@ class _SearchScreenState extends State<SearchScreen> {
       openingHours: venueResult.timeSlot,
       ratePerHour: "Rs. ${venueResult.price}",
     );
+  }
+
+  // Helper function to convert VenueResult to court data format for CourtDetailScreen
+  Map<String, dynamic> _convertToCourtData(VenueResult venueResult) {
+    return {
+      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      'name': venueResult.title,
+      'type': '${venueResult.type} Court',
+      'location': venueResult.location,
+      'distance': venueResult.distance,
+      'rating': venueResult.rating,
+      'total_reviews': 85, // Default value
+      'price_per_hour': double.tryParse(venueResult.price) ?? 2500.0,
+      'opening_hours': 'Open Now',
+      'closing_time': 'Closes at 11:00 PM',
+      'phone': '+94 77 123 4567', // Default value
+      'email': 'info@venue.lk', // Default value
+      'website': 'www.venue.lk', // Default value
+      'description': 'Premium ${venueResult.type.toLowerCase()} facility with state-of-the-art equipment and professional-grade surfaces.',
+      'images': [
+        venueResult.imageUrl,
+        'https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+        'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
+      ],
+      'sports_available': [venueResult.type],
+    };
   }
 
   void _showCustomSnackBar(BuildContext context, String message) {
