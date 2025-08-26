@@ -3,6 +3,7 @@ import 'customers/home.dart';
 import 'customers/loading_screen.dart';
 import 'customers/services/navigation_service.dart';
 import 'customers/services/supabase_service.dart';
+import 'customers/services/auth_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,9 +12,13 @@ void main() async {
   try {
     await SupabaseService.initialize();
     print('Supabase initialized successfully');
+    
+    // Initialize AuthService
+    await AuthService().initialize();
+    print('AuthService initialized successfully');
   } catch (e) {
-    print('Error initializing Supabase: $e');
-    // Continue without Supabase for now
+    print('Error initializing services: $e');
+    // Continue without services for now - app will handle gracefully
   }
   
   runApp(const MyApp());

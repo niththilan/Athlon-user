@@ -1,7 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:flutter/material.dart';
-import 'userProfile.dart';
+import 'profile/user_profile_screen.dart';
 import 'widgets/football_spinner.dart';
 import 'availableSports.dart'; // Add this import
 import 'courtDetails.dart'; // Add this import
