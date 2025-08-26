@@ -2,8 +2,20 @@ import 'package:flutter/material.dart';
 import 'customers/home.dart';
 import 'customers/loading_screen.dart';
 import 'customers/services/navigation_service.dart';
+import 'customers/services/supabase_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Supabase
+  try {
+    await SupabaseService.initialize();
+    print('Supabase initialized successfully');
+  } catch (e) {
+    print('Error initializing Supabase: $e');
+    // Continue without Supabase for now
+  }
+  
   runApp(const MyApp());
 }
 

@@ -8,8 +8,10 @@ import 'courtDetails.dart'; // Add this import
 import 'search.dart'; // Add search import
 
 import 'footer.dart';
-import 'nearbyVenues.dart' as venues; // Import the nearbyVenues file
+import 'nearbyVenues.dart' as nearby_venues; // Import the nearbyVenues file
 import 'services/navigation_service.dart';
+import 'services/data_service.dart';
+import 'models/venue_models.dart' as venue_models;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   bool _isLoading = true;
   String _selectedLocation = "Current Location";
+  List<venue_models.VenueModel> _venues = [];
+  bool _isLoadingVenues = false;
 
   final TextEditingController _searchController = TextEditingController();
   final List<String> _pastSearchLocations = [
@@ -35,14 +39,49 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
     // Quick initialization for home screen (200ms)
-    Future.delayed(const Duration(milliseconds: 200), () {
+    await Future.delayed(const Duration(milliseconds: 200));
+    
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+      
+      // Load venues in background
+      _loadVenues();
+    }
+  }
+
+  Future<void> _loadVenues() async {
+    if (_isLoadingVenues) return;
+    
+    setState(() {
+      _isLoadingVenues = true;
+    });
+
+    try {
+      final venues = await DataService.loadVenues();
+      
       if (mounted) {
         setState(() {
-          _isLoading = false;
+          _venues = venues;
+          _isLoadingVenues = false;
         });
       }
-    });
+    } catch (e) {
+      print('Error loading venues: $e');
+      if (mounted) {
+        setState(() {
+          _isLoadingVenues = false;
+          // Use fallback mock data if loading fails
+          _venues = [];
+        });
+      }
+    }
   }
 
   // ADD THIS METHOD - Reset current index when returning to home
@@ -262,7 +301,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 24),
                 SportsSection(),
                 const SizedBox(height: 24),
-                VenuesSection(),
+                VenuesSection(
+                  venues: _venues,
+                  isLoading: _isLoadingVenues,
+                ),
               ],
             ),
           ),
@@ -708,7 +750,7 @@ class FeatureCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           // Navigate to Nearby Venues screen
-          NavigationService.pushInstant(const venues.NearByVenueScreen());
+          NavigationService.pushInstant(const nearby_venues.NearByVenueScreen());
         },
         borderRadius: BorderRadius.circular(16),
         child: Container(
@@ -979,7 +1021,14 @@ class SportsCard extends StatelessWidget {
 
 // ----------------- VenuesSection & VenueCard -----------------
 class VenuesSection extends StatelessWidget {
-  const VenuesSection({super.key});
+  final List<venue_models.VenueModel> venues;
+  final bool isLoading;
+
+  const VenuesSection({
+    super.key,
+    required this.venues,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1018,7 +1067,7 @@ class VenuesSection extends StatelessWidget {
                 onPressed: () {
                   // Navigate to Nearby Venues screen with no transition
                   NavigationService.pushInstant(
-                    const venues.NearByVenueScreen(),
+                    const nearby_venues.NearByVenueScreen(),
                   );
                 },
                 child: Text(
@@ -1034,21 +1083,48 @@ class VenuesSection extends StatelessWidget {
           SizedBox(height: 4),
           SizedBox(
             height: 260, // Fixed height for horizontal scrolling
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: _sampleVenues.length,
-              itemBuilder: (context, index) {
-                final venue = _sampleVenues[index];
-                return Container(
-                  width: 180, // Fixed width for each card
-                  margin: EdgeInsets.only(
-                    left: index == 0 ? 8 : 12,
-                    right: index == _sampleVenues.length - 1 ? 8 : 0,
-                  ),
-                  child: VenueCard(venue: venue),
-                );
-              },
-            ),
+            child: isLoading
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF1B2C4F),
+                    ),
+                  )
+                : venues.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.location_off,
+                              size: 48,
+                              color: Colors.grey[400],
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              'No venues found',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: venues.length,
+                        itemBuilder: (context, index) {
+                          final venue = venues[index];
+                          return Container(
+                            width: 180, // Fixed width for each card
+                            margin: EdgeInsets.only(
+                              left: index == 0 ? 8 : 12,
+                              right: index == venues.length - 1 ? 8 : 0,
+                            ),
+                            child: VenueCard(venue: venue),
+                          );
+                        },
+                      ),
           ),
         ],
       ),
@@ -1057,7 +1133,7 @@ class VenuesSection extends StatelessWidget {
 }
 
 class VenueCard extends StatelessWidget {
-  final VenueModel venue;
+  final venue_models.VenueModel venue;
 
   const VenueCard({super.key, required this.venue});
 
@@ -1073,29 +1149,28 @@ class VenueCard extends StatelessWidget {
             CourtDetailScreen(
               courtData: {
                 'id': venue.id,
-                'name': venue.title,
+                'name': venue.name,
                 'type': venue.sports.isNotEmpty
                     ? venue.sports.first
                     : 'Sports Facility',
                 'location': venue.location,
                 'distance': '${venue.distance} km away',
                 'rating': venue.rating,
-                'total_reviews': 124,
-                'price_per_hour':
-                    double.tryParse(
-                      venue.ratePerHour.replaceAll(RegExp(r'[^\d.]'), ''),
-                    ) ??
-                    0.0,
+                'total_reviews': venue.reviewCount,
+                'price_per_hour': venue.courts.isNotEmpty
+                    ? venue.courts.first.hourlyRate
+                    : 0.0,
                 'opening_hours': venue.openingHours,
                 'closing_time': 'Closes at 11:00 PM',
-                'phone': '+94 77 123 4567',
-                'email':
-                    'info@${venue.title.toLowerCase().replaceAll(' ', '')}.lk',
-                'website':
-                    'www.${venue.title.toLowerCase().replaceAll(' ', '')}.lk',
-                'description':
+                'phone': venue.phone ?? '+94 77 123 4567',
+                'email': venue.website?.contains('@') == true 
+                    ? venue.website
+                    : 'info@${venue.name.toLowerCase().replaceAll(' ', '')}.lk',
+                'website': venue.website ?? 
+                    'www.${venue.name.toLowerCase().replaceAll(' ', '')}.lk',
+                'description': venue.bio ?? 
                     'Premium sports facility with state-of-the-art equipment and professional-grade surfaces.',
-                'images': [venue.imageUrl],
+                'images': [venue.primaryImageUrl],
                 'sports_available': venue.sports,
               },
             ),
@@ -1122,7 +1197,7 @@ class VenueCard extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                   child: Image.network(
-                    venue.imageUrl,
+                    venue.primaryImageUrl,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
@@ -1145,7 +1220,7 @@ class VenueCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      venue.title,
+                      venue.name,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -1183,152 +1258,3 @@ class VenueCard extends StatelessWidget {
     );
   }
 }
-
-// VenueModel class for venue data
-class VenueModel {
-  final String id;
-  final String title;
-  final String location;
-  final double rating;
-  final String imageUrl;
-  final List<String> sports;
-  final double distance;
-  final String openingHours;
-  final String ratePerHour;
-
-  VenueModel({
-    required this.id,
-    required this.title,
-    required this.location,
-    required this.rating,
-    required this.imageUrl,
-    required this.sports,
-    required this.distance,
-    required this.openingHours,
-    required this.ratePerHour,
-  });
-}
-
-// Sample venue data from nearbyVenues.dart
-final List<VenueModel> _sampleVenues = [
-  VenueModel(
-    id: '1',
-    title: "CR7 FUTSAL & INDOOR CRICKET",
-    location: "23 Mile Post Ave, Colombo 00300",
-    rating: 4.75,
-    distance: 1.2,
-    imageUrl:
-        "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    sports: ["Futsal", "Cricket", "Indoor"],
-    openingHours: "6:00 AM - 11:00 PM",
-    ratePerHour: "Rs. 3,000",
-  ),
-  VenueModel(
-    id: '2',
-    title: "ARK SPORTS - INDOOR CRICKET & FUTSAL",
-    location: "141/A, Wattala 11300",
-    rating: 4.23,
-    distance: 3.5,
-    imageUrl:
-        "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    sports: ["Futsal", "Cricket", "Indoor"],
-    openingHours: "7:00 AM - 10:00 PM",
-    ratePerHour: "Rs. 2,500",
-  ),
-  VenueModel(
-    id: '3',
-    title: "CHAMPION'S ARENA",
-    location: "45 Sports Complex Road, Rajagiriya 10100",
-    rating: 4.89,
-    distance: 0.8,
-    imageUrl:
-        "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    sports: ["Badminton", "Tennis", "Squash", "Outdoor"],
-    openingHours: "6:00 AM - 10:00 PM",
-    ratePerHour: "Rs. 2,000",
-  ),
-  VenueModel(
-    id: '4',
-    title: "AQUA SPORTS CENTER",
-    location: "78 Poolside Avenue, Mount Lavinia 10370",
-    rating: 4.67,
-    distance: 5.2,
-    imageUrl:
-        "https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    sports: ["Swimming", "Water Polo", "Diving"],
-    openingHours: "5:30 AM - 9:30 PM",
-    ratePerHour: "Rs. 1,200",
-  ),
-  VenueModel(
-    id: '5',
-    title: "ELITE BASKETBALL ACADEMY",
-    location: "92 Court Lane, Dehiwala 10350",
-    rating: 4.45,
-    distance: 2.7,
-    imageUrl:
-        "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    sports: ["Basketball", "Volleyball"],
-    openingHours: "7:00 AM - 11:00 PM",
-    ratePerHour: "Rs. 1,800",
-  ),
-  VenueModel(
-    id: '6',
-    title: "VICTORY VALLEY GOLF CLUB",
-    location: "156 Greens Road, Kandy 20000",
-    rating: 4.92,
-    distance: 8.6,
-    imageUrl:
-        "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    sports: ["Golf"],
-    openingHours: "6:00 AM - 8:00 PM",
-    ratePerHour: "Rs. 5,000",
-  ),
-  VenueModel(
-    id: '7',
-    title: "COLOMBO TENNIS CLUB",
-    location: "45 Racquet Road, Colombo 00500",
-    rating: 4.82,
-    distance: 1.5,
-    imageUrl:
-        "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    sports: ["Tennis", "Badminton"],
-    openingHours: "6:00 AM - 8:00 PM",
-    ratePerHour: "Rs. 2,000",
-  ),
-  VenueModel(
-    id: '8',
-    title: "OCEANSIDE SURFING SCHOOL",
-    location: "Beach Front, Hikkaduwa 80240",
-    rating: 4.78,
-    distance: 12.3,
-    imageUrl:
-        "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    sports: ["Surfing", "Swimming", "Beach Volleyball"],
-    openingHours: "7:00 AM - 6:00 PM",
-    ratePerHour: "Rs. 1,500",
-  ),
-  VenueModel(
-    id: '9',
-    title: "CENTRAL YOGA & FITNESS",
-    location: "22 Wellness Street, Nawala 10107",
-    rating: 4.65,
-    distance: 1.9,
-    imageUrl:
-        "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    sports: ["Yoga", "Pilates", "Fitness"],
-    openingHours: "6:30 AM - 10:30 PM",
-    ratePerHour: "Rs. 1,000",
-  ),
-  VenueModel(
-    id: '10',
-    title: "MOUNTAIN BIKING TRAILS",
-    location: "Hanthana Mountain Range, Kandy 20000",
-    rating: 4.91,
-    distance: 10.5,
-    imageUrl:
-        "https://images.unsplash.com/photo-1541625602330-2277a4c46182?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-    sports: ["Mountain Biking", "Hiking", "Trail Running"],
-    openingHours: "6:00 AM - 6:00 PM",
-    ratePerHour: "Rs. 800",
-  ),
-];

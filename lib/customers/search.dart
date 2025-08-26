@@ -2,10 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'bookings.dart'; // Import the bookings.dart file
-import 'nearbyVenues.dart'; // Import for VenueModel
 import 'footer.dart'; // Import footer
 import 'widgets/football_spinner.dart'; // Import football spinner
 import 'courtDetails.dart' as court_details; // Import court details page
+import 'models/venue_models.dart' as venue_models;
 
 void main() {
   runApp(const MyApp());
@@ -782,11 +782,11 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 
   // Helper function to convert VenueResult to VenueModel
-  VenueModel _convertToVenueModel(VenueResult venueResult) {
-    return VenueModel(
+  venue_models.VenueModel _convertToVenueModel(VenueResult venueResult) {
+    return venue_models.VenueModel(
       id: DateTime.now().millisecondsSinceEpoch
           .toString(), // Generate unique ID
-      title: venueResult.title,
+      name: venueResult.title,
       location: venueResult.location,
       rating: venueResult.rating,
       distance:
@@ -797,7 +797,6 @@ class _SearchScreenState extends State<SearchScreen> {
       imageUrl: venueResult.imageUrl,
       sports: [venueResult.type], // Convert single type to list
       openingHours: venueResult.timeSlot,
-      ratePerHour: "Rs. ${venueResult.price}",
     );
   }
 

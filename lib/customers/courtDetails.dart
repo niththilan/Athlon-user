@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'footer.dart';
 import 'bookings.dart'; // Import bookings.dart
 import 'widgets/football_spinner.dart';
+import 'models/venue_models.dart' as venue_models;
 
 void main() {
   runApp(const MyApp());
@@ -29,30 +30,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// VenueModel class for similar venues
-class VenueModel {
-  final String id;
-  final String title;
-  final String location;
-  final double rating;
-  final String imageUrl;
-  final List<String> sports;
-  final double distance;
-  final String openingHours;
-  final String ratePerHour;
-
-  VenueModel({
-    required this.id,
-    required this.title,
-    required this.location,
-    required this.rating,
-    required this.imageUrl,
-    required this.sports,
-    required this.distance,
-    required this.openingHours,
-    required this.ratePerHour,
-  });
-}
+// VenueModel class is now imported from models/venue_models.dart
 
 class SportItem {
   final String name;

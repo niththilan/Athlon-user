@@ -5,8 +5,8 @@ import 'favourites.dart';
 import 'bookings.dart';
 import 'footer.dart';
 import 'widgets/football_spinner.dart';
-import 'nearbyVenues.dart';
 import 'courtDetails.dart' as court;
+import 'models/venue_models.dart' as venue_models;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -399,10 +399,10 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
   }
 
   // Helper function to convert venue Map to VenueModel
-  VenueModel _convertToVenueModel(Map<String, dynamic> venue) {
-    return VenueModel(
+  venue_models.VenueModel _convertToVenueModel(Map<String, dynamic> venue) {
+    return venue_models.VenueModel(
       id: venue['id'] ?? '',
-      title: venue['title'] ?? '',
+      name: venue['title'] ?? '',
       location: venue['location'] ?? '',
       rating: (venue['rating'] as num?)?.toDouble() ?? 0.0,
       imageUrl: venue['image_path'] ?? '',
@@ -414,7 +414,6 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
           ) ??
           0.0,
       openingHours: venue['opening_hours'] ?? '',
-      ratePerHour: venue['rate_per_hour'] ?? '',
     );
   }
 

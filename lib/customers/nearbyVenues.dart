@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 //import 'bookNow.dart';
 import 'filter_screen.dart';
 import 'widgets/football_spinner.dart';
+import 'models/venue_models.dart' as venue_models;
+import 'services/data_service.dart';
 
 void main() {
   runApp(const MyApp());
@@ -102,165 +104,8 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     'Netball': Icons.sports_basketball_rounded,
   };
 
-  // List of all venues with distance
-  final List<VenueModel> _allVenues = [
-    VenueModel(
-      id: '1',
-      title: "CR7 FUTSAL & INDOOR CRICKET",
-      location: "23 Mile Post Ave, Colombo 00300",
-      rating: 4.75,
-      distance: 1.2,
-      imageUrl:
-          "https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Futsal", "Cricket", "Basketball", "Badminton", "Tennis"],
-      openingHours: "6:00 AM - 11:00 PM",
-      ratePerHour: "Rs. 3,000",
-    ),
-    VenueModel(
-      id: '2',
-      title: "ARK SPORTS - INDOOR CRICKET & FUTSAL",
-      location: "141/A, Wattala 11300",
-      rating: 4.23,
-      distance: 3.5,
-      imageUrl:
-          "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Futsal", "Cricket", "Squash", "Table Tennis", "Volleyball"],
-      openingHours: "7:00 AM - 10:00 PM",
-      ratePerHour: "Rs. 2,500",
-    ),
-    VenueModel(
-      id: '3',
-      title: "CHAMPION'S ARENA",
-      location: "45 Sports Complex Road, 10100",
-      rating: 4.89,
-      distance: 0.8,
-      imageUrl:
-          "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Badminton", "Tennis", "Squash", "Table Tennis", "Swimming"],
-      openingHours: "6:00 AM - 10:00 PM",
-      ratePerHour: "Rs. 2,000",
-    ),
-    VenueModel(
-      id: '4',
-      title: "AQUA SPORTS CENTER",
-      location: "78 Poolside Avenue, Mount Lavinia 10370",
-      rating: 4.67,
-      distance: 5.2,
-      imageUrl:
-          "https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Swimming", "Water Polo", "Diving"],
-      openingHours: "5:30 AM - 9:30 PM",
-      ratePerHour: "Rs. 1,200",
-    ),
-    VenueModel(
-      id: '5',
-      title: "ELITE BASKETBALL ACADEMY",
-      location: "92 Court Lane, Dehiwala 10350",
-      rating: 4.45,
-      distance: 2.7,
-      imageUrl:
-          "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Basketball", "Volleyball", "Futsal", "Netball"],
-      openingHours: "7:00 AM - 11:00 PM",
-      ratePerHour: "Rs. 1,800",
-    ),
-    VenueModel(
-      id: '6',
-      title: "VICTORY VALLEY GOLF CLUB",
-      location: "156 Greens Road, Kandy 20000",
-      rating: 4.92,
-      distance: 8.6,
-      imageUrl:
-          "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Golf", "Tennis", "Swimming"],
-      openingHours: "6:00 AM - 8:00 PM",
-      ratePerHour: "Rs. 5,000",
-    ),
-    VenueModel(
-      id: '7',
-      title: "COLOMBO TENNIS CLUB",
-      location: "45 Racquet Road, Colombo 00500",
-      rating: 4.82,
-      distance: 1.5,
-      imageUrl:
-          "https://images.unsplash.com/photo-1595435934249-5df7ed86e1c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Tennis", "Badminton", "Squash", "Swimming"],
-      openingHours: "6:00 AM - 8:00 PM",
-      ratePerHour: "Rs. 2,000",
-    ),
-    VenueModel(
-      id: '8',
-      title: "OCEANSIDE SURFING SCHOOL",
-      location: "Beach Front, Hikkaduwa 80240",
-      rating: 4.78,
-      distance: 12.3,
-      imageUrl:
-          "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Surfing", "Swimming", "Beach Volleyball", "Diving"],
-      openingHours: "7:00 AM - 6:00 PM",
-      ratePerHour: "Rs. 1,500",
-    ),
-    VenueModel(
-      id: '9',
-      title: "COLOMBO BOXING & MARTIAL ARTS",
-      location: "22 Wellness Street, Nawala 10107",
-      rating: 4.65,
-      distance: 1.9,
-      imageUrl:
-          "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Boxing"],
-      openingHours: "6:30 AM - 10:30 PM",
-      ratePerHour: "Rs. 1,000",
-    ),
-    VenueModel(
-      id: '10',
-      title: "MOUNTAIN BIKING TRAILS",
-      location: "Hanthana Mountain Range, Kandy 20000",
-      rating: 4.91,
-      distance: 10.5,
-      imageUrl:
-          "https://images.unsplash.com/photo-1541625602330-2277a4c46182?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Mountain Biking", "Rock Climbing"],
-      openingHours: "6:00 AM - 6:00 PM",
-      ratePerHour: "Rs. 800",
-    ),
-    VenueModel(
-      id: '11',
-      title: "COLOMBO BOXING CLUB",
-      location: "78 Fighter's Lane, Colombo 00700",
-      rating: 4.56,
-      distance: 4.3,
-      imageUrl:
-          "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Boxing", "MMA", "Kickboxing"],
-      openingHours: "7:00 AM - 10:00 PM",
-      ratePerHour: "Rs. 1,500",
-    ),
-    VenueModel(
-      id: '12',
-      title: "GRAND SLAM CRICKET ACADEMY",
-      location: "123 Boundary Road, Galle 80000",
-      rating: 4.88,
-      distance: 7.8,
-      imageUrl:
-          "https://images.unsplash.com/photo-1531415074968-036ba1b575da?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Cricket", "Baseball", "Rugby", "Football"],
-      openingHours: "6:00 AM - 9:00 PM",
-      ratePerHour: "Rs. 2,500",
-    ),
-    VenueModel(
-      id: '13',
-      title: "KANDY HILLS ROCK CLIMBING",
-      location: "Rock Face Avenue, Kandy 20100",
-      rating: 4.70,
-      distance: 9.2,
-      imageUrl:
-          "https://images.unsplash.com/photo-1522163182402-834f871fd851?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-      sports: ["Rock Climbing", "Bouldering"],
-      openingHours: "7:00 AM - 5:00 PM",
-      ratePerHour: "Rs. 2,000",
-    ),
-  ];
+  // List of all venues - loaded from DataService
+  List<venue_models.VenueModel> _allVenues = [];
 
   bool _isLoading = true;
 
@@ -275,8 +120,8 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
       duration: const Duration(milliseconds: 300),
     );
 
-    // Sort venues by distance (nearest first)
-    _allVenues.sort((a, b) => a.distance.compareTo(b.distance));
+    // Load venues from DataService
+    _loadVenues();
 
     // Load search history
     _loadSearchHistory();
@@ -301,6 +146,28 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
     _searchFocusNode.dispose();
     _animationController.dispose();
     super.dispose();
+  }
+
+  // Load venues from DataService
+  Future<void> _loadVenues() async {
+    try {
+      final venues = await DataService.loadVenues();
+      if (mounted) {
+        setState(() {
+          _allVenues = venues;
+          // Sort venues by distance (nearest first)
+          _allVenues.sort((a, b) => a.distance.compareTo(b.distance));
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading venues: $e');
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   // Load search history (placeholder - implement SharedPreferences later)
@@ -385,13 +252,13 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   }
 
   // Filtered venues based on search and active filter
-  List<VenueModel> get _filteredVenues {
-    List<VenueModel> filtered = _allVenues;
+  List<venue_models.VenueModel> get _filteredVenues {
+    List<venue_models.VenueModel> filtered = _allVenues;
 
     // Apply search filter
     if (_searchQuery.isNotEmpty) {
       filtered = filtered.where((venue) {
-        final titleMatches = venue.title.toLowerCase().contains(_searchQuery);
+        final titleMatches = venue.name.toLowerCase().contains(_searchQuery);
         final locationMatches = venue.location.toLowerCase().contains(
           _searchQuery,
         );
@@ -723,10 +590,10 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   }
 
   // MINIMAL & MODERN VENUE CARD DESIGN
-  Widget _buildVenueCard(VenueModel venue, bool isFavorite) {
+  Widget _buildVenueCard(venue_models.VenueModel venue, bool isFavorite) {
     final Map<String, dynamic> courtData = {
       'id': venue.id,
-      'name': venue.title,
+      'name': venue.name,
       'type': venue.sports.isNotEmpty
           ? '${venue.sports.first} Court'
           : 'Sports Court',
@@ -745,9 +612,9 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
           : 'Closes at 11:00 PM',
       'phone': '+94 77 123 4567',
       'email':
-          'info@${venue.title.toLowerCase().replaceAll(' ', '').replaceAll(RegExp(r'[^\w]'), '')}.lk',
+          'info@${venue.name.toLowerCase().replaceAll(' ', '').replaceAll(RegExp(r'[^\w]'), '')}.lk',
       'website':
-          'www.${venue.title.toLowerCase().replaceAll(' ', '').replaceAll(RegExp(r'[^\w]'), '')}.lk',
+          'www.${venue.name.toLowerCase().replaceAll(' ', '').replaceAll(RegExp(r'[^\w]'), '')}.lk',
       'description':
           'Premium ${venue.sports.join(', ')} facility with state-of-the-art equipment and professional-grade surfaces.',
       'images': [
@@ -815,7 +682,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                       topRight: Radius.circular(16),
                     ),
                     child: Image.network(
-                      venue.imageUrl,
+                      venue.imageUrl ?? 'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
                       width: double.infinity,
                       height: 160,
                       fit: BoxFit.cover,
@@ -895,7 +762,7 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
                 children: [
                   // Venue name
                   Text(
-                    venue.title,
+                    venue.name,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -1163,27 +1030,5 @@ class _NearByVenueScreenState extends State<NearByVenueScreen>
   }
 }
 
-// Venue Model - Enhanced to match first file data structure
-class VenueModel {
-  final String id;
-  final String title;
-  final String location;
-  final double rating;
-  final String imageUrl;
-  final List<String> sports;
-  final double distance;
-  final String openingHours;
-  final String ratePerHour;
-
-  VenueModel({
-    required this.id,
-    required this.title,
-    required this.location,
-    required this.rating,
-    required this.imageUrl,
-    required this.sports,
-    required this.distance,
-    required this.openingHours,
-    required this.ratePerHour,
-  });
-}
+// Venue Model - Now using shared venue models
+// The VenueModel class is now imported from models/venue_models.dart

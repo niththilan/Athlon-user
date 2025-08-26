@@ -3,47 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'footer.dart';
-import 'nearbyVenues.dart';
 import 'widgets/football_spinner.dart';
-
-// Data models (matching homepage structure)
-class Facility {
-  final String id;
-  final String name;
-  final String location;
-  final int pendingBookings;
-  final int todayBookings;
-  final int totalCourts;
-  final double monthlyRevenue;
-  final List<Court> courts;
-
-  Facility({
-    required this.id,
-    required this.name,
-    required this.location,
-    required this.pendingBookings,
-    required this.todayBookings,
-    required this.totalCourts,
-    required this.monthlyRevenue,
-    required this.courts,
-  });
-}
-
-class Court {
-  final String id;
-  final String name;
-  final String type;
-  final bool isAvailable;
-  final double hourlyRate;
-
-  Court({
-    required this.id,
-    required this.name,
-    required this.type,
-    required this.isAvailable,
-    required this.hourlyRate,
-  });
-}
+import 'models/venue_models.dart' as venue_models;
 
 // TimeSlot class for venue opening hours
 class TimeSlot {
@@ -147,7 +108,7 @@ class SlotsBookingApp extends StatelessWidget {
 
 class SlotsPage extends StatefulWidget {
   final String? selectedCourtId;
-  final VenueModel? selectedVenue;
+  final venue_models.VenueModel? selectedVenue;
   final Map<String, dynamic>? courtData;
 
   const SlotsPage({
@@ -173,76 +134,86 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       5; // This will place the current date in the middle of the visible dates
 
   // Mock courts data instead of loading from Supabase
-  List<Court> courts = [
-    Court(
+  List<venue_models.Court> courts = [
+    venue_models.Court(
       id: 'court_1',
+      facilityId: 'venue_1',
       name: 'Court A',
       type: 'Futsal',
-      isAvailable: true,
       hourlyRate: 2500.0,
+      isActive: true,
     ),
-    Court(
+    venue_models.Court(
       id: 'court_2',
+      facilityId: 'venue_1',
       name: 'Court B',
       type: 'Cricket',
-      isAvailable: true,
       hourlyRate: 3000.0,
+      isActive: true,
     ),
-    Court(
+    venue_models.Court(
       id: 'court_3',
+      facilityId: 'venue_1',
       name: 'Court C',
       type: 'Basketball',
-      isAvailable: true,
       hourlyRate: 2000.0,
+      isActive: true,
     ),
-    Court(
+    venue_models.Court(
       id: 'court_4',
+      facilityId: 'venue_1',
       name: 'Court D',
       type: 'Badminton',
-      isAvailable: true,
       hourlyRate: 1800.0,
+      isActive: true,
     ),
-    Court(
+    venue_models.Court(
       id: 'court_5',
+      facilityId: 'venue_1',
       name: 'Court E',
       type: 'Tennis',
-      isAvailable: true,
       hourlyRate: 2200.0,
+      isActive: true,
     ),
-    Court(
+    venue_models.Court(
       id: 'court_6',
+      facilityId: 'venue_1',
       name: 'Pool A',
       type: 'Swimming',
-      isAvailable: true,
       hourlyRate: 1500.0,
+      isActive: true,
     ),
-    Court(
+    venue_models.Court(
       id: 'court_7',
+      facilityId: 'venue_1',
       name: 'Court F',
       type: 'Squash',
-      isAvailable: true,
       hourlyRate: 2000.0,
+      isActive: true,
     ),
-    Court(
+    venue_models.Court(
       id: 'court_8',
+      facilityId: 'venue_1',
       name: 'Court G',
       type: 'Table Tennis',
-      isAvailable: true,
       hourlyRate: 1200.0,
+      isActive: true,
     ),
-    Court(
+    venue_models.Court(
       id: 'court_9',
+      facilityId: 'venue_1',
       name: 'Court H',
       type: 'Volleyball',
-      isAvailable: true,
       hourlyRate: 1800.0,
+      isActive: true,
     ),
-    Court(
+    venue_models.Court(
       id: 'court_10',
+      facilityId: 'venue_1',
       name: 'Court I',
       type: 'Boxing',
-      isAvailable: true,
       hourlyRate: 2000.0,
+      isActive: true,
     ),
   ];
 
@@ -250,7 +221,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
 
   int selectedCourtIndex = 0;
 
-  Court? get selectedCourt {
+  venue_models.Court? get selectedCourt {
     // Get courts for the currently selected sport
     final courtsForSport = _getCourtsForSelectedSport();
 
@@ -263,7 +234,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   }
 
   // Helper method to get courts for the currently selected sport
-  List<Court> _getCourtsForSelectedSport() {
+  List<venue_models.Court> _getCourtsForSelectedSport() {
     if (selectedSport == null) return courts;
 
     return courts.where((court) => court.type == selectedSport).toList();
@@ -4421,7 +4392,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
 
     // Get unique sport types from available courts
     final availableSportTypes = courts
-        .where((court) => court.isAvailable)
+        .where((court) => court.isActive)
         .map((court) => court.type)
         .toSet()
         .toList();
