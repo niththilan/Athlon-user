@@ -51,6 +51,7 @@ class CustomerService {
       final user = SupabaseService.currentUser;
       if (user == null) throw Exception('User not authenticated');
 
+      // Create customer profile in customers table
       final customerData = {
         'id': user.id,
         'name': name,
@@ -63,13 +64,28 @@ class CustomerService {
         'updated_at': DateTime.now().toIso8601String(),
       };
 
-      final response = await _supabase
+      final customerResponse = await _supabase
           .from('customers')
           .insert(customerData)
           .select()
           .single();
 
-      return CustomerProfile.fromSupabase(response);
+      // Also create profile in profiles table with user_type = 'customer'
+      final profileData = {
+        'id': user.id,
+        'name': name,
+        'phone': phone,
+        'user_type': 'customer',
+        'location': location,
+        'created_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toIso8601String(),
+      };
+
+      await _supabase
+          .from('profiles')
+          .insert(profileData);
+
+      return CustomerProfile.fromSupabase(customerResponse);
     } catch (e) {
       print('Error creating customer profile: $e');
       rethrow;

@@ -3,46 +3,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-// import '../services/supabase_service.dart'; // Uncomment when you have Supabase service
-// import 'homepage.dart'; // Import your homepage
-
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFFF5F6FA),
-        fontFamily: 'Poppins',
-        colorScheme: ColorScheme.light(
-          primary: const Color(0xFF1B2C4F),
-          secondary: const Color(0xFF6B8AFE),
-          surface: Colors.white,
-        ),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: const Color(0xFF1B2C4F),
-            elevation: 0,
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-        ),
-      ),
-      home: const LoginPage(),
-    );
-  }
-}
+import 'services/customer_service.dart';
+import 'home.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -68,8 +30,7 @@ class _LoginPageState extends State<LoginPage>
   final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _facilityNameController = TextEditingController(); // For facility name
-  final _locationController = TextEditingController(); // For location
+  final _locationController = TextEditingController(); // For user location
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -94,7 +55,6 @@ class _LoginPageState extends State<LoginPage>
     _confirmPasswordController.dispose();
     _nameController.dispose();
     _phoneController.dispose();
-    _facilityNameController.dispose();
     _locationController.dispose();
     _animationController.dispose();
     super.dispose();
@@ -113,7 +73,6 @@ class _LoginPageState extends State<LoginPage>
         _confirmPasswordController.clear();
         _nameController.clear();
         _phoneController.clear();
-        _facilityNameController.clear();
         _locationController.clear();
       }
     });
@@ -202,8 +161,7 @@ class _LoginPageState extends State<LoginPage>
                     }
 
                     try {
-                      // TO DO: Implement password reset logic with Supabase
-                      // await SupabaseService.client.auth.resetPasswordForEmail(email);
+                      await CustomerService.resetPassword(email);
 
                       // Close the modal
                       Navigator.pop(context);
@@ -212,7 +170,7 @@ class _LoginPageState extends State<LoginPage>
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            'Password reset link sent to $email (mock)',
+                            'Password reset link sent to $email',
                           ),
                           backgroundColor: Colors.green,
                           duration: const Duration(seconds: 3),
@@ -278,24 +236,28 @@ class _LoginPageState extends State<LoginPage>
                 height: 300,
                 child: SingleChildScrollView(
                   child: Text(
-                    'By creating an account as a Complex Owner, you agree to our Terms of Service and Privacy Policy. '
-                    'These terms govern your use of our sports complex management platform.\n\n'
+                    'By creating an account as a Customer, you agree to our Terms of Service and Privacy Policy. '
+                    'These terms govern your use of our sports venue booking platform.\n\n'
                     '1. ACCOUNT REQUIREMENTS\n'
-                    '• You must be the legal owner or authorized representative of the sports facility\n'
-                    '• All facility and contact information must be accurate and up-to-date\n'
-                    '• You are responsible for maintaining the security of your account credentials\n\n'
+                    '• You must provide accurate personal information during registration\n'
+                    '• You are responsible for maintaining the security of your account credentials\n'
+                    '• You must be 18 years or older to create an account\n\n'
                     '2. PLATFORM USAGE\n'
-                    '• Use the platform solely for legitimate sports complex management purposes\n'
-                    '• Ensure all bookings and transactions comply with local laws and regulations\n'
-                    '• Maintain appropriate insurance coverage for your facility\n\n'
-                    '3. DATA AND PRIVACY\n'
-                    '• We collect facility data, booking information, and customer details to provide our services\n'
-                    '• Customer payment information is processed securely through certified payment processors\n'
-                    '• You maintain ownership of your facility data and can export it at any time\n\n'
-                    '4. RESPONSIBILITIES\n'
-                    '• Ensure your facility meets all safety standards and regulations\n'
-                    '• Handle customer disputes and refunds according to your published policies\n'
-                    '• Notify us immediately of any security breaches or unauthorized access\n\n'
+                    '• Use the platform solely for legitimate sports venue booking purposes\n'
+                    '• Make bookings in good faith and honor your reservations\n'
+                    '• Follow all venue rules and regulations during your visit\n\n'
+                    '3. BOOKINGS AND PAYMENTS\n'
+                    '• All bookings are subject to venue availability and confirmation\n'
+                    '• Payment must be completed at the time of booking\n'
+                    '• Cancellation policies vary by venue and are displayed during booking\n\n'
+                    '4. DATA AND PRIVACY\n'
+                    '• We collect your personal information to provide booking services\n'
+                    '• Your payment information is processed securely through certified processors\n'
+                    '• You can update or delete your account information at any time\n\n'
+                    '5. USER RESPONSIBILITIES\n'
+                    '• Arrive on time for your bookings\n'
+                    '• Treat venue facilities and staff with respect\n'
+                    '• Report any issues or damages immediately to venue staff\n\n'
                     'By proceeding, you acknowledge that you have read and agree to these terms.',
                     style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
@@ -356,62 +318,44 @@ class _LoginPageState extends State<LoginPage>
 
       try {
         if (_isLogin) {
-          // TO DO: Login with Supabase
-          // final response = await SupabaseService.signIn(
-          //   email: _emailController.text.trim(),
-          //   password: _passwordController.text,
-          // );
+          // Login with Supabase
+          await CustomerService.signIn(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
 
           // Close loading dialog
           if (mounted) {
             Navigator.of(context).pop();
           }
 
-          // Mock successful login
+          // Navigate to home screen
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Login successful! (mock)'),
-                backgroundColor: Colors.green,
-                duration: Duration(seconds: 2),
-              ),
-            );
-
-            // Navigate to appropriate homepage
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const FacilityOwnerHomePage(),
+                builder: (context) => const HomeScreen(),
               ),
             );
           }
         } else {
-          // TO DO: Sign up with Supabase
-          // final response = await SupabaseService.signUp(
-          //   email: _emailController.text.trim(),
-          //   password: _passwordController.text,
-          // );
+          // Sign up with Supabase as customer
+          await CustomerService.signUp(
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+            name: _nameController.text.trim(),
+            phone: _phoneController.text.trim(),
+          );
 
-          // Mock signup success
+          // Close loading dialog
           if (mounted) {
-            Navigator.of(context).pop(); // Close loading dialog
+            Navigator.of(context).pop();
+          }
 
-            // For facility owners, create profile
-            // TO DO: Implement profile creation with Supabase
-            // await SupabaseService.createUserProfile(
-            //   userId: response.user!.id,
-            //   name: _nameController.text.trim(),
-            //   phone: _phoneController.text.trim(),
-            //   facilityName: _facilityNameController.text.trim(),
-            //   userType: 'vendor',
-            //   location: _locationController.text.trim().isNotEmpty
-            //       ? _locationController.text.trim()
-            //       : null,
-            // );
-
+          if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text(
-                  'Account and profile created successfully! Please check your email to verify your account. (mock)',
+                  'Account created successfully! Please check your email to verify your account.',
                 ),
                 backgroundColor: Colors.green,
                 duration: Duration(seconds: 4),
@@ -427,7 +371,6 @@ class _LoginPageState extends State<LoginPage>
               _confirmPasswordController.clear();
               _nameController.clear();
               _phoneController.clear();
-              _facilityNameController.clear();
               _locationController.clear();
               _agreeToTerms = false;
             });
@@ -500,7 +443,7 @@ class _LoginPageState extends State<LoginPage>
                       Text(
                         _isLogin
                             ? 'Sign in to your account'
-                            : 'Register as a User',
+                            : 'Register as a Customer',
                         style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 14,
@@ -1027,18 +970,6 @@ class _LoginPageState extends State<LoginPage>
         icon: Icon(icon, color: color, size: size),
         onPressed: onPressed,
       ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
-      body: const Center(child: Text('Welcome to the Home Screen!')),
     );
   }
 }

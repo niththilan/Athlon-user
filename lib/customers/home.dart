@@ -6,11 +6,13 @@ import 'widgets/football_spinner.dart';
 import 'availableSports.dart'; // Add this import
 import 'courtDetails.dart'; // Add this import
 import 'search.dart'; // Add search import
+import 'UserLogin.dart'; // Add login import
 
 import 'footer.dart';
 import 'nearbyVenues.dart' as nearby_venues; // Import the nearbyVenues file
 import 'services/navigation_service.dart';
 import 'services/data_service.dart';
+import 'services/customer_service.dart'; // Add customer service import
 import 'models/venue_models.dart' as venue_models;
 
 class HomeScreen extends StatefulWidget {
@@ -171,6 +173,67 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _handleLogout() async {
+    try {
+      // Show confirmation dialog
+      final shouldLogout = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Logout', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldLogout == true) {
+        // Show loading
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const Center(
+            child: CircularProgressIndicator(color: Color(0xFF1B2C4F)),
+          ),
+        );
+
+        // Logout from Supabase
+        await CustomerService.signOut();
+
+        // Close loading dialog
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
+
+        // Navigate back to login screen
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const LoginPage()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      // Close loading dialog if open
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error logging out: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   Widget _buildSearchBar() {
     return GestureDetector(
       onTap: () {
@@ -253,15 +316,42 @@ class _HomeScreenState extends State<HomeScreen> {
                   _navigateToNotifications(), // Match facility owner's behavior
               tooltip: 'Notifications',
             ),
-            // 2. Then replace the profile IconButton in your AppBar actions with this:
-            IconButton(
+            // Profile dropdown menu with logout option
+            PopupMenuButton<String>(
+              onSelected: (value) async {
+                if (value == 'profile') {
+                  _navigateToProfile();
+                } else if (value == 'logout') {
+                  await _handleLogout();
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'profile',
+                  child: Row(
+                    children: [
+                      Icon(Icons.person_outline, color: Color(0xFF1B2C4F)),
+                      SizedBox(width: 8),
+                      Text('Profile'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'logout',
+                  child: Row(
+                    children: [
+                      Icon(Icons.logout, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Logout', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+              ],
               icon: const Icon(
                 Icons.person_outline,
                 color: Color(0xFF1B2C4F),
                 size: 28,
               ),
-              onPressed: () => _navigateToProfile(),
-              tooltip: 'Profile',
             ),
             const SizedBox(width: 25),
           ],

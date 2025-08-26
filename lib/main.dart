@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'customers/home.dart';
+import 'customers/home.dart' as home;
 import 'customers/loading_screen.dart';
+import 'customers/UserLogin.dart';
 import 'customers/services/navigation_service.dart';
 import 'customers/services/supabase_service.dart';
 import 'customers/services/auth_service.dart';
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-/// App initializer that shows loading screen then navigates to home
+/// App initializer that shows loading screen then navigates based on auth state
 class AppInitializer extends StatefulWidget {
   const AppInitializer({super.key});
 
@@ -72,35 +73,43 @@ class _AppInitializerState extends State<AppInitializer> {
   }
 
   Future<void> _initializeApp() async {
-    // Simulate sophisticated loading sequence from vendor app
-
-    // 1. Supabase initialization (500ms-1s)
+    // Simulate loading sequence
     await Future.delayed(const Duration(milliseconds: 800));
 
-    // 2. Auth state check (100-300ms)
+    // Auth state check
     await Future.delayed(const Duration(milliseconds: 200));
 
-    // 3. Profile fetch - network dependent (500ms-2s)
-    await Future.delayed(const Duration(milliseconds: 1200));
+    // Check if user is authenticated
+    final authService = AuthService();
+    final isAuthenticated = authService.isAuthenticated;
 
-    // 4. Provider initialization (50-100ms)
-    await Future.delayed(const Duration(milliseconds: 75));
-
-    // Total realistic loading time: ~2.3 seconds (matching vendor app)
-
+    // Navigate based on authentication status
     if (mounted && !_isNavigated) {
       _isNavigated = true;
 
-      // Use Navigator.of(context).pushAndRemoveUntil to clear the stack
-      Navigator.of(context).pushAndRemoveUntil(
-        PageRouteBuilder(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              const HomeScreen(),
-          transitionDuration: Duration.zero,
-          reverseTransitionDuration: Duration.zero,
-        ),
-        (route) => false, // Remove all routes
-      );
+      if (isAuthenticated) {
+        // User is logged in, go to home
+        Navigator.of(context).pushAndRemoveUntil(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const home.HomeScreen(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+          (route) => false,
+        );
+      } else {
+        // User is not logged in, go to login
+        Navigator.of(context).pushAndRemoveUntil(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                const LoginPage(),
+            transitionDuration: Duration.zero,
+            reverseTransitionDuration: Duration.zero,
+          ),
+          (route) => false,
+        );
+      }
     }
   }
 
