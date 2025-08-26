@@ -316,42 +316,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   _navigateToNotifications(), // Match facility owner's behavior
               tooltip: 'Notifications',
             ),
-            // Profile dropdown menu with logout option
-            PopupMenuButton<String>(
-              onSelected: (value) async {
-                if (value == 'profile') {
-                  _navigateToProfile();
-                } else if (value == 'logout') {
-                  await _handleLogout();
-                }
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'profile',
-                  child: Row(
-                    children: [
-                      Icon(Icons.person_outline, color: Color(0xFF1B2C4F)),
-                      SizedBox(width: 8),
-                      Text('Profile'),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'logout',
-                  child: Row(
-                    children: [
-                      Icon(Icons.logout, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Logout', style: TextStyle(color: Colors.red)),
-                    ],
-                  ),
-                ),
-              ],
+            // Profile icon - direct navigation to profile
+            IconButton(
               icon: const Icon(
                 Icons.person_outline,
                 color: Color(0xFF1B2C4F),
                 size: 28,
               ),
+              onPressed: () => _navigateToProfile(),
+              tooltip: 'Profile',
             ),
             const SizedBox(width: 25),
           ],
