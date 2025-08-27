@@ -434,20 +434,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget _buildEmptyState(String message, IconData icon) {
     return Container(
       padding: const EdgeInsets.all(20),
-      child: Column(
-        children: [
-          Icon(icon, size: 48, color: Colors.grey[400]),
-          const SizedBox(height: 8),
-          Text(
-            message,
-            style: TextStyle(
-              color: Colors.grey[500],
-              fontSize: 14,
-              fontStyle: FontStyle.italic,
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(icon, size: 48, color: Colors.grey[400]),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: TextStyle(
+                color: Colors.grey[500],
+                fontSize: 14,
+                fontStyle: FontStyle.italic,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -486,7 +490,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 12,
                   fontWeight: FontWeight.w500,
                   color: textColor ?? textDarkColor,
                 ),
@@ -1788,58 +1792,57 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Container(
-                padding: const EdgeInsets.all(16), // Reduced padding
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Recent Activities",
-                          style: TextStyle(
-                            fontSize: 16, // Reduced font size
-                            fontWeight: FontWeight.w600,
-                            color: textDarkColor,
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isRecentActivitiesExpanded = !_isRecentActivitiesExpanded;
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16), // Reduced padding
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.08),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Recent Activities",
+                            style: TextStyle(
+                              fontSize: 16, // Reduced font size
+                              fontWeight: FontWeight.w600,
+                              color: textDarkColor,
+                            ),
                           ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isRecentActivitiesExpanded =
-                                  !_isRecentActivitiesExpanded;
-                            });
-                          },
-                          child: Icon(
+                          Icon(
                             _isRecentActivitiesExpanded
                                 ? Icons.keyboard_arrow_up
                                 : Icons.keyboard_arrow_down,
                             color: Colors.grey[600],
                             size: 24,
                           ),
+                        ],
+                      ),
+                      if (_isRecentActivitiesExpanded) ...[
+                        const SizedBox(height: 16),
+                        _buildEmptyState(
+                          "No recent activities found",
+                          Icons.history,
                         ),
                       ],
-                    ),
-                    if (_isRecentActivitiesExpanded) ...[
-                      const SizedBox(height: 16),
-                      _buildEmptyState(
-                        "No recent activities found",
-                        Icons.history,
-                      ),
                     ],
-                  ],
+                  ),
                 ),
               ),
             ),
