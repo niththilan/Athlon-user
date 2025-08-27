@@ -28,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _selectedLocation = "Current Location";
   List<venue_models.VenueModel> _venues = [];
   bool _isLoadingVenues = false;
+  String _userName = "User"; // Add user name tracking
 
   final TextEditingController _searchController = TextEditingController();
   final List<String> _pastSearchLocations = [
@@ -53,8 +54,9 @@ class _HomeScreenState extends State<HomeScreen> {
         _isLoading = false;
       });
       
-      // Load venues in background
+      // Load venues and user data in background
       _loadVenues();
+      _loadUserName();
     }
   }
 
@@ -83,6 +85,21 @@ class _HomeScreenState extends State<HomeScreen> {
           _venues = [];
         });
       }
+    }
+  }
+
+  // Add method to load user name
+  Future<void> _loadUserName() async {
+    try {
+      final customerProfile = await CustomerService.getCurrentCustomerProfile();
+      if (mounted && customerProfile != null && customerProfile.name.isNotEmpty) {
+        setState(() {
+          _userName = customerProfile.name.split(' ').first; // Get first name only
+        });
+      }
+    } catch (e) {
+      // If loading fails, keep default "User"
+      print('Error loading user name: $e');
     }
   }
 
@@ -160,8 +177,14 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.pop(context);
       }
 
-      // Navigate to profile screen
-      NavigationService.pushInstant(const UserProfileScreen());
+      // Navigate to profile screen and wait for result
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const UserProfileScreen()),
+      );
+
+      // Refresh user name when returning from profile
+      _loadUserName();
     } catch (e) {
       // Handle any errors
       if (Navigator.canPop(context)) {
@@ -169,7 +192,13 @@ class _HomeScreenState extends State<HomeScreen> {
       }
 
       // Still navigate to profile screen
-      NavigationService.pushInstant(const UserProfileScreen());
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const UserProfileScreen()),
+      );
+
+      // Refresh user name when returning from profile
+      _loadUserName();
     }
   }
 
@@ -342,7 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0),
                   child: Text(
-                    "Welcome back, Sam!",
+                    "Welcome back, $_userName!",
                     style: textTheme.titleMedium?.copyWith(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
