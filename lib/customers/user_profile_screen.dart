@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../models/customer_models.dart';
-import '../services/auth_service.dart';
-import '../services/customer_service.dart';
-import '../widgets/football_spinner.dart';
-import '../settings.dart';
+import 'models/customer_models.dart';
+import 'services/auth_service.dart';
+import 'services/customer_service.dart';
+import 'widgets/football_spinner.dart';
+import 'settings.dart';
 
 // Constants for consistent styling - matching vendor screen
 const Color primaryColor = Color(0xFF1B2C4F);
@@ -38,7 +38,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final AuthService _authService = AuthService();
   CustomerProfile? _customerProfile;
   bool _isLoading = true;
-  int _unreadNotifications = 0;
 
   bool _isRecentActivitiesExpanded = false;
   bool _isFavoriteVenuesExpanded = false;
@@ -88,7 +87,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     try {
       if (_authService.isAuthenticated) {
         _customerProfile = await CustomerService.getCurrentCustomerProfile();
-        _unreadNotifications = await CustomerService.getUnreadNotificationCount();
       }
     } catch (e) {
       print('Error loading user data: $e');
@@ -700,42 +698,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 tooltip: 'Edit Profile',
               ),
               const SizedBox(width: 16),
-              if (_authService.isAuthenticated)
-                Stack(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.notifications_outlined, color: Colors.white),
-                      onPressed: () {
-                        // Navigate to notifications screen
-                      },
-                    ),
-                    if (_unreadNotifications > 0)
-                      Positioned(
-                        right: 8,
-                        top: 8,
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 16,
-                            minHeight: 16,
-                          ),
-                          child: Text(
-                            _unreadNotifications > 99 ? '99+' : '$_unreadNotifications',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
             ],
           ),
 
