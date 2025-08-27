@@ -177,10 +177,15 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.pop(context);
       }
 
-      // Navigate to profile screen and wait for result
+      // Navigate to profile screen with no animation
       await Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const UserProfileScreen()),
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const UserProfileScreen(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
       );
 
       // Refresh user name when returning from profile
@@ -191,10 +196,15 @@ class _HomeScreenState extends State<HomeScreen> {
         Navigator.pop(context);
       }
 
-      // Still navigate to profile screen
+      // Still navigate to profile screen with no animation
       await Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const UserProfileScreen()),
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+              const UserProfileScreen(),
+          transitionDuration: Duration.zero,
+          reverseTransitionDuration: Duration.zero,
+        ),
       );
 
       // Refresh user name when returning from profile

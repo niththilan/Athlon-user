@@ -1418,7 +1418,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           width: double.infinity,
           height: double.infinity,
           color: Colors.white,
-          child: const Center(child: FootballSpinner(size: 60.0)),
+          //child: const Center(child: FootballSpinner(size: 60.0)),
         ),
       ),
     );
