@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../customers/footer.dart';
 import 'home.dart' as home;
 import 'messages.dart';
+import 'widgets/football_spinner.dart'; // Add this import
 
 /// Simplified History Screen with user-friendly design
 class HistoryScreen extends StatefulWidget {
@@ -16,7 +17,6 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class HistoryScreenState extends State<HistoryScreen> {
-  // ignore: unused_field
   bool _isLoading = true;
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
@@ -47,11 +47,28 @@ class HistoryScreenState extends State<HistoryScreen> {
   void initState() {
     super.initState();
     _initializeDateList();
-    _initializeMockData(); // Add mock data initialization
     _scrollController.addListener(_onScroll);
+    
+    // Initialize data immediately without delay
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeData();
+    });
+  }
 
-    // Set loading to false since we're using mock data
-    _isLoading = false;
+  // Match home.dart initialization pattern exactly
+  Future<void> _initializeData() async {
+    // Quick initialization for history screen (200ms) - same as home
+    await Future.delayed(const Duration(milliseconds: 200));
+    
+    if (mounted) {
+      // Load mock data first
+      _initializeMockData();
+      
+      // Then set loading to false
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _initializeDateList() {
@@ -63,7 +80,7 @@ class HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  // Add mock data for player history
+  // Move mock data initialization to be called before loading completes
   void _initializeMockData() {
     final now = DateTime.now();
     bookingHistory = [
@@ -348,9 +365,12 @@ class HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // if (_isLoading) {
-    //   return const Scaffold(body: Center(child: FootballLoadingWidget()));
-    // }
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Color(0xFFF8F9FA), // Match the background color
+        body: Center(child: FootballLoadingWidget())
+      );
+    }
 
     return Scaffold(
       backgroundColor: backgroundColor,
