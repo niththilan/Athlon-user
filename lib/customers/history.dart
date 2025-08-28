@@ -24,6 +24,7 @@ class HistoryScreenState extends State<HistoryScreen> {
   // Date scroll and calendar state
   DateTime selectedDate = DateTime.now();
   bool showCalendar = false;
+  bool showAllBookings = false; // Add this new state variable
   late List<DateTime> dateList;
   int currentDateStartIndex = 5; // Place the current date in the middle
 
@@ -415,7 +416,10 @@ class HistoryScreenState extends State<HistoryScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 16),
-                _buildCalendarContent(),
+                // Show calendar content only when not in "view all" mode
+                if (!showAllBookings) _buildCalendarContent(),
+                // Show just the "View All" button when in "view all" mode
+                if (showAllBookings) _buildViewAllButton(),
                 const SizedBox(height: 16),
                 _buildHistoryContent(),
               ],
@@ -442,6 +446,10 @@ class HistoryScreenState extends State<HistoryScreen> {
   }
 
   List<BookingHistoryItem> get filteredBookings {
+    if (showAllBookings) {
+      // Show all bookings sorted by date (newest first)
+      return bookingHistory..sort((a, b) => b.date.compareTo(a.date));
+    }
     return bookingHistory.where((booking) {
       return _isSameDay(booking.date, selectedDate);
     }).toList();
@@ -449,18 +457,96 @@ class HistoryScreenState extends State<HistoryScreen> {
 
   Widget _buildBookingList() {
     final filtered = filteredBookings;
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.all(16),
-      itemCount: filtered.length,
-      itemBuilder: (context, index) {
-        return _buildSimpleBookingCard(filtered[index]);
-      },
+    
+    return Column(
+      children: [
+        // Show selected date info when not in "view all" mode
+        if (!showAllBookings) ...[
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: primaryColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.calendar_today, color: primaryColor, size: 16),
+                SizedBox(width: 8),
+                Text(
+                  'Bookings for ${DateFormat('EEEE, MMM d, yyyy').format(selectedDate)}',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: primaryColor,
+                  ),
+                ),
+                Spacer(),
+                Text(
+                  '${filtered.length} booking${filtered.length != 1 ? 's' : ''}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 16),
+        ],
+        
+        // Show total count when in "view all" mode
+        if (showAllBookings) ...[
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: successColor.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.list_alt, color: successColor, size: 16),
+                SizedBox(width: 8),
+                Text(
+                  'All Bookings',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: successColor,
+                  ),
+                ),
+                Spacer(),
+                Text(
+                  '${filtered.length} total booking${filtered.length != 1 ? 's' : ''}',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: 16),
+        ],
+
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          itemCount: filtered.length,
+          itemBuilder: (context, index) {
+            return _buildEnhancedBookingCard(filtered[index]);
+          },
+        ),
+      ],
     );
   }
 
-  Widget _buildSimpleBookingCard(BookingHistoryItem booking) {
+  Widget _buildEnhancedBookingCard(BookingHistoryItem booking) {
+    final isToday = _isSameDay(booking.date, DateTime.now());
+    final isFuture = booking.date.isAfter(DateTime.now());
+    
     return Container(
       margin: EdgeInsets.only(bottom: 12),
       padding: EdgeInsets.all(16),
@@ -469,116 +555,148 @@ class HistoryScreenState extends State<HistoryScreen> {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.grey.shade200, width: 1),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
-          // Left: Court details and facility name
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  booking.courtName,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: textPrimary,
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  booking.facilityName,
-                  style: TextStyle(fontSize: 14, color: textSecondary),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  '${DateFormat('MMM d').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
-                  style: TextStyle(fontSize: 13, color: textSecondary),
-                ),
-              ],
-            ),
-          ),
-          // Right: Price and action buttons
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'LKR ${booking.price.toStringAsFixed(0)}',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: primaryColor,
+              // Left: Court details and facility name
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      booking.courtName,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      booking.facilityName,
+                      style: TextStyle(fontSize: 14, color: textSecondary),
+                    ),
+                    SizedBox(height: 4),
+                    // Enhanced date/time display for "view all" mode
+                    if (showAllBookings) ...[
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: isToday 
+                            ? primaryColor.withOpacity(0.1)
+                            : isFuture 
+                              ? successColor.withOpacity(0.1)
+                              : Colors.grey.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          isToday 
+                            ? 'Today • ${booking.startTime} - ${booking.endTime}'
+                            : '${DateFormat('MMM d, yyyy').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
+                          style: TextStyle(
+                            fontSize: 12, 
+                            color: isToday 
+                              ? primaryColor
+                              : isFuture 
+                                ? successColor
+                                : textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ] else ...[
+                      Text(
+                        '${DateFormat('MMM d').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
+                        style: TextStyle(fontSize: 13, color: textSecondary),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              SizedBox(height: 8),
-              Row(
-                mainAxisSize: MainAxisSize.min,
+              // Right: Price and action buttons
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  // Call button
-                  SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: GestureDetector(
-                      onTap: () => _makeCall(booking),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: callColor,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.phone,
-                            size: 20,
-                            color: Colors.white,
+                  Text(
+                    'LKR ${booking.price.toStringAsFixed(0)}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Call button
+                      SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: GestureDetector(
+                          onTap: () => _makeCall(booking),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: callColor,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.phone,
+                                size: 20,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  SizedBox(width: 8),
-                  // Details button
-                  SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: GestureDetector(
-                      onTap: () => _showBookingDetails(booking),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: primaryColor,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Icon(
-                            Icons.info_outline,
-                            size: 20,
-                            color: Colors.white,
+                      SizedBox(width: 8),
+                      // Details button
+                      SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: GestureDetector(
+                          onTap: () => _showBookingDetails(booking),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: primaryColor,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.info_outline,
+                                size: 20,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
+                  // Status badge
+                  if (booking.status.toLowerCase() != 'confirmed') ...[
+                    SizedBox(height: 6),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: _getStatusColor(booking.status),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        booking.status.toUpperCase(),
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
-              // Status box (right, below price, aligned with court details/time)
-              if (booking.status.toLowerCase() != 'confirmed' &&
-                  booking.status.toLowerCase() != 'completed' &&
-                  booking.status.toLowerCase() != 'cancelled')
-                Container(
-                  margin: EdgeInsets.only(top: 6),
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: _getStatusColor(booking.status),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    booking.status.toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
             ],
           ),
         ],
@@ -1031,9 +1149,11 @@ class HistoryScreenState extends State<HistoryScreen> {
             ),
             SizedBox(height: 24),
             Text(
-              bookingHistory.isEmpty
+              showAllBookings
                   ? 'No bookings yet'
-                  : 'No bookings for $dateText',
+                  : bookingHistory.isEmpty
+                      ? 'No bookings yet'
+                      : 'No bookings for $dateText',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
@@ -1042,9 +1162,11 @@ class HistoryScreenState extends State<HistoryScreen> {
             ),
             SizedBox(height: 8),
             Text(
-              bookingHistory.isEmpty
+              showAllBookings
                   ? 'Your booking history will appear here'
-                  : 'Try selecting a different date',
+                  : bookingHistory.isEmpty
+                      ? 'Your booking history will appear here'
+                      : 'Try selecting a different date or view all bookings',
               style: TextStyle(fontSize: 14, color: textSecondary),
             ),
           ],
@@ -1199,39 +1321,86 @@ class HistoryScreenState extends State<HistoryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header row with View Calendar button
+          // Header row with View Calendar and View All buttons
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // View Calendar button
+              // View All button
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    showCalendar = !showCalendar;
+                    showAllBookings = !showAllBookings;
+                    if (showAllBookings) {
+                      showCalendar = false; // Hide calendar when viewing all
+                    }
                   });
                 },
-                child: Text(
-                  showCalendar ? 'Hide Calendar' : 'View Calendar',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: primaryColor,
-                    decoration: showCalendar ? TextDecoration.underline : null,
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: showAllBookings 
+                      ? primaryColor 
+                      : primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    showAllBookings ? 'View by Date' : 'View All',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: showAllBookings 
+                        ? Colors.white 
+                        : primaryColor,
+                    ),
                   ),
                 ),
               ),
+
+              // View Calendar button (only show when not in view all mode)
+              if (!showAllBookings)
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      showCalendar = !showCalendar;
+                    });
+                  },
+                  child: Text(
+                    showCalendar ? 'Hide Calendar' : 'View Calendar',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: primaryColor,
+                      decoration: showCalendar ? TextDecoration.underline : null,
+                    ),
+                  ),
+                ),
             ],
           ),
           const SizedBox(height: 25),
 
-          showCalendar
-              ? _buildCalendarContentExpanded()
-              : _buildDateAndBookingsContent(),
+          // Show different content based on the current mode
+          if (showAllBookings)
+            _buildViewAllContent()
+          else if (showCalendar)
+            _buildCalendarContentExpanded()
+          else
+            _buildDateAndBookingsContent(),
         ],
       ),
     );
   }
 
+  Widget _buildViewAllContent() {
+    return Column(
+      children: [
+        SizedBox(height: 24),
+        Divider(color: Colors.grey[300], height: 1),
+        SizedBox(height: 24),
+      ],
+    );
+  }
+
+  /// Builds the calendar header and grid for expanded view
   Widget _buildCalendarContentExpanded() {
     return Column(
       children: [
@@ -1412,6 +1581,39 @@ class HistoryScreenState extends State<HistoryScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildViewAllButton() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                showAllBookings = false;
+                showCalendar = false;
+              });
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: primaryColor,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                'View by Date',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
