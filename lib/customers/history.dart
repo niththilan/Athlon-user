@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../customers/footer.dart';
+import '../customers/widgets/football_spinner.dart';
 
 /// Simplified History Screen with user-friendly design
 class HistoryScreen extends StatefulWidget {
@@ -37,6 +38,9 @@ class HistoryScreenState extends State<HistoryScreen> {
   static const Color warningColor = Color(0xFFF59E0B);
   static const Color textPrimary = Color(0xFF111827);
   static const Color textSecondary = Color(0xFF6B7280);
+
+  // Add loading state
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -245,6 +249,20 @@ class HistoryScreenState extends State<HistoryScreen> {
     ];
     
     _scrollController.addListener(_onScroll);
+    
+    // Simulate loading data
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    // Simulate network delay
+    await Future.delayed(Duration(milliseconds: 1500));
+    
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -267,7 +285,17 @@ class HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Direct render without any loading checks
+    // Show loading spinner if still loading
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: backgroundColor,
+        body: FootballLoadingWidget(
+          backgroundColor: backgroundColor,
+        ),
+      );
+    }
+
+    // Show main content when loaded
     return Scaffold(
       backgroundColor: backgroundColor,
       body: CustomScrollView(
