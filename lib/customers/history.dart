@@ -368,8 +368,8 @@ class HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
-        backgroundColor: Color(0xFFF8F9FA), // Match the background color
-        body: Center(child: FootballLoadingWidget())
+        backgroundColor: Color(0xFFF8F9FA),
+        body: FootballLoadingWidget(),
       );
     }
 
