@@ -3,9 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../customers/footer.dart';
-import 'home.dart' as home;
-import 'messages.dart';
-import 'widgets/football_spinner.dart'; // Add this import
 
 /// Simplified History Screen with user-friendly design
 class HistoryScreen extends StatefulWidget {
@@ -17,17 +14,17 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class HistoryScreenState extends State<HistoryScreen> {
-  bool _isLoading = true;
   final ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
 
   // Date scroll and calendar state
   DateTime selectedDate = DateTime.now();
   bool showCalendar = false;
-  bool showAllBookings = false; // Add this new state variable
+  bool showAllBookings = false;
   late List<DateTime> dateList;
-  int currentDateStartIndex = 5; // Place the current date in the middle
+  int currentDateStartIndex = 5;
 
+  // Initialize data immediately in declaration
   List<BookingHistoryItem> bookingHistory = [];
 
   // Simplified color scheme
@@ -35,11 +32,8 @@ class HistoryScreenState extends State<HistoryScreen> {
   static const Color backgroundColor = Color(0xFFF8F9FA);
   static const Color cardColor = Colors.white;
   static const Color successColor = Color(0xFF10B981);
-  static const Color darkGreenColor = Color(0xFF065F46); // Added dark green
-  static const Color callColor = Color(
-    0xFF065F46,
-  ); // Darker green color for call button
-  static const Color errorColor = Color(0xFFB91C1C); // Much darker red color
+  static const Color callColor = Color(0xFF065F46);
+  static const Color errorColor = Color(0xFFB91C1C);
   static const Color warningColor = Color(0xFFF59E0B);
   static const Color textPrimary = Color(0xFF111827);
   static const Color textSecondary = Color(0xFF6B7280);
@@ -47,45 +41,17 @@ class HistoryScreenState extends State<HistoryScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeDateList();
-    _scrollController.addListener(_onScroll);
     
-    // Initialize data immediately without delay
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeData();
-    });
-  }
-
-  // Match home.dart initialization pattern exactly
-  Future<void> _initializeData() async {
-    // Quick initialization for history screen (200ms) - same as home
-    await Future.delayed(const Duration(milliseconds: 200));
-    
-    if (mounted) {
-      // Load mock data first
-      _initializeMockData();
-      
-      // Then set loading to false
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  void _initializeDateList() {
-    dateList = [];
+    // Initialize everything synchronously in constructor-like pattern
     final today = DateTime.now();
-    // Include past, current, and future dates, with today centered
+    dateList = [];
     for (int i = -7; i <= 30; i++) {
       dateList.add(today.add(Duration(days: i)));
     }
-  }
-
-  // Move mock data initialization to be called before loading completes
-  void _initializeMockData() {
+    
+    // Initialize mock data directly
     final now = DateTime.now();
     bookingHistory = [
-      // Today's bookings - from player perspective
       BookingHistoryItem(
         id: '1',
         courtName: 'Football Court A',
@@ -277,6 +243,8 @@ class HistoryScreenState extends State<HistoryScreen> {
         status: 'pending',
       ),
     ];
+    
+    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -297,82 +265,9 @@ class HistoryScreenState extends State<HistoryScreen> {
     }
   }
 
-  // Future<void> _loadBookingHistory() async {
-  //   // try {
-  //   //   setState(() {
-  //   //     _isLoading = true;
-  //   //   });
-
-  //   //   // Get all facilities first
-  //   //   final facilities = await SupabaseService.getVendorFacilities();
-  //   //   final List<BookingHistoryItem> loadedHistory = [];
-
-  //   //   // Get bookings from all facilities
-  //   //   for (final facility in facilities) {
-  //   //     final facilityBookings = await SupabaseService.searchBookings(
-  //   //       facilityId: facility['id'],
-  //   //       limit: 100, // Get recent bookings
-  //   //     );
-
-  //   //     // Convert booking data to BookingHistoryItem
-  //   //     for (final bookingData in facilityBookings) {
-  //   //       try {
-  //   //         final startTime = DateTime.parse(bookingData['start_time']);
-  //   //         final endTime = DateTime.parse(bookingData['end_time']);
-
-  //   //         loadedHistory.add(
-  //   //           BookingHistoryItem(
-  //   //             id: bookingData['id'] ?? '',
-  //   //             customerName: bookingData['customer_name'] ?? 'Unknown Customer',
-  //   //             courtName: bookingData['court_name'] ?? 'Unknown Court',
-  //   //             courtType: bookingData['court_type'] ?? 'General',
-  //   //             date: DateTime.parse(bookingData['booking_date']),
-  //   //             startTime: DateFormat('h:mm a').format(startTime),
-  //   //             endTime: DateFormat('h:mm a').format(endTime),
-  //   //             duration: bookingData['duration'] ?? 60,
-  //   //             price: (bookingData['price'] ?? 0.0).toDouble(),
-  //   //             status: bookingData['status'] ?? 'confirmed',
-  //   //             customerPhone: bookingData['customer_phone'] ?? 'N/A',
-  //   //           ),
-  //   //         );
-  //   //       } catch (e) {
-  //   //         // Skip malformed booking data
-  //   //         print('Error parsing booking data: $e');
-  //   //         continue;
-  //   //       }
-  //   //     }
-  //   //   }
-
-  //   //   // Sort by date (newest first)
-  //   //   loadedHistory.sort((a, b) => b.date.compareTo(a.date));
-
-  //   //   if (mounted) {
-  //   //     setState(() {
-  //   //       bookingHistory = loadedHistory;
-  //   //       _isLoading = false;
-  //   //     });
-  //   //   }
-  //   // } catch (e) {
-  //   //   print('Error loading booking history: $e');
-  //   //   if (mounted) {
-  //   //     setState(() {
-  //   //       // Fall back to empty list on error
-  //   //       bookingHistory = [];
-  //   //       _isLoading = false;
-  //   //     });
-  //   //   }
-  //   // }
-  // }
-
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: Color(0xFFF8F9FA),
-        body: FootballLoadingWidget(),
-      );
-    }
-
+    // Direct render without any loading checks
     return Scaffold(
       backgroundColor: backgroundColor,
       body: CustomScrollView(
@@ -385,6 +280,7 @@ class HistoryScreenState extends State<HistoryScreen> {
             pinned: true,
             backgroundColor: primaryColor,
             centerTitle: false,
+            automaticallyImplyLeading: false, // Remove default back button
             title: const Text(
               "Booking Details",
               style: TextStyle(
@@ -403,10 +299,7 @@ class HistoryScreenState extends State<HistoryScreen> {
                   size: 28,
                 ),
                 onPressed: () {
-                  // Simply pop back - no complex logic needed
-                  if (Navigator.canPop(context)) {
-                    Navigator.pop(context);
-                  }
+                  Navigator.of(context).pop();
                 },
                 tooltip: 'Back',
               ),
@@ -430,8 +323,7 @@ class HistoryScreenState extends State<HistoryScreen> {
       bottomNavigationBar: AppFooter(
         currentIndex: 2,
         onTabSelected: (int index) {
-          // Let the AppFooter handle all navigation
-          // Remove the complex switch logic and just let footer handle it
+          // Simple navigation - let footer handle it
         },
       ),
     );
@@ -1207,10 +1099,7 @@ class HistoryScreenState extends State<HistoryScreen> {
         currentDateStartIndex = newStartIndex;
       });
 
-      // Save to DateProvider for sharing with other screens
-      // final dateProvider = Provider.of<DateProvider>(context, listen: false);
-      // dateProvider.setDate(newSelectedDate);
-
+      
       // No need to reload bookings - filtering will handle the display
     }
   }

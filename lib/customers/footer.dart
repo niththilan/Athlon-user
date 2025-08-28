@@ -91,22 +91,6 @@ class AppFooter extends StatelessWidget {
   Future<void> _navigateToBookings(BuildContext context) async {
     print('Attempting to navigate to bookings...');
     try {
-      // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        barrierColor: Colors.black.withOpacity(0.3),
-        builder: (BuildContext context) {
-          return const Center(child: FootballLoadingWidget());
-        },
-      );
-
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      }
-
       print('Navigating to Bookings...');
       // Use regular push instead of pushAndRemoveUntil
       Navigator.push(
@@ -123,10 +107,6 @@ class AppFooter extends StatelessWidget {
       print('History navigation completed');
     } catch (e) {
       print('Error in history navigation: $e');
-
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      }
 
       // Show error to user
       if (context.mounted) {
@@ -262,3 +242,4 @@ class AppFooter extends StatelessWidget {
     );
   }
 }
+                 
