@@ -593,22 +593,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
           // Scrollable Venues Section
           Expanded(
             child: _isLoading
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FootballSpinner(size: 50.0, color: _themeNavyBlue),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Loading venues...',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
+                ? const Center(
+                    child: FootballLoadingWidget(),
                   )
                 : !_showVenues
                 ? Center(
@@ -1000,6 +986,7 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
                                                           FontWeight.w600,
                                                       color: Colors.orange[600],
                                                     ),
+                                                    textAlign: TextAlign.center,
                                                   ),
                                                 ],
                                               ),
@@ -1788,3 +1775,4 @@ class _SportsCategoriesState extends State<SportsCategories> {
     );
   }
 }
+                           
