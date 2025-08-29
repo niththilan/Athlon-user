@@ -133,7 +133,7 @@ class AppFooter extends StatelessWidget {
         children: [
           _buildNavItem(context, 0, Icons.sports_basketball, 'Home'),
           _buildNavItem(context, 1, Icons.favorite, 'Favorites'),
-          _buildNavItem(context, 2, Icons.history, 'History'),
+          _buildNavItem(context, 2, Icons.history, 'Bookings'),
           _buildNavItem(context, 3, Icons.chat_bubble_outline, 'Chat'),
         ],
       ),
