@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'home.dart'; // Add home import
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -14,7 +15,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F6FA), // Match other files
       body: SafeArea(
         child: Column(
           children: [
@@ -51,28 +52,28 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: 150,
             height: 150,
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: const Color(0xFF1B2C4F).withOpacity(0.1), // Match theme
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.location_on,
               size: 80,
-              color: Theme.of(context).primaryColor,
+              color: Color(0xFF1B2C4F), // Match primary color
             ),
           ),
           const SizedBox(height: 40),
-          Text(
+          const Text(
             'Allow Location Access',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              color: Color(0xFF1B2C4F), // Match primary color
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
           Text(
-            'We need your location to find nearby services and provide you with the best booking experience.',
+            'We need your location to find nearby sports venues and provide you with the best booking experience.',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[600],
@@ -84,11 +85,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ElevatedButton(
             onPressed: _requestLocationPermission,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
+              backgroundColor: const Color(0xFF1B2C4F), // Match primary color
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30),
+                borderRadius: BorderRadius.circular(16), // Match border radius
               ),
             ),
             child: const Text(
@@ -111,22 +112,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: 150,
             height: 150,
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: const Color(0xFF1B2C4F).withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
+            child: const Icon(
               Icons.book_online,
               size: 80,
-              color: Theme.of(context).primaryColor,
+              color: Color(0xFF1B2C4F),
             ),
           ),
           const SizedBox(height: 40),
-          Text(
+          const Text(
             'How Booking Works',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              color: Color(0xFF1B2C4F),
             ),
             textAlign: TextAlign.center,
           ),
@@ -134,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _buildInstructionItem(
             Icons.search,
             'Browse Services',
-            'Find the perfect service for your needs from our wide range of options.',
+            'Find the perfect sports venue for your needs from our wide range of options.',
           ),
           _buildInstructionItem(
             Icons.calendar_today,
@@ -149,7 +150,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           _buildInstructionItem(
             Icons.check_circle,
             'Enjoy Service',
-            'Relax and enjoy your booked service at your chosen location and time.',
+            'Relax and enjoy your booked venue at your chosen location and time.',
           ),
         ],
       ),
@@ -166,12 +167,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: const Color(0xFF1B2C4F).withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
-              color: Theme.of(context).primaryColor,
+              color: const Color(0xFF1B2C4F),
               size: 20,
             ),
           ),
@@ -185,6 +186,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
+                    color: Color(0xFF1B2C4F), // Match text color
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -216,8 +218,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Theme.of(context).primaryColor.withOpacity(0.8),
-                  Theme.of(context).primaryColor,
+                  const Color(0xFF1B2C4F).withOpacity(0.8),
+                  const Color(0xFF1B2C4F),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -231,18 +233,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
           const SizedBox(height: 40),
-          Text(
+          const Text(
             'Ready to Get Started!',
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[800],
+              color: Color(0xFF1B2C4F),
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
           Text(
-            'You\'re all set! Start exploring amazing services and book your first appointment with ease.',
+            'You\'re all set! Start exploring amazing sports venues and book your first appointment with ease.',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[600],
@@ -257,10 +259,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: ElevatedButton(
               onPressed: _proceedToApp,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
+                backgroundColor: const Color(0xFF1B2C4F),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 3,
               ),
@@ -286,7 +288,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           height: 8,
           decoration: BoxDecoration(
             color: _currentPage == index
-                ? Theme.of(context).primaryColor
+                ? const Color(0xFF1B2C4F) // Match primary color
                 : Colors.grey[300],
             borderRadius: BorderRadius.circular(4),
           ),
@@ -309,10 +311,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   curve: Curves.easeInOut,
                 );
               },
-              child: Text(
+              child: const Text(
                 'Back',
                 style: TextStyle(
-                  color: Theme.of(context).primaryColor,
+                  color: Color(0xFF1B2C4F), // Match primary color
                   fontSize: 16,
                 ),
               ),
@@ -327,10 +329,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   curve: Curves.easeInOut,
                 );
               },
-              child: Text(
+              child: const Text(
                 'Next',
                 style: TextStyle(
-                  color: Theme.of(context).primaryColor,
+                  color: Color(0xFF1B2C4F), // Match primary color
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -354,14 +356,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Location access granted!'),
-        backgroundColor: Colors.green,
+        backgroundColor: Color(0xFF1B2C4F), // Use consistent primary color
       ),
     );
   }
 
   void _proceedToApp() {
-    // Navigate to main app
-    Navigator.of(context).pushReplacementNamed('/home');
+    // Navigate to home screen
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => const HomeScreen(),
+      ),
+    );
   }
 }
 

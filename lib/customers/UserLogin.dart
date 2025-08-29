@@ -4,6 +4,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'services/customer_service.dart';
+import 'onboarding.dart'; // Add onboarding import
 import 'home.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -59,7 +60,7 @@ class _LoginPageState extends State<LoginPage>
 
       // Check if user just signed in and email is confirmed
       if (event == AuthChangeEvent.signedIn && session?.user != null) {
-        // Only navigate to home if we're currently on the login page and email is confirmed
+        // Only navigate to onboarding if we're currently on the login page and email is confirmed
         if (mounted && ModalRoute.of(context)?.settings.name == '/login') {
           // Show success message for email confirmation
           ScaffoldMessenger.of(context).showSnackBar(
@@ -70,12 +71,12 @@ class _LoginPageState extends State<LoginPage>
             ),
           );
           
-          // Navigate to home after a short delay
+          // Navigate to onboarding after a short delay
           Future.delayed(const Duration(milliseconds: 500), () {
             if (mounted) {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
-                  builder: (context) => const HomeScreen(),
+                  builder: (context) => const OnboardingScreen(),
                 ),
               );
             }
@@ -521,11 +522,11 @@ class _LoginPageState extends State<LoginPage>
             Navigator.of(context).pop();
           }
 
-          // Navigate to home screen
+          // Navigate to onboarding screen instead of home
           if (mounted) {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
+                builder: (context) => const OnboardingScreen(),
               ),
             );
           }
