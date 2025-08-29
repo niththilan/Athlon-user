@@ -1387,6 +1387,4 @@ class VenueCard extends StatelessWidget {
     );
   }
 }
-    );
-  }
-}
+    
