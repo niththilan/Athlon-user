@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'footer.dart';
 import 'widgets/football_spinner.dart';
-
+import 'services/navigation_service.dart';
 import 'courtDetails.dart';
 import 'nearbyVenues.dart';
 
@@ -24,14 +24,27 @@ class FavoritesScreen extends StatefulWidget {
 class _FavoritesScreenState extends State<FavoritesScreen> {
   // Set to favorites tab index (1 in footer structure)
   late List<Map<String, dynamic>> _favoriteVenues;
+  bool _isInitialLoading = true;
 
   @override
   void initState() {
     super.initState();
-    // Use mock data if favoriteVenues is empty, otherwise use provided data
-    _favoriteVenues = widget.favoriteVenues.isEmpty
-        ? _getMockFavoriteVenues()
-        : List.from(widget.favoriteVenues);
+    _initializeFavorites();
+  }
+
+  Future<void> _initializeFavorites() async {
+    // Show loading for 500ms - much faster initialization
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (mounted) {
+      setState(() {
+        // Use mock data if favoriteVenues is empty, otherwise use provided data
+        _favoriteVenues = widget.favoriteVenues.isEmpty
+            ? _getMockFavoriteVenues()
+            : List.from(widget.favoriteVenues);
+        _isInitialLoading = false;
+      });
+    }
   }
 
   // Mock data for demonstration purposes
@@ -110,6 +123,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Show loading screen during initialization
+    if (_isInitialLoading) {
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: FootballLoadingWidget(),
+        ),
+      );
+    }
+
     // Check if we have any favorites to display
     final hasNoFavorites = _favoriteVenues.isEmpty;
 
@@ -119,11 +142,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
         backgroundColor: const Color(0xFF1B2C4F),
         elevation: 2,
         toolbarHeight: 50,
+        surfaceTintColor: Colors.transparent,
         title: Text(
           "Favourite Venues (${_favoriteVenues.length})",
           style: const TextStyle(
@@ -140,13 +164,29 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             icon: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
             onPressed: () async {
               try {
-                // Close any existing dialogs first
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  barrierColor: Colors.white,
+                  builder: (BuildContext context) {
+                    return const FootballLoadingWidget();
+                  },
+                );
+
+                // Simulate loading time - 500ms
+                await Future.delayed(const Duration(milliseconds: 500));
+
+                // Close loading dialog and navigate back
                 if (Navigator.canPop(context)) {
-                  // Simply pop back to previous screen
-                  Navigator.pop(context);
+                  Navigator.pop(context); // Close loading dialog
+                  Navigator.pop(context); // Go back
                 }
               } catch (e) {
                 // Handle any errors
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                }
                 if (context.mounted) {
                   Navigator.pop(context);
                 }
@@ -193,14 +233,25 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.favorite_border, size: 80, color: Colors.grey[400]),
-          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1B2C4F).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.favorite_border,
+              size: 60,
+              color: const Color(0xFF1B2C4F).withOpacity(0.7),
+            ),
+          ),
+          const SizedBox(height: 20),
           Text(
             "No favorite venues yet",
             style: TextStyle(
               fontSize: 18,
               color: Colors.grey[700],
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 8),
@@ -210,13 +261,35 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           ),
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () {
-              // Navigate to Nearby Venues screen
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const NearByVenueScreen(),
-                ),
-              );
+            onPressed: () async {
+              try {
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  barrierColor: Colors.white,
+                  builder: (BuildContext context) {
+                    return const FootballLoadingWidget();
+                  },
+                );
+
+                // Simulate loading time - 500ms
+                await Future.delayed(const Duration(milliseconds: 500));
+
+                // Close loading dialog
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                }
+
+                // Navigate to Nearby Venues screen
+                NavigationService.pushInstant(const NearByVenueScreen());
+              } catch (e) {
+                // Handle any errors
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                }
+                NavigationService.pushInstant(const NearByVenueScreen());
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1B2C4F),
@@ -410,32 +483,33 @@ class VenueCardFavorite extends StatelessWidget {
                     // View More Button
                     ElevatedButton(
                       onPressed: () async {
-                        // Show loading screen immediately
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          barrierColor: Colors.white,
-                          builder: (BuildContext context) {
-                            return const FootballLoadingWidget();
-                          },
-                        );
-
-                        // Loading delay
-                        await Future.delayed(const Duration(milliseconds: 300));
-
-                        // Navigate without animation
-                        if (context.mounted) {
-                          Navigator.pop(context); // Close loading dialog
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      const CourtDetailScreen(),
-                              transitionDuration: Duration.zero,
-                              reverseTransitionDuration: Duration.zero,
-                            ),
+                        try {
+                          // Show loading indicator
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            barrierColor: Colors.white,
+                            builder: (BuildContext context) {
+                              return const FootballLoadingWidget();
+                            },
                           );
+
+                          // Simulate loading time - 500ms
+                          await Future.delayed(const Duration(milliseconds: 500));
+
+                          // Close loading dialog
+                          if (Navigator.canPop(context)) {
+                            Navigator.pop(context);
+                          }
+
+                          // Navigate to court details with no animation
+                          NavigationService.pushInstant(const CourtDetailScreen());
+                        } catch (e) {
+                          // Handle any errors
+                          if (Navigator.canPop(context)) {
+                            Navigator.pop(context);
+                          }
+                          NavigationService.pushInstant(const CourtDetailScreen());
                         }
                       },
                       style: ElevatedButton.styleFrom(

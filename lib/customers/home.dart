@@ -414,9 +414,35 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: AppFooter(
         currentIndex: 0,
-        onTabSelected: (int index) {
-          // Let the AppFooter handle all navigation
-          // Remove the complex switch logic and just let footer handle it
+        onTabSelected: (int index) async {
+          // Add loading for favorites navigation
+          if (index == 1) { // Favorites tab
+            try {
+              // Show loading indicator
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                barrierColor: Colors.white,
+                builder: (BuildContext context) {
+                  return const FootballLoadingWidget();
+                },
+              );
+
+              // Simulate loading time - 500ms for faster navigation
+              await Future.delayed(const Duration(milliseconds: 500));
+
+              // Close loading dialog
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            } catch (e) {
+              // Handle any errors
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
+              }
+            }
+          }
+          // Let the AppFooter handle the actual navigation after loading
         },
       ),
     );

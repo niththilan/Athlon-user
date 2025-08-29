@@ -20,28 +20,10 @@ class AppFooter extends StatelessWidget {
 
   Future<void> _navigateToFavorites(BuildContext context) async {
     try {
-      // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        barrierColor: Colors.black.withOpacity(0.3),
-        builder: (BuildContext context) {
-          return const Center(child: FootballLoadingWidget());
-        },
-      );
-
-      // Simulate loading time - much shorter
-      await Future.delayed(const Duration(milliseconds: 300));
-
       List<Map<String, dynamic>> favoriteVenues = [];
 
       // Supabase integration removed. You may want to load favorites from another source here.
       // Example: favoriteVenues = await loadFavoritesFromLocalOrOtherApi();
-
-      // Close loading dialog
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      }
 
       // Navigate using regular push instead of pushAndRemoveUntil
       Navigator.push(
@@ -58,11 +40,6 @@ class AppFooter extends StatelessWidget {
         ),
       );
     } catch (e) {
-      // Handle any errors in the main try block
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      }
-
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -242,4 +219,3 @@ class AppFooter extends StatelessWidget {
     );
   }
 }
-                 

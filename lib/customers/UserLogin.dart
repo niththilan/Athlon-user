@@ -59,13 +59,27 @@ class _LoginPageState extends State<LoginPage>
 
       // Check if user just signed in and email is confirmed
       if (event == AuthChangeEvent.signedIn && session?.user != null) {
-        // Only navigate to home if we're currently on the login page
+        // Only navigate to home if we're currently on the login page and email is confirmed
         if (mounted && ModalRoute.of(context)?.settings.name == '/login') {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => const HomeScreen(),
+          // Show success message for email confirmation
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Email confirmed! Welcome to Athlon!'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 2),
             ),
           );
+          
+          // Navigate to home after a short delay
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => const HomeScreen(),
+                ),
+              );
+            }
+          });
         }
       }
       
@@ -343,6 +357,129 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
+  void _showEmailConfirmationDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: const BoxDecoration(
+                    color: Colors.green,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.email_outlined,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Confirm Your Email Address',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1B2C4F),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'We\'ve sent a verification link to\n${_emailController.text.trim()}\n\nPlease check your inbox and click the verification link to activate your account.',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: const BorderSide(color: Color(0xFF1B2C4F)),
+                          ),
+                        ),
+                        child: const Text(
+                          'OK',
+                          style: TextStyle(
+                            color: Color(0xFF1B2C4F),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () async {
+                    try {
+                      await CustomerService.signUp(
+                        email: _emailController.text.trim(),
+                        password: _passwordController.text,
+                        name: _nameController.text.trim(),
+                        phone: _phoneController.text.trim(),
+                      );
+                      
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Verification email sent again!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    } catch (error) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Error: ${error.toString()}'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  child: const Text(
+                    'Resend Email',
+                    style: TextStyle(
+                      color: Color(0xFF6B8AFE),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _handleLogin() async {
     // Set attempted submission to true
     setState(() {
@@ -406,23 +543,9 @@ class _LoginPageState extends State<LoginPage>
             Navigator.of(context).pop();
           }
 
+          // Show email confirmation dialog instead of navigating immediately
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                  'Confirm your email address! Check your inbox for a verification link to activate your account.',
-                ),
-                backgroundColor: Colors.green,
-                duration: Duration(seconds: 5),
-              ),
-            );
-
-            // Navigate directly to the home page after successful signup
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
-              ),
-            );
+            _showEmailConfirmationDialog();
           }
         }
       } catch (error) {
