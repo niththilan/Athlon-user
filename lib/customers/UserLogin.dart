@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'services/customer_service.dart';
 import 'home.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -46,6 +47,60 @@ class _LoginPageState extends State<LoginPage>
       CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
     _animationController.forward();
+
+    // Add auth state listener for email confirmation
+    _setupAuthListener();
+  }
+
+  void _setupAuthListener() {
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      final AuthChangeEvent event = data.event;
+      final Session? session = data.session;
+
+      // Check if user just signed in and email is confirmed
+      if (event == AuthChangeEvent.signedIn && session?.user != null) {
+        // Only navigate to home if we're currently on the login page
+        if (mounted && ModalRoute.of(context)?.settings.name == '/login') {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => const HomeScreen(),
+            ),
+          );
+        }
+      }
+      
+      // Handle sign out event - ensure complete logout
+      if (event == AuthChangeEvent.signedOut) {
+        // User has been signed out, ensure we're on the login page
+        // Clear all navigation and show only login page
+        if (mounted) {
+          // Check if we're not already on login page
+          final currentRoute = ModalRoute.of(context)?.settings.name;
+          if (currentRoute != '/login') {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => const LoginPage(),
+                settings: const RouteSettings(name: '/login'),
+              ),
+              (Route<dynamic> route) => false,
+            );
+          }
+        }
+      }
+
+      // Handle token refresh failures - force logout
+      if (event == AuthChangeEvent.tokenRefreshed && session == null) {
+        if (mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const LoginPage(),
+              settings: const RouteSettings(name: '/login'),
+            ),
+            (Route<dynamic> route) => false,
+          );
+        }
+      }
+    });
   }
 
   @override
@@ -355,25 +410,19 @@ class _LoginPageState extends State<LoginPage>
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text(
-                  'Account created successfully! Please check your email to verify your account.',
+                  'Confirm your email address! Check your inbox for a verification link to activate your account.',
                 ),
                 backgroundColor: Colors.green,
-                duration: Duration(seconds: 4),
+                duration: Duration(seconds: 5),
               ),
             );
 
-            // Switch to login mode after successful signup
-            setState(() {
-              _isLogin = true;
-              _attemptedSubmission = false;
-              _emailController.clear();
-              _passwordController.clear();
-              _confirmPasswordController.clear();
-              _nameController.clear();
-              _phoneController.clear();
-              _locationController.clear();
-              _agreeToTerms = false;
-            });
+            // Navigate directly to the home page after successful signup
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              ),
+            );
           }
         }
       } catch (error) {
@@ -382,11 +431,13 @@ class _LoginPageState extends State<LoginPage>
           Navigator.of(context).pop();
         }
 
-        // Show error message
+        // Show user-friendly error message
         if (mounted) {
+          String userFriendlyMessage = _getUserFriendlyErrorMessage(error.toString(), _isLogin);
+          
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(error.toString()),
+              content: Text(userFriendlyMessage),
               backgroundColor: Colors.red,
               duration: const Duration(seconds: 4),
             ),
@@ -394,6 +445,62 @@ class _LoginPageState extends State<LoginPage>
         }
       }
     }
+  }
+
+  // Helper method to convert technical error messages to user-friendly ones
+  String _getUserFriendlyErrorMessage(String errorMessage, bool isLogin) {
+    String lowerError = errorMessage.toLowerCase();
+    
+    if (isLogin) {
+      // Login error messages
+      if (lowerError.contains('invalid login credentials') || 
+          lowerError.contains('invalid email or password') ||
+          lowerError.contains('email not confirmed')) {
+        return 'Invalid email or password. Please check your credentials and try again.';
+      } else if (lowerError.contains('email not confirmed')) {
+        return 'Please verify your email address before signing in. Check your inbox for a verification link.';
+      } else if (lowerError.contains('too many requests')) {
+        return 'Too many login attempts. Please wait a few minutes and try again.';
+      } else if (lowerError.contains('network') || lowerError.contains('connection')) {
+        return 'Network error. Please check your internet connection and try again.';
+      } else if (lowerError.contains('user not found')) {
+        return 'No account found with this email address. Please sign up or check your email.';
+      }
+    } else {
+      // Signup error messages
+      if (lowerError.contains('user already registered') || 
+          lowerError.contains('email already exists') ||
+          lowerError.contains('already registered') ||
+          lowerError.contains('email address not available')) {
+        return 'An account already exists with this email address. Please try logging in instead.';
+      } else if (lowerError.contains('password') && lowerError.contains('weak')) {
+        return 'Password is too weak. Please use at least 8 characters with a mix of letters, numbers, and symbols.';
+      } else if (lowerError.contains('invalid email')) {
+        return 'Please enter a valid email address.';
+      } else if (lowerError.contains('password') && (lowerError.contains('short') || lowerError.contains('minimum'))) {
+        return 'Password must be at least 6 characters long.';
+      } else if (lowerError.contains('signup disabled')) {
+        return 'New registrations are temporarily disabled. Please try again later.';
+      } else if (lowerError.contains('rate limit') || lowerError.contains('too many')) {
+        return 'Too many signup attempts. Please wait a few minutes and try again.';
+      } else if (lowerError.contains('network') || lowerError.contains('connection')) {
+        return 'Network error. Please check your internet connection and try again.';
+      }
+    }
+
+    // Generic error messages for unhandled cases
+    if (lowerError.contains('network') || lowerError.contains('connection') || lowerError.contains('timeout')) {
+      return 'Connection error. Please check your internet and try again.';
+    } else if (lowerError.contains('server') || lowerError.contains('500')) {
+      return 'Server error. Please try again in a few minutes.';
+    } else if (lowerError.contains('400') || lowerError.contains('bad request')) {
+      return 'Invalid request. Please check your information and try again.';
+    }
+
+    // If no specific error pattern matched, return a generic message
+    return isLogin 
+      ? 'Login failed. Please check your credentials and try again.'
+      : 'Registration failed. Please check your information and try again.';
   }
 
   @override

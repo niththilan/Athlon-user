@@ -7,6 +7,7 @@ import 'services/auth_service.dart';
 import 'services/customer_service.dart';
 import 'widgets/football_spinner.dart';
 import 'settings.dart';
+import 'UserLogin.dart'; // Add this import
 
 // Constants for consistent styling - matching vendor screen
 const Color primaryColor = Color(0xFF1B2C4F);
@@ -146,8 +147,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     if (confirmed == true) {
       await _authService.signOut();
       if (mounted) {
-        // Navigate back to home or show sign in dialog
-        Navigator.pop(context);
+        // Navigate to login page and clear navigation stack
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => const LoginPage(),
+          ),
+          (Route<dynamic> route) => false,
+        );
       }
     }
   }
@@ -523,7 +529,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     // Navigate to help screen
   }
 
-  // Logout action - Updated to match screenshot
+  // Logout action - Updated to navigate to login page
   void _showLogoutConfirmation() {
     if (!mounted) return;
 
@@ -557,9 +563,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           Container(
             height: 36,
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(dialogContext);
-                _signOut();
+                
+                // Sign out and navigate to login
+                await _authService.signOut();
+                if (mounted) {
+                  // Navigate to login page and clear navigation stack
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const LoginPage(),
+                    ),
+                    (Route<dynamic> route) => false,
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
@@ -1954,73 +1971,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.person_outline,
-                size: 100,
-                color: Colors.grey[400],
-              ),
-              const SizedBox(height: 24),
-              Text(
-                'Sign In Required',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey[800],
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'Please sign in to view your profile and manage your bookings.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // For now, show a simple dialog asking to sign in
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Sign In Required'),
-                        content: const Text('Please create an account or sign in to access your profile.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1B2C4F),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Sign In',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
