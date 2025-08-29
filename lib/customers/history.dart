@@ -627,38 +627,40 @@ class HistoryScreenState extends State<HistoryScreen> {
   void _showBookingDetails(BookingHistoryItem booking) {
     showDialog(
       context: context,
-      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.4),
       builder: (BuildContext context) {
         return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          backgroundColor: cardColor,
+          elevation: 8,
           child: Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Booking Details',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: textPrimary,
-                      ),
+            width: MediaQuery.of(context).size.width > 500
+                ? 480
+                : MediaQuery.of(context).size.width * 0.9,
+            constraints: BoxConstraints(
+              maxWidth: 480,
+              minWidth: 280,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            padding: EdgeInsets.all(
+              MediaQuery.of(context).size.width < 400 ? 16 : 24,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Header
+                  Text(
+                    'Booking Details',
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width < 400 ? 16 : 18,
+                      fontWeight: FontWeight.w600,
+                      color: textPrimary,
                     ),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
-                      child: Icon(Icons.close, size: 24, color: textSecondary),
-                    ),
-                  ],
-                ),
+                  ),
 
-                SizedBox(height: 20),
+                  SizedBox(height: MediaQuery.of(context).size.width < 400 ? 12 : 16),
 
                 // Booking ID
                 _buildDetailRow('Booking ID', booking.id),
@@ -688,80 +690,138 @@ class HistoryScreenState extends State<HistoryScreen> {
                   'LKR ${booking.price.toStringAsFixed(0)}',
                 ),
 
-                SizedBox(height: 24),
+                  SizedBox(height: 24),
 
-                // Action buttons
-                Row(
-                  children: [
-                    // Cancel booking button (only show for confirmed/pending bookings)
-                    if (booking.status.toLowerCase() == 'confirmed' ||
-                        booking.status.toLowerCase() == 'pending')
-                      Expanded(
-                        child: Container(
-                          height: 44,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              _showCancelConfirmation(booking);
-                            },
-                            child: Text(
-                              'Cancel Booking',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                  // Action buttons - using the same responsive layout as settings.dart
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      // If screen is too narrow, stack buttons vertically
+                      if (constraints.maxWidth < 300) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Cancel booking button (only show for confirmed/pending bookings)
+                            if (booking.status.toLowerCase() == 'confirmed' ||
+                                booking.status.toLowerCase() == 'pending')
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  _showCancelConfirmation(booking);
+                                },
+                                child: Text(
+                                  'Cancel Booking',
+                                  style: TextStyle(
+                                    fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: errorColor,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 12,
+                                  ),
+                                ),
+                              ),
+
+                            // Add spacing if cancel button exists
+                            if (booking.status.toLowerCase() == 'confirmed' ||
+                                booking.status.toLowerCase() == 'pending')
+                              SizedBox(height: 8),
+
+                            // Close button
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                              ),
+                              child: Text(
+                                'Close',
+                                style: TextStyle(
+                                  color: textSecondary,
+                                  fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: errorColor,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                          ],
+                        );
+                      } else {
+                        // Horizontal layout for wider screens
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            // Close button
+                            Flexible(
+                              child: TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Close',
+                                  style: TextStyle(
+                                    color: textSecondary,
+                                    fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                               ),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
+                            ),
+
+                            // Add spacing and cancel button if exists
+                            if (booking.status.toLowerCase() == 'confirmed' ||
+                                booking.status.toLowerCase() == 'pending') ...[
+                              SizedBox(width: 8),
+                              Flexible(
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    _showCancelConfirmation(booking);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: errorColor,
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 12,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                  ),
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      'Cancel Booking',
+                                      style: TextStyle(
+                                        fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 15,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                    // Add spacing if cancel button exists
-                    if (booking.status.toLowerCase() == 'confirmed' ||
-                        booking.status.toLowerCase() == 'pending')
-                      SizedBox(width: 12),
-
-                    // Close button
-                    Expanded(
-                      child: Container(
-                        height: 44,
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: primaryColor, width: 1.5),
-                            foregroundColor: primaryColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                          child: Text(
-                            'Close',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                            ],
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -772,139 +832,205 @@ class HistoryScreenState extends State<HistoryScreen> {
   void _showCancelConfirmation(BookingHistoryItem booking) {
     showDialog(
       context: context,
-      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.4),
       builder: (BuildContext context) {
         return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          backgroundColor: cardColor,
+          elevation: 8,
           child: Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.warning_amber_rounded,
-                  size: 48,
-                  color: warningColor,
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Cancel Booking',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: textPrimary,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Are you sure you want to cancel this booking?',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: textSecondary),
-                ),
-                SizedBox(height: 12),
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        booking.courtName,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: textPrimary,
-                        ),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        '${DateFormat('MMM d, yyyy').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
-                        style: TextStyle(fontSize: 12, color: textSecondary),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'This action cannot be undone. Refund policies may apply.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: textSecondary,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        height: 44,
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          style: OutlinedButton.styleFrom(
-                            side: BorderSide(
-                              color: Colors.grey[400]!,
-                              width: 1.5,
-                            ),
-                            foregroundColor: textSecondary,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                          ),
-                          child: Text(
-                            'Keep Booking',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
+            width: MediaQuery.of(context).size.width > 500
+                ? 480
+                : MediaQuery.of(context).size.width * 0.9,
+            constraints: BoxConstraints(
+              maxWidth: 480,
+              minWidth: 280,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            padding: EdgeInsets.all(
+              MediaQuery.of(context).size.width < 400 ? 16 : 24,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Icon(
+                      Icons.warning_amber_rounded,
+                      size: 48,
+                      color: warningColor,
                     ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Container(
-                        height: 44,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            _cancelBooking(booking);
-                          },
-                          label: Text(
-                            'Yes, Cancel',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: errorColor,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.width < 400 ? 12 : 16),
+                  Text(
+                    'Cancel Booking',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width < 400 ? 16 : 18,
+                      fontWeight: FontWeight.w600,
+                      color: textPrimary,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Are you sure you want to cancel this booking?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, color: textSecondary),
+                  ),
+                  SizedBox(height: 12),
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          booking.courtName,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: textPrimary,
                           ),
                         ),
-                      ),
+                        SizedBox(height: 2),
+                        Text(
+                          '${DateFormat('MMM d, yyyy').format(booking.date)} • ${booking.startTime} - ${booking.endTime}',
+                          style: TextStyle(fontSize: 12, color: textSecondary),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'This action cannot be undone. Refund policies may apply.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: textSecondary,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.width < 400 ? 16 : 24),
+
+                  // Responsive button layout like settings.dart
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      // If screen is too narrow, stack buttons vertically
+                      if (constraints.maxWidth < 300) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                _cancelBooking(booking);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: errorColor,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'Yes, Cancel',
+                                style: TextStyle(
+                                  fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                              ),
+                              child: Text(
+                                'Keep Booking',
+                                style: TextStyle(
+                                  color: textSecondary,
+                                  fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        // Horizontal layout for wider screens
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Flexible(
+                              child: TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Keep Booking',
+                                  style: TextStyle(
+                                    color: textSecondary,
+                                    fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Flexible(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  _cancelBooking(booking);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: errorColor,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    'Yes, Cancel',
+                                    style: TextStyle(
+                                      fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -952,58 +1078,167 @@ class HistoryScreenState extends State<HistoryScreen> {
     // to make an actual phone call: launch('tel:+1234567890')
     showDialog(
       context: context,
-      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.4),
       builder: (BuildContext context) {
         return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          backgroundColor: cardColor,
+          elevation: 8,
           child: Container(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.phone, size: 48, color: callColor),
-                SizedBox(height: 16),
-                Text(
-                  'Contact Facility',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: textPrimary,
+            width: MediaQuery.of(context).size.width > 500
+                ? 480
+                : MediaQuery.of(context).size.width * 0.9,
+            constraints: BoxConstraints(
+              maxWidth: 480,
+              minWidth: 280,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            padding: EdgeInsets.all(
+              MediaQuery.of(context).size.width < 400 ? 16 : 24,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Center(
+                    child: Icon(Icons.phone, size: 48, color: callColor),
                   ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  booking.facilityName,
-                  style: TextStyle(fontSize: 16, color: textSecondary),
-                ),
-                SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(color: textSecondary),
-                      ),
+                  SizedBox(height: MediaQuery.of(context).size.width < 400 ? 12 : 16),
+                  Text(
+                    'Contact Facility',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width < 400 ? 16 : 18,
+                      fontWeight: FontWeight.w600,
+                      color: textPrimary,
                     ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        // Here you would implement the actual call functionality
-                        // For example: launch('tel:+1234567890')
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: callColor,
-                        foregroundColor: Colors.white,
-                      ),
-                      child: Text('Call Now'),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    booking.facilityName,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: textSecondary),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.width < 400 ? 16 : 24),
+
+                  // Responsive button layout like settings.dart
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      // If screen is too narrow, stack buttons vertically
+                      if (constraints.maxWidth < 300) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                // Here you would implement the actual call functionality
+                                // For example: launch('tel:+1234567890')
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: callColor,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: Text(
+                                'Call Now',
+                                style: TextStyle(
+                                  fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 15,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 12,
+                                ),
+                              ),
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                  color: textSecondary,
+                                  fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      } else {
+                        // Horizontal layout for wider screens
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Flexible(
+                              child: TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: textSecondary,
+                                    fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Flexible(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  // Here you would implement the actual call functionality
+                                  // For example: launch('tel:+1234567890')
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: callColor,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    'Call Now',
+                                    style: TextStyle(
+                                      fontSize: MediaQuery.of(context).size.width < 400 ? 14 : 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         );
