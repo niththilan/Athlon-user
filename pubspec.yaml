@@ -18,6 +18,7 @@ dependencies:
   font_awesome_flutter: ^10.6.0  # Added for better social login icons
   supabase_flutter: ^2.5.6  # Supabase Flutter SDK
   http: ^1.2.0  # HTTP requests
+  shared_preferences: ^2.2.2  # For storing user preferences and session data
 
 dev_dependencies:
   flutter_test:
@@ -63,10 +64,3 @@ flutter_launcher_icons:
   macos:
     generate: true
     image_path: "assets/logo.jpg"
-
-
-dependencies:
-  flutter:
-    sdk: flutter
-  shared_preferences: ^2.2.2
-  geolocator: ^10.1.0
