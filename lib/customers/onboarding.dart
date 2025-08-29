@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
+import 'home.dart'; // Add home import
+import 'services/onboarding_service.dart'; // Add onboarding service import
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({Key? key}) : super(key: key);
@@ -12,16 +13,6 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   PageController pageController = PageController();
   int currentIndex = 0;
-
-  static Future<bool> shouldShowOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool('onboarding_completed') != true;
-  }
-
-  static Future<void> completeOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('onboarding_completed', true);
-  }
 
   Future<void> requestLocationPermission() async {
     bool serviceEnabled;
@@ -88,14 +79,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      completeOnboarding();
-      Navigator.pushReplacementNamed(context, '/home'); // Replace with your home route
+      OnboardingService.completeOnboarding();
+      // Navigate to home screen directly
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
+        ),
+      );
     }
   }
 
   void skipOnboarding() {
-    completeOnboarding();
-    Navigator.pushReplacementNamed(context, '/home'); // Replace with your home route
+    OnboardingService.completeOnboarding();
+    // Navigate to home screen directly
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HomeScreen(),
+      ),
+    );
   }
 
   @override
@@ -341,3 +344,4 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
+               

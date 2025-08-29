@@ -7,6 +7,7 @@ import 'availableSports.dart'; // Add this import
 import 'courtDetails.dart'; // Add this import
 import 'search.dart'; // Add search import
 import 'UserLogin.dart'; // Add login import
+import 'services/onboarding_service.dart'; // Add onboarding service import
 
 import 'footer.dart';
 import 'nearbyVenues.dart' as nearby_venues; // Import the nearbyVenues file
@@ -1383,6 +1384,9 @@ class VenueCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
     );
   }
 }
