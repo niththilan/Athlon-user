@@ -1330,7 +1330,6 @@ class _ChatScreenState extends State<ChatScreen> {
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
   bool _showAttachments = false;
-  bool _showQuickReplies = false;
   late List<Message> messages;
 
   // Quick replies for vendors
@@ -1841,7 +1840,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
     _messageController.clear();
     setState(() {
-      _showQuickReplies = false;
     });
 
     try {

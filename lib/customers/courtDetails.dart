@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'footer.dart';
 import 'bookings.dart'; // Import bookings.dart
 import 'widgets/football_spinner.dart';
-import 'models/venue_models.dart' as venue_models;
 
 void main() {
   runApp(const MyApp());
