@@ -145,7 +145,14 @@ class CustomerService {
         maxDistance: maxDistance,
       );
 
-      final venues = venuesData.map((data) => VenueModel.fromSupabase(data)).toList();
+      final venues = venuesData.map((data) {
+        try {
+          return VenueModel.fromSupabase(data);
+        } catch (e) {
+          print('Warning: Failed to parse venue ${data['name']}: $e');
+          return null;
+        }
+      }).where((venue) => venue != null).cast<VenueModel>().toList();
 
       // Sort venues
       switch (sortBy) {

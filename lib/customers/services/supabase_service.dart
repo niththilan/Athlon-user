@@ -454,17 +454,18 @@ class SupabaseService {
             )
           ''');
 
-      // Apply filters
+      // Apply filters - simplified for now
       if (searchTerm != null && searchTerm.isNotEmpty) {
-        query = query.or('name.ilike.%$searchTerm%,profiles.name.ilike.%$searchTerm%,profiles.location.ilike.%$searchTerm%');
+        query = query.ilike('name', '%$searchTerm%');
       }
       
       if (location != null && location.isNotEmpty) {
-        query = query.or('location.ilike.%$location%,profiles.location.ilike.%$location%');
+        query = query.ilike('location', '%$location%');
       }
       
       if (minRating != null) {
-        query = query.gte('profiles.rating', minRating);
+        // Comment out for now until we verify the relationship
+        // query = query.gte('profiles.rating', minRating);
       }
 
       final response = await query;
@@ -473,12 +474,26 @@ class SupabaseService {
       // Filter by sports if specified
       if (sports != null && sports.isNotEmpty) {
         venues = venues.where((venue) {
-          final facilitiesList = venue['profiles']['facilities_list'] as List?;
-          if (facilitiesList == null) return false;
-          
-          return sports.any((sport) =>
-              facilitiesList.any((facility) =>
-                  facility.toString().toLowerCase().contains(sport.toLowerCase())));
+          try {
+            // Handle case where profiles might be a List or Map
+            dynamic profilesData = venue['profiles'];
+            List? facilitiesList;
+            
+            if (profilesData is Map<String, dynamic>) {
+              facilitiesList = profilesData['facilities_list'] as List?;
+            } else if (profilesData is List && profilesData.isNotEmpty) {
+              facilitiesList = (profilesData.first as Map<String, dynamic>)['facilities_list'] as List?;
+            }
+            
+            if (facilitiesList == null) return false;
+            
+            return sports.any((sport) =>
+                facilitiesList!.any((facility) =>
+                    facility.toString().toLowerCase().contains(sport.toLowerCase())));
+          } catch (e) {
+            print('Warning: Error in sports filtering for venue ${venue['name']}: $e');
+            return false;
+          }
         }).toList();
       }
 

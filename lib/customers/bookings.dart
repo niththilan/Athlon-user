@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'footer.dart';
 import 'widgets/football_spinner.dart';
 import 'models/venue_models.dart' as venue_models;
+import 'services/data_service.dart';
+import 'services/customer_service.dart';
 
 // TimeSlot class for venue opening hours
 class TimeSlot {
@@ -244,9 +246,6 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
   List<BookingTimeSlot> timeSlots = [];
   List<TimeSlot> venueOpeningHours = [];
   bool _isRefreshing = false;
-
-  // Mock booking data storage
-  Map<String, Map<String, Map<String, String>>> mockBookings = {};
 
   // Selected venue and sport dropdown
   String? selectedSport;
@@ -568,24 +567,66 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
         .toSet();
   }
 
-  // Load venue opening hours - using mock data instead of Supabase
+  // Load venue opening hours from Supabase
   Future<void> _loadVenueOpeningHours() async {
-    // Mock opening hours - venue open Monday to Sunday 7 AM to 11 PM
-    venueOpeningHours = [
-      TimeSlot(
-        open: '7:00 AM',
-        close: '11:00 PM',
-        days: [
-          'Monday',
-          'Tuesday',
-          'Wednesday',
-          'Thursday',
-          'Friday',
-          'Saturday',
-          'Sunday',
-        ],
-      ),
-    ];
+    try {
+      // Load venue details from Supabase to get opening hours
+      final venue = await DataService.getVenueDetails(widget.selectedVenue?.id ?? '');
+      
+      if (venue != null && venue.openingHours.isNotEmpty) {
+        // Parse opening hours from venue data
+        venueOpeningHours = [
+          TimeSlot(
+            open: '7:00 AM', // Default - should be parsed from venue.openingHours
+            close: '11:00 PM', // Default - should be parsed from venue.openingHours  
+            days: [
+              'Monday',
+              'Tuesday',
+              'Wednesday',
+              'Thursday',
+              'Friday',
+              'Saturday',
+              'Sunday',
+            ],
+          ),
+        ];
+      } else {
+        // Fallback to default hours if no venue data
+        venueOpeningHours = [
+          TimeSlot(
+            open: '7:00 AM',
+            close: '11:00 PM',
+            days: [
+              'Monday',
+              'Tuesday',
+              'Wednesday',
+              'Thursday',
+              'Friday',
+              'Saturday',
+              'Sunday',
+            ],
+          ),
+        ];
+      }
+    } catch (e) {
+      print('Error loading venue opening hours: $e');
+      // Fallback to default hours
+      venueOpeningHours = [
+        TimeSlot(
+          open: '7:00 AM',
+          close: '11:00 PM',
+          days: [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday',
+          ],
+        ),
+      ];
+    }
     _generateTimeSlotsForSelectedDate();
   }
 
@@ -1925,7 +1966,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     );
   }
 
-  // UPDATED METHOD: Confirm booking with customer details (using mock storage)
+  // UPDATED METHOD: Confirm booking with Supabase integration
   void _confirmBooking({
     double? rate,
     String? customerName,
@@ -1956,35 +1997,34 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       selectedTimeSlots.sort(
         (a, b) => _parseTimeString(a).compareTo(_parseTimeString(b)),
       );
-      // final startTime = _parseTimeString(selectedTimeSlots.first);
-      // final endTime = _parseTimeString(selectedTimeSlots.last).add(const Duration(minutes: 30));
+      final startTime = _parseTimeString(selectedTimeSlots.first);
+      final endTime = _parseTimeString(selectedTimeSlots.last).add(const Duration(minutes: 30));
 
       // Calculate duration and price
-      // final duration = selectedTimeSlots.length * 30; // 30 minutes per slot
-      // final totalPrice = (rate ?? selectedCourt!.hourlyRate) * (duration / 60.0);
+      final duration = selectedTimeSlots.length * 30; // 30 minutes per slot
+      final totalPrice = (rate ?? selectedCourt!.hourlyRate) * (duration / 60.0);
 
-      // Note: DateTime objects would be used for database storage
-      // final bookingStartTime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, startTime.hour, startTime.minute);
-      // final bookingEndTime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, endTime.hour, endTime.minute);
+      // Create DateTime objects for database storage
+      final bookingStartTime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, startTime.hour, startTime.minute);
+      final bookingEndTime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, endTime.hour, endTime.minute);
 
-      // Generate booking ID
-      final bookingId = 'booking_${DateTime.now().millisecondsSinceEpoch}';
-
-      // Store booking in mock storage
-      final courtId = selectedCourt!.id;
-      final dateStr = selectedDate.toIso8601String().split('T')[0];
-
-      if (mockBookings[courtId] == null) {
-        mockBookings[courtId] = {};
-      }
-      if (mockBookings[courtId]![dateStr] == null) {
-        mockBookings[courtId]![dateStr] = {};
-      }
-
-      // Store booking details for each time slot
-      for (final timeSlot in selectedTimeSlots) {
-        mockBookings[courtId]![dateStr]![timeSlot] = bookingId;
-      }
+      // Create booking in Supabase
+      final bookingId = await CustomerService.createBooking(
+        facilityId: selectedCourt!.facilityId,
+        courtId: selectedCourt!.id,
+        customerName: customerName ?? 'Guest',
+        customerPhone: customerPhone ?? '',
+        courtName: selectedCourt!.name,
+        courtType: selectedCourt!.type,
+        bookingDate: selectedDate,
+        timeSlot: selectedTimeSlots.join(', '),
+        startTime: bookingStartTime,
+        endTime: bookingEndTime,
+        durationMinutes: duration,
+        price: rate ?? selectedCourt!.hourlyRate,
+        totalAmount: totalPrice,
+        paymentMethod: 'Cash', // Default payment method
+      );
 
       // Update UI
       setState(() {
@@ -2003,20 +2043,16 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
       _showSuccessDialog(rate: rate, customerName: customerName);
     } catch (e) {
       print('Error confirming booking: $e');
-      // Still update UI even if storage fails
-      setState(() {
-        // Convert selected slots to occupied (red) status
-        for (var slot in timeSlots) {
-          if (selectedSlots.contains(slot.time)) {
-            slot.status = SlotStatus.occupied;
-          }
-        }
-        // Clear selected slots
-        selectedSlots.clear();
-      });
-
-      // Show success dialog with rate and customer details
-      _showSuccessDialog(rate: rate, customerName: customerName);
+      // Show error message to user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to create booking: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+      
+      // Don't update UI if booking failed
     }
   }
 
@@ -2037,7 +2073,7 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     }
   }
 
-  // Add this method to update time slots based on selected court and date (using mock data)
+  // Add this method to update time slots based on selected court and date (simplified for now)
   void _updateTimeSlots() async {
     if (selectedCourt == null) return; // Guard clause
 
@@ -2045,54 +2081,17 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
     _generateTimeSlotsForSelectedDate();
 
     setState(() {
-      // Reset all slots to available first
+      // For now, show all slots as available
+      // TODO: Implement real-time booking conflict checking with Supabase
       for (var slot in timeSlots) {
         slot.status = SlotStatus.available;
         slot.bookingId = null;
       }
+      
+      // Clear any existing selections
+      selectedSlots.clear();
+      selectedBookingId = null;
     });
-
-    try {
-      // Load time slots from mock storage
-      final courtId = selectedCourt!.id;
-      final dateStr = selectedDate.toIso8601String().split('T')[0];
-
-      if (mounted) {
-        setState(() {
-          // Update slots based on mock data
-          if (mockBookings[courtId] != null &&
-              mockBookings[courtId]![dateStr] != null) {
-            for (var slot in timeSlots) {
-              final bookingId = mockBookings[courtId]![dateStr]![slot.time];
-              if (bookingId != null) {
-                slot.status = SlotStatus.occupied;
-                slot.bookingId = bookingId;
-              }
-            }
-          }
-
-          // Clear any existing selections
-          selectedSlots.clear();
-          selectedBookingId = null;
-        });
-      }
-    } catch (e) {
-      print('Error loading time slots: $e');
-      // Fall back to empty pattern if mock storage fails - all slots available
-      if (mounted) {
-        setState(() {
-          // Reset all slots to available status (no mock bookings)
-          for (var slot in timeSlots) {
-            slot.status = SlotStatus.available;
-            slot.bookingId = null;
-          }
-
-          // Clear any existing selections
-          selectedSlots.clear();
-          selectedBookingId = null;
-        });
-      }
-    }
   }
 
   @override
@@ -4333,17 +4332,9 @@ class _SlotsPageState extends State<SlotsPage> with WidgetsBindingObserver {
 
       allSelectedTimes.addAll(selectedSlots);
 
-      // Remove bookings from mock storage
-      final courtId = selectedCourt!.id;
-      final dateStr = selectedDate.toIso8601String().split('T')[0];
-
-      if (mockBookings[courtId] != null &&
-          mockBookings[courtId]![dateStr] != null) {
-        for (final timeSlot in allSelectedTimes) {
-          mockBookings[courtId]![dateStr]!.remove(timeSlot);
-        }
-      }
-
+      // TODO: Implement real booking cancellation with Supabase
+      // For now, just update UI to make slots available
+      
       // Update UI state
       setState(() {
         for (var slot in timeSlots) {

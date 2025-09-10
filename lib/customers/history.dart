@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../customers/footer.dart';
 import '../customers/widgets/football_spinner.dart';
+import 'services/data_service.dart';
 
 /// Simplified History Screen with user-friendly design
 class HistoryScreen extends StatefulWidget {
@@ -53,205 +54,58 @@ class HistoryScreenState extends State<HistoryScreen> {
       dateList.add(today.add(Duration(days: i)));
     }
     
-    // Initialize mock data directly
-    final now = DateTime.now();
-    bookingHistory = [
-      BookingHistoryItem(
-        id: '1',
-        courtName: 'Football Court A',
-        courtType: 'Football',
-        facilityName: 'CR7 Arena',
-        date: now,
-        startTime: '6:00 PM',
-        endTime: '7:00 PM',
-        duration: 60,
-        price: 2500.0,
-        status: 'confirmed',
-      ),
-      BookingHistoryItem(
-        id: '2',
-        courtName: 'Basketball Court B',
-        courtType: 'Basketball',
-        facilityName: 'Champion\'s Arena',
-        date: now,
-        startTime: '4:00 PM',
-        endTime: '5:30 PM',
-        duration: 90,
-        price: 3000.0,
-        status: 'confirmed',
-      ),
-      BookingHistoryItem(
-        id: '3',
-        courtName: 'Tennis Court 1',
-        courtType: 'Tennis',
-        facilityName: 'Colombo Tennis Club',
-        date: now,
-        startTime: '8:00 PM',
-        endTime: '9:00 PM',
-        duration: 60,
-        price: 2000.0,
-        status: 'completed',
-      ),
-
-      // Yesterday's bookings
-      BookingHistoryItem(
-        id: '4',
-        courtName: 'Football Court B',
-        courtType: 'Football',
-        facilityName: 'Sports Complex Central',
-        date: now.subtract(Duration(days: 1)),
-        startTime: '5:00 PM',
-        endTime: '6:30 PM',
-        duration: 90,
-        price: 3500.0,
-        status: 'completed',
-      ),
-      BookingHistoryItem(
-        id: '5',
-        courtName: 'Badminton Court A',
-        courtType: 'Badminton',
-        facilityName: 'Metro Sports Club',
-        date: now.subtract(Duration(days: 1)),
-        startTime: '7:00 PM',
-        endTime: '8:00 PM',
-        duration: 60,
-        price: 1500.0,
-        status: 'completed',
-      ),
-      BookingHistoryItem(
-        id: '6',
-        courtName: 'Football Court A',
-        courtType: 'Football',
-        facilityName: 'CR7 Arena',
-        date: now.subtract(Duration(days: 1)),
-        startTime: '3:00 PM',
-        endTime: '4:00 PM',
-        duration: 60,
-        price: 2500.0,
-        status: 'cancelled',
-      ),
-
-      // Two days ago
-      BookingHistoryItem(
-        id: '7',
-        courtName: 'Tennis Court 2',
-        courtType: 'Tennis',
-        facilityName: 'Colombo Tennis Club',
-        date: now.subtract(Duration(days: 2)),
-        startTime: '6:30 PM',
-        endTime: '7:30 PM',
-        duration: 60,
-        price: 2000.0,
-        status: 'completed',
-      ),
-      BookingHistoryItem(
-        id: '8',
-        courtName: 'Basketball Court A',
-        courtType: 'Basketball',
-        facilityName: 'Champion\'s Arena',
-        date: now.subtract(Duration(days: 2)),
-        startTime: '8:00 PM',
-        endTime: '9:30 PM',
-        duration: 90,
-        price: 3000.0,
-        status: 'completed',
-      ),
-
-      // Three days ago
-      BookingHistoryItem(
-        id: '9',
-        courtName: 'Football Court C',
-        courtType: 'Football',
-        facilityName: 'Elite Sports Arena',
-        date: now.subtract(Duration(days: 3)),
-        startTime: '4:30 PM',
-        endTime: '6:00 PM',
-        duration: 90,
-        price: 3500.0,
-        status: 'completed',
-      ),
-      BookingHistoryItem(
-        id: '10',
-        courtName: 'Volleyball Court A',
-        courtType: 'Volleyball',
-        facilityName: 'Volleyball Center',
-        date: now.subtract(Duration(days: 3)),
-        startTime: '7:00 PM',
-        endTime: '8:30 PM',
-        duration: 90,
-        price: 2800.0,
-        status: 'completed',
-      ),
-
-      // A week ago
-      BookingHistoryItem(
-        id: '11',
-        courtName: 'Badminton Court B',
-        courtType: 'Badminton',
-        facilityName: 'Metro Sports Club',
-        date: now.subtract(Duration(days: 7)),
-        startTime: '5:30 PM',
-        endTime: '6:30 PM',
-        duration: 60,
-        price: 1500.0,
-        status: 'completed',
-      ),
-      BookingHistoryItem(
-        id: '12',
-        courtName: 'Tennis Court 1',
-        courtType: 'Tennis',
-        facilityName: 'Colombo Tennis Club',
-        date: now.subtract(Duration(days: 7)),
-        startTime: '6:00 PM',
-        endTime: '7:00 PM',
-        duration: 60,
-        price: 2000.0,
-        status: 'completed',
-      ),
-
-      // Future bookings
-      BookingHistoryItem(
-        id: '13',
-        courtName: 'Football Court A',
-        courtType: 'Football',
-        facilityName: 'CR7 Arena',
-        date: now.add(Duration(days: 1)),
-        startTime: '5:00 PM',
-        endTime: '6:00 PM',
-        duration: 60,
-        price: 2500.0,
-        status: 'confirmed',
-      ),
-      BookingHistoryItem(
-        id: '14',
-        courtName: 'Basketball Court B',
-        courtType: 'Basketball',
-        facilityName: 'Champion\'s Arena',
-        date: now.add(Duration(days: 2)),
-        startTime: '7:00 PM',
-        endTime: '8:30 PM',
-        duration: 90,
-        price: 3000.0,
-        status: 'confirmed',
-      ),
-      BookingHistoryItem(
-        id: '15',
-        courtName: 'Tennis Court 2',
-        courtType: 'Tennis',
-        facilityName: 'Colombo Tennis Club',
-        date: now.add(Duration(days: 3)),
-        startTime: '6:30 PM',
-        endTime: '7:30 PM',
-        duration: 60,
-        price: 2000.0,
-        status: 'pending',
-      ),
-    ];
+    // Initialize empty booking history - will be loaded from Supabase
+    bookingHistory = [];
+    
+    // Load actual booking data from Supabase
+    _loadBookingHistoryFromSupabase();
     
     _scrollController.addListener(_onScroll);
     
-    // Simulate loading data
+    // Load actual data
     _loadData();
+  }
+
+  // Load booking history from Supabase
+  Future<void> _loadBookingHistoryFromSupabase() async {
+    try {
+      final bookings = await DataService.getCustomerBookings();
+      
+      if (mounted) {
+        setState(() {
+          // Convert BookingModel to BookingHistoryItem for UI compatibility
+          bookingHistory = bookings.map((booking) => BookingHistoryItem(
+            id: booking.id,
+            courtName: booking.courtName,
+            courtType: booking.courtType,
+            facilityName: booking.facilityName,
+            date: booking.bookingDate,
+            startTime: _formatTime(booking.startTime),
+            endTime: _formatTime(booking.endTime),
+            duration: booking.duration,
+            price: booking.totalAmount,
+            status: booking.status.toString().split('.').last,
+          )).toList();
+        });
+      }
+    } catch (e) {
+      print('Error loading booking history from Supabase: $e');
+      // Keep empty list if loading fails
+      if (mounted) {
+        setState(() {
+          bookingHistory = [];
+        });
+      }
+    }
+  }
+
+  // Helper method to format time
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour;
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final displayHour = hour > 12 ? hour - 12 : (hour == 0 ? 12 : hour);
+    return '$displayHour:$minute $period';
   }
 
   Future<void> _loadData() async {

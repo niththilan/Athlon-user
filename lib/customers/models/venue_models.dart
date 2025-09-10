@@ -42,7 +42,16 @@ class VenueModel {
   });
 
   factory VenueModel.fromSupabase(Map<String, dynamic> data) {
-    final profile = data['profiles'] as Map<String, dynamic>?;
+    // Handle profiles data which might be a List or Map due to join query
+    Map<String, dynamic>? profile;
+    final profilesData = data['profiles'];
+    
+    if (profilesData is Map<String, dynamic>) {
+      profile = profilesData;
+    } else if (profilesData is List && profilesData.isNotEmpty) {
+      profile = profilesData.first as Map<String, dynamic>;
+    }
+    
     final courtsData = data['courts'] as List<dynamic>? ?? [];
     final imagesData = data['facility_images'] as List<dynamic>? ?? [];
 
@@ -56,7 +65,7 @@ class VenueModel {
       sports: _parseStringList(profile?['facilities_list']),
       amenities: _parseStringList(profile?['amenities_list']),
       openingHours: profile?['opening_hours'] as String? ?? '',
-      businessHoursDisplay: profile?['business_hours_display'] as Map<String, dynamic>?,
+      businessHoursDisplay: _parseBusinessHours(profile?['business_hours_display']),
       phone: profile?['phone'] as String?,
       website: profile?['website'] as String?,
       bio: profile?['bio'] as String?,
@@ -72,6 +81,17 @@ class VenueModel {
       return data.map((item) => item.toString()).toList();
     }
     return [];
+  }
+
+  static Map<String, dynamic>? _parseBusinessHours(dynamic data) {
+    if (data == null) return null;
+    if (data is Map<String, dynamic>) return data;
+    if (data is List && data.isNotEmpty) {
+      // Convert list format to a map format for compatibility
+      // This is a temporary workaround - ideally the backend should return consistent format
+      return {'hours_list': data};
+    }
+    return null;
   }
 
   String get primaryImageUrl {

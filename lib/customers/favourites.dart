@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'footer.dart';
 import 'widgets/football_spinner.dart';
 import 'services/navigation_service.dart';
+import 'services/data_service.dart';
 import 'courtDetails.dart';
 import 'nearbyVenues.dart';
 
@@ -37,29 +38,31 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     await Future.delayed(const Duration(milliseconds: 500));
 
     if (mounted) {
-      setState(() {
-        // Use mock data if favoriteVenues is empty, otherwise use provided data
-        _favoriteVenues = widget.favoriteVenues.isEmpty
-            ? _getMockFavoriteVenues()
-            : List.from(widget.favoriteVenues);
-        _isInitialLoading = false;
-      });
+      // Load favorites from Supabase using DataService
+      try {
+        final favoriteVenues = await DataService.getFavoriteVenues();
+        
+        setState(() {
+          // Convert VenueModel to Map format for existing UI compatibility
+          _favoriteVenues = favoriteVenues.map((venue) => {
+            'id': venue.id,
+            'title': venue.name,
+            'location': venue.location,
+            'rating': venue.rating,
+            'imagePath': venue.primaryImageUrl,
+            'distance': '${venue.distance.toStringAsFixed(1)} km',
+          }).toList();
+          _isInitialLoading = false;
+        });
+      } catch (e) {
+        print('Error loading favorites from Supabase: $e');
+        setState(() {
+          // Use empty list if Supabase fails
+          _favoriteVenues = [];
+          _isInitialLoading = false;
+        });
+      }
     }
-  }
-
-  // Mock data for demonstration purposes
-  List<Map<String, dynamic>> _getMockFavoriteVenues() {
-    return [
-      {
-        'id': '1',
-        'title': "ARK SPORTS - INDOOR CRICKET & FUTSAL",
-        'location': '141/A, Wattala 11300',
-        'rating': 4.23,
-        'imagePath':
-            "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        'distance': '3.5 km',
-      },
-    ];
   }
 
   // Footer navigation to handle all tabs

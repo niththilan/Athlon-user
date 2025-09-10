@@ -7,6 +7,7 @@ import 'footer.dart';
 import 'widgets/football_spinner.dart';
 import 'courtDetails.dart' as court;
 import 'models/venue_models.dart' as venue_models;
+import 'services/data_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,117 +73,9 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
   final Color _themeNavyBlue = const Color(0xFF1B2C4F);
   final Color _themeLightNavyBlue = const Color(0xFFF0F4FF);
 
-  // Venue data - now using hardcoded data instead of Supabase
+  // Venue data - loaded from Supabase
   List<Map<String, dynamic>> _venues = [];
   List<Map<String, dynamic>> _filteredVenues = [];
-
-  // Hardcoded venue data with additional fields
-  final List<Map<String, dynamic>> _sampleVenues = [
-    {
-      'id': '1',
-      'title': 'SportsCentral Stadium',
-      'location': 'Downtown, Colombo 00200',
-      'sport': 'Football',
-      'rating': 4.8,
-      'image_path':
-          'https://images.unsplash.com/photo-1459865264687-595d652de67e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2069&q=80',
-      'distance': '2.3 km',
-      'is_favorite': false,
-      'opening_hours': '6:00 AM - 10:00 PM',
-      'rate_per_hour': 'Rs. 2,500',
-    },
-    {
-      'id': '2',
-      'title': 'Galaxy Sports Complex',
-      'location': 'North Avenue, Colombo 00300',
-      'sport': 'Basketball',
-      'rating': 4.5,
-      'image_path':
-          'https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2060&q=80',
-      'distance': '3.7 km',
-      'is_favorite': false,
-      'opening_hours': '7:00 AM - 11:00 PM',
-      'rate_per_hour': 'Rs. 1,800',
-    },
-    {
-      'id': '3',
-      'title': 'Olympic Swimming Center',
-      'location': 'Lake View, Colombo 00400',
-      'sport': 'Swimming',
-      'rating': 4.7,
-      'image_path':
-          'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      'distance': '5.2 km',
-      'is_favorite': false,
-      'opening_hours': '5:30 AM - 9:30 PM',
-      'rate_per_hour': 'Rs. 1,200',
-    },
-    {
-      'id': '4',
-      'title': 'Tennis Court Complex',
-      'location': 'Green Hills, Colombo 00500',
-      'sport': 'Tennis',
-      'rating': 4.4,
-      'image_path':
-          'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      'distance': '1.8 km',
-      'is_favorite': false,
-      'opening_hours': '6:00 AM - 8:00 PM',
-      'rate_per_hour': 'Rs. 2,000',
-    },
-    {
-      'id': '5',
-      'title': 'City Badminton Center',
-      'location': 'Central Park, Colombo 00600',
-      'sport': 'Badminton',
-      'rating': 4.6,
-      'image_path':
-          'https://images.unsplash.com/photo-1594736797933-d0201ba2fe65?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80',
-      'distance': '4.1 km',
-      'is_favorite': false,
-      'opening_hours': '6:30 AM - 10:30 PM',
-      'rate_per_hour': 'Rs. 1,500',
-    },
-    {
-      'id': '6',
-      'title': 'CR7 FUTSAL & INDOOR CRICKET',
-      'location': '23 Mile Post Ave, Colombo 00300',
-      'sport': 'Cricket',
-      'rating': 4.75,
-      'image_path':
-          'https://images.unsplash.com/photo-1531415074968-036ba1b575da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2067&q=80',
-      'distance': '2.5 km',
-      'is_favorite': false,
-      'opening_hours': '6:00 AM - 11:00 PM',
-      'rate_per_hour': 'Rs. 3,000',
-    },
-    {
-      'id': '7',
-      'title': 'Table Tennis Hub',
-      'location': 'City Center, Colombo 00100',
-      'sport': 'Table Tennis',
-      'rating': 4.2,
-      'image_path':
-          'https://images.unsplash.com/photo-1609710228159-0fa9bd7c0827?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      'distance': '3.0 km',
-      'is_favorite': false,
-      'opening_hours': '7:00 AM - 10:00 PM',
-      'rate_per_hour': 'Rs. 800',
-    },
-    {
-      'id': '8',
-      'title': 'Baseball Diamond',
-      'location': 'West End, Colombo 00700',
-      'sport': 'Baseball',
-      'rating': 4.1,
-      'image_path':
-          'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80',
-      'distance': '7.2 km',
-      'is_favorite': false,
-      'opening_hours': '6:00 AM - 8:00 PM',
-      'rate_per_hour': 'Rs. 2,200',
-    },
-  ];
 
   @override
   void initState() {
@@ -218,18 +111,42 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
     super.dispose();
   }
 
-  // Load venues data from local data without showing them
+  // Load venues data from Supabase without showing them
   Future<void> _loadVenuesData() async {
     if (!mounted) return;
 
     try {
+      // Load venues from Supabase using DataService
+      final venues = await DataService.loadVenues();
+      
       setState(() {
-        _venues = List<Map<String, dynamic>>.from(_sampleVenues);
-        debugPrint('🏟️ Venues data loaded: ${_venues.length}');
+        // Convert VenueModel objects to Map format for existing UI code
+        _venues = venues.map((venue) => _venueModelToMap(venue)).toList();
+        debugPrint('🏟️ Venues data loaded from Supabase: ${_venues.length}');
       });
     } catch (error) {
-      debugPrint('❌ Error loading venues data: $error');
+      debugPrint('❌ Error loading venues data from Supabase: $error');
+      setState(() {
+        _venues = [];
+      });
     }
+  }
+
+  // Helper method to convert VenueModel to Map format for existing UI code
+  Map<String, dynamic> _venueModelToMap(venue_models.VenueModel venue) {
+    return {
+      'id': venue.id,
+      'title': venue.name,
+      'location': venue.location,
+      'sport': venue.sports.isNotEmpty ? venue.sports.first : 'General',
+      'rating': venue.rating,
+      'image_path': venue.primaryImageUrl,
+      'distance': '${venue.distance.toStringAsFixed(1)} km',
+      'is_favorite': false, // This would be populated from user favorites
+      'opening_hours': venue.openingHours,
+      'rate_per_hour': venue.courts.isNotEmpty ? 
+          'Rs. ${venue.courts.first.hourlyRate.toStringAsFixed(0)}' : 'Contact for rates',
+    };
   }
 
   // Load and show venues for a specific sport
@@ -241,37 +158,28 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       _showVenues = false;
     });
 
-    // Simulate loading delay for better UX
-    await Future.delayed(const Duration(milliseconds: 800));
-
-    if (!mounted) return;
-
     try {
-      // Ensure venues data is loaded
-      if (_venues.isEmpty) {
-        _venues = List<Map<String, dynamic>>.from(_sampleVenues);
-      }
+      // Load venues from Supabase with sport filter
+      final venues = await DataService.searchVenues(
+        sports: sportName.isNotEmpty ? [sportName] : null,
+      );
+
+      if (!mounted) return;
 
       setState(() {
         debugPrint('🏟️ Loading venues for sport: $sportName');
 
-        // Filter venues based on selected sport
-        if (sportName.isEmpty) {
-          _filteredVenues = _venues;
-        } else {
-          _filteredVenues = _venues
-              .where((venue) => venue['sport'] == sportName)
-              .toList();
-          debugPrint(
-            '🎯 Filtered for $sportName: ${_filteredVenues.length} venues',
-          );
-        }
+        // Convert VenueModel objects to Map format for existing UI code
+        _venues = venues.map((venue) => _venueModelToMap(venue)).toList();
+        _filteredVenues = _venues;
 
         _isLoading = false;
         _showVenues = true;
 
         if (_filteredVenues.isEmpty) {
           debugPrint('⚠️ No venues found for sport: $sportName');
+        } else {
+          debugPrint('🎯 Found ${_filteredVenues.length} venues for $sportName');
         }
       });
     } catch (error) {
@@ -281,6 +189,8 @@ class _SportsVenueScreenState extends State<SportsVenueScreen>
       setState(() {
         _isLoading = false;
         _showVenues = false;
+        _venues = [];
+        _filteredVenues = [];
       });
     }
   }

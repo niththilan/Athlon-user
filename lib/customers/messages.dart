@@ -104,108 +104,25 @@ class _MessagesScreenState extends State<MessagesScreen> {
       _isLoading = true;
     });
 
-    // Simulate loading time to show the football loader
-    await Future.delayed(const Duration(milliseconds: 800));
+    // Load messages from Supabase or other real data source
+    // For now, we'll implement a placeholder that loads empty messages
+    // until a proper messaging system is implemented in the backend
+    
+    await Future.delayed(const Duration(milliseconds: 800)); // Keep loading simulation for UX
 
     if (!_isDisposed) {
-      _initializeMockData();
-
+      // Load real data instead of mock data
       if (mounted) {
         setState(() {
+          _messages = []; // No mock data - load from real source when available
+          _filteredMessages = [];
           _isLoading = false;
         });
       }
     }
   }
 
-  void _initializeMockData() {
-    // FIXED: Don't call setState here since it's called from _loadData
-    setState(() {
-      _messages = [
-        ChatMessage(
-          name: 'Arena Football Court',
-          lastMessage: 'We have slots available at 6 PM and 8 PM.',
-          time: '2:35 PM',
-          unreadCount: 1,
-          avatarUrl: '',
-          messages: [
-            Message(
-              content:
-                  'Hi, is the football court available for tomorrow evening?',
-              time: '2:30 PM',
-              isSentByMe: true, // Customer asks
-            ),
-            Message(
-              content: 'We have slots available at 6 PM and 8 PM.',
-              time: '2:35 PM',
-              isSentByMe: false, // Vendor replies
-            ),
-          ],
-        ),
-        ChatMessage(
-          name: 'City Sports Complex',
-          lastMessage:
-              'Yes, you can reschedule up to 24 hours before your booking.',
-          time: '1:45 PM',
-          unreadCount: 0,
-          avatarUrl: '',
-          messages: [
-            Message(
-              content: 'Can I reschedule my booking for next week?',
-              time: '1:44 PM',
-              isSentByMe: true,
-            ),
-            Message(
-              content:
-                  'Yes, you can reschedule up to 24 hours before your booking.',
-              time: '1:45 PM',
-              isSentByMe: false,
-            ),
-          ],
-          isPinned: true,
-        ),
-        ChatMessage(
-          name: 'Greenfield Arena',
-          lastMessage: 'Thank you! Looking forward to seeing you.',
-          time: 'Yesterday',
-          unreadCount: 0,
-          avatarUrl: '',
-          messages: [
-            Message(
-              content: 'Thanks for confirming my booking!',
-              time: 'Yesterday',
-              isSentByMe: true,
-            ),
-            Message(
-              content: 'Thank you! Looking forward to seeing you.',
-              time: 'Yesterday',
-              isSentByMe: false,
-            ),
-          ],
-        ),
-        ChatMessage(
-          name: 'Downtown Turf',
-          lastMessage: 'Yes, we provide footballs and bibs for rent.',
-          time: 'Monday',
-          unreadCount: 2,
-          avatarUrl: '',
-          messages: [
-            Message(
-              content: 'Do you provide footballs and bibs for rent?',
-              time: 'Monday',
-              isSentByMe: true,
-            ),
-            Message(
-              content: 'Yes, we provide footballs and bibs for rent.',
-              time: 'Monday',
-              isSentByMe: false,
-            ),
-          ],
-        ),
-      ];
-      _filteredMessages = _filterMessagesByCategory(_selectedCategory);
-    });
-  }
+  // Messages will be loaded from Supabase when messaging system is implemented
 
   // Add mock data for testing categories
   // void _initializeMockData() {

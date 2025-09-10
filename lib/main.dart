@@ -88,7 +88,7 @@ class _AppInitializerState extends State<AppInitializer> {
       _isNavigated = true;
 
       if (isAuthenticated) {
-        // User is logged in, go to home
+        // User is logged in, go to home screen
         Navigator.of(context).pushAndRemoveUntil(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
@@ -99,11 +99,11 @@ class _AppInitializerState extends State<AppInitializer> {
           (route) => false,
         );
       } else {
-        // User is not logged in, go to login
+        // User is not logged in, go to home screen
         Navigator.of(context).pushAndRemoveUntil(
           PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) =>
-                const LoginPage(),
+                const home.HomeScreen(),
             transitionDuration: Duration.zero,
             reverseTransitionDuration: Duration.zero,
           ),
