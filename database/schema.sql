@@ -35,8 +35,8 @@ CREATE TABLE public.bookings (
   maintenance_reason text,
   booking_blocked boolean NOT NULL DEFAULT false,
   CONSTRAINT bookings_pkey PRIMARY KEY (id),
-  CONSTRAINT bookings_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id),
-  CONSTRAINT bookings_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id)
+  CONSTRAINT bookings_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id),
+  CONSTRAINT bookings_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id)
 );
 CREATE TABLE public.business_hours (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -110,8 +110,8 @@ CREATE TABLE public.customer_favorites (
   facility_id uuid NOT NULL,
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT customer_favorites_pkey PRIMARY KEY (id),
-  CONSTRAINT customer_favorites_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id),
-  CONSTRAINT customer_favorites_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id)
+  CONSTRAINT customer_favorites_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id),
+  CONSTRAINT customer_favorites_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id)
 );
 CREATE TABLE public.customer_loyalty (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -127,9 +127,9 @@ CREATE TABLE public.customer_loyalty (
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT customer_loyalty_pkey PRIMARY KEY (id),
-  CONSTRAINT customer_loyalty_program_id_fkey FOREIGN KEY (program_id) REFERENCES public.loyalty_programs(id),
+  CONSTRAINT customer_loyalty_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id),
   CONSTRAINT customer_loyalty_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id),
-  CONSTRAINT customer_loyalty_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id)
+  CONSTRAINT customer_loyalty_program_id_fkey FOREIGN KEY (program_id) REFERENCES public.loyalty_programs(id)
 );
 CREATE TABLE public.customers (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -214,8 +214,8 @@ CREATE TABLE public.notifications (
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT notifications_pkey PRIMARY KEY (id),
-  CONSTRAINT notifications_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.profiles(id),
-  CONSTRAINT notifications_recipient_id_fkey FOREIGN KEY (recipient_id) REFERENCES public.profiles(id)
+  CONSTRAINT notifications_recipient_id_fkey FOREIGN KEY (recipient_id) REFERENCES public.profiles(id),
+  CONSTRAINT notifications_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.pending_bookings (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -248,8 +248,8 @@ CREATE TABLE public.pending_bookings (
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT pending_bookings_pkey PRIMARY KEY (id),
-  CONSTRAINT pending_bookings_processed_by_fkey FOREIGN KEY (processed_by) REFERENCES public.profiles(id),
-  CONSTRAINT pending_bookings_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id)
+  CONSTRAINT pending_bookings_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id),
+  CONSTRAINT pending_bookings_processed_by_fkey FOREIGN KEY (processed_by) REFERENCES public.profiles(id)
 );
 CREATE TABLE public.pricing_rules (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -291,6 +291,8 @@ CREATE TABLE public.profiles (
   timezone text DEFAULT 'Asia/Kolkata'::text,
   business_hours_display jsonb,
   amenities_list ARRAY,
+  latitude numeric,
+  longitude numeric,
   CONSTRAINT profiles_pkey PRIMARY KEY (id),
   CONSTRAINT profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
 );
@@ -318,9 +320,9 @@ CREATE TABLE public.reviews (
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT reviews_pkey PRIMARY KEY (id),
-  CONSTRAINT reviews_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(id),
+  CONSTRAINT reviews_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id),
   CONSTRAINT reviews_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id),
-  CONSTRAINT reviews_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id)
+  CONSTRAINT reviews_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(id)
 );
 CREATE TABLE public.time_slots (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -334,6 +336,6 @@ CREATE TABLE public.time_slots (
   updated_at timestamp with time zone DEFAULT now(),
   maintenance_reason text,
   CONSTRAINT time_slots_pkey PRIMARY KEY (id),
-  CONSTRAINT time_slots_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(id),
-  CONSTRAINT time_slots_court_id_fkey FOREIGN KEY (court_id) REFERENCES public.courts(id)
+  CONSTRAINT time_slots_court_id_fkey FOREIGN KEY (court_id) REFERENCES public.courts(id),
+  CONSTRAINT time_slots_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(id)
 );
