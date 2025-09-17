@@ -1,11 +1,19 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
+CREATE TABLE public.booking_audit (
+  audit_id uuid NOT NULL DEFAULT uuid_generate_v4(),
+  booking_id uuid NOT NULL,
+  operation character varying NOT NULL,
+  old_data jsonb,
+  new_data jsonb,
+  changed_by uuid,
+  changed_at timestamp with time zone DEFAULT now(),
+  CONSTRAINT booking_audit_pkey PRIMARY KEY (audit_id)
+);
 CREATE TABLE public.bookings (
-  id text NOT NULL,
   customer_id uuid,
   facility_id uuid NOT NULL,
-  court_id text NOT NULL,
   customer_name text NOT NULL,
   customer_phone text NOT NULL,
   customer_email text,
@@ -34,9 +42,46 @@ CREATE TABLE public.bookings (
   maintenance_status text DEFAULT 'operational'::text CHECK (maintenance_status = ANY (ARRAY['operational'::text, 'maintenance'::text, 'blocked'::text, 'temporarily_closed'::text, 'suspended'::text])),
   maintenance_reason text,
   booking_blocked boolean NOT NULL DEFAULT false,
+  court_id uuid NOT NULL,
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   CONSTRAINT bookings_pkey PRIMARY KEY (id),
   CONSTRAINT bookings_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id),
-  CONSTRAINT bookings_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id)
+  CONSTRAINT bookings_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id),
+  CONSTRAINT bookings_court_id_fkey FOREIGN KEY (court_id) REFERENCES public.courts(id)
+);
+CREATE TABLE public.bookings_backup (
+  id text,
+  customer_id uuid,
+  facility_id uuid,
+  court_id text,
+  customer_name text,
+  customer_phone text,
+  customer_email text,
+  court_name text,
+  court_type text,
+  booking_date date,
+  time_slot text,
+  start_time timestamp with time zone,
+  end_time timestamp with time zone,
+  duration integer,
+  duration_hours numeric,
+  price numeric,
+  total_amount numeric,
+  status text,
+  payment_status text,
+  payment_method text,
+  special_requests text,
+  booking_source text,
+  check_in_time timestamp with time zone,
+  check_out_time timestamp with time zone,
+  cancellation_reason text,
+  cancelled_by text,
+  notes text,
+  created_at timestamp with time zone,
+  updated_at timestamp with time zone,
+  maintenance_status text,
+  maintenance_reason text,
+  booking_blocked boolean
 );
 CREATE TABLE public.business_hours (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -84,11 +129,10 @@ CREATE TABLE public.chat_messages (
   CONSTRAINT chat_messages_conversation_id_fkey FOREIGN KEY (conversation_id) REFERENCES public.chat_conversations(id)
 );
 CREATE TABLE public.courts (
-  id text NOT NULL,
   facility_id uuid NOT NULL,
   name text NOT NULL,
   type text NOT NULL,
-  hourly_rate numeric DEFAULT 0.00,
+  hourly_rate numeric DEFAULT 0.00 CHECK (hourly_rate >= 0::numeric),
   is_active boolean DEFAULT true,
   is_blocked boolean NOT NULL DEFAULT false,
   description text,
@@ -101,8 +145,28 @@ CREATE TABLE public.courts (
   maintenance_reason text,
   last_maintenance_date date,
   booking_blocked boolean NOT NULL DEFAULT false,
+  id uuid NOT NULL DEFAULT uuid_generate_v4(),
   CONSTRAINT courts_pkey PRIMARY KEY (id),
   CONSTRAINT courts_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id)
+);
+CREATE TABLE public.courts_backup (
+  id text,
+  facility_id uuid,
+  name text,
+  type text,
+  hourly_rate numeric,
+  is_active boolean,
+  is_blocked boolean,
+  description text,
+  capacity integer,
+  equipment_provided ARRAY,
+  amenities ARRAY,
+  created_at timestamp with time zone,
+  updated_at timestamp with time zone,
+  maintenance_status text,
+  maintenance_reason text,
+  last_maintenance_date date,
+  booking_blocked boolean
 );
 CREATE TABLE public.customer_favorites (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -110,8 +174,8 @@ CREATE TABLE public.customer_favorites (
   facility_id uuid NOT NULL,
   created_at timestamp with time zone DEFAULT now(),
   CONSTRAINT customer_favorites_pkey PRIMARY KEY (id),
-  CONSTRAINT customer_favorites_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id),
-  CONSTRAINT customer_favorites_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id)
+  CONSTRAINT customer_favorites_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id),
+  CONSTRAINT customer_favorites_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id)
 );
 CREATE TABLE public.customer_loyalty (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -128,8 +192,8 @@ CREATE TABLE public.customer_loyalty (
   updated_at timestamp with time zone DEFAULT now(),
   CONSTRAINT customer_loyalty_pkey PRIMARY KEY (id),
   CONSTRAINT customer_loyalty_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id),
-  CONSTRAINT customer_loyalty_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id),
-  CONSTRAINT customer_loyalty_program_id_fkey FOREIGN KEY (program_id) REFERENCES public.loyalty_programs(id)
+  CONSTRAINT customer_loyalty_program_id_fkey FOREIGN KEY (program_id) REFERENCES public.loyalty_programs(id),
+  CONSTRAINT customer_loyalty_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id)
 );
 CREATE TABLE public.customers (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -163,7 +227,6 @@ CREATE TABLE public.facilities (
 CREATE TABLE public.facility_images (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   facility_id uuid NOT NULL,
-  court_id text,
   image_url text NOT NULL,
   image_type text DEFAULT 'general'::text CHECK (image_type = ANY (ARRAY['general'::text, 'court'::text, 'amenity'::text, 'exterior'::text, 'interior'::text])),
   caption text,
@@ -176,9 +239,27 @@ CREATE TABLE public.facility_images (
   dimensions text,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  court_id uuid,
   CONSTRAINT facility_images_pkey PRIMARY KEY (id),
   CONSTRAINT facility_images_uploaded_by_fkey FOREIGN KEY (uploaded_by) REFERENCES public.profiles(id),
-  CONSTRAINT facility_images_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id)
+  CONSTRAINT facility_images_court_id_fkey FOREIGN KEY (court_id) REFERENCES public.courts(id)
+);
+CREATE TABLE public.facility_images_backup (
+  id uuid,
+  facility_id uuid,
+  court_id text,
+  image_url text,
+  image_type text,
+  caption text,
+  alt_text text,
+  display_order integer,
+  is_primary boolean,
+  is_active boolean,
+  uploaded_by uuid,
+  file_size integer,
+  dimensions text,
+  created_at timestamp with time zone,
+  updated_at timestamp with time zone
 );
 CREATE TABLE public.loyalty_programs (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
@@ -254,7 +335,6 @@ CREATE TABLE public.pending_bookings (
 CREATE TABLE public.pricing_rules (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
   facility_id uuid NOT NULL,
-  court_id text,
   day_of_week integer CHECK (day_of_week >= 0 AND day_of_week <= 6),
   start_time time without time zone,
   end_time time without time zone,
@@ -263,8 +343,22 @@ CREATE TABLE public.pricing_rules (
   is_active boolean DEFAULT true,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  court_id uuid,
   CONSTRAINT pricing_rules_pkey PRIMARY KEY (id),
-  CONSTRAINT pricing_rules_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id)
+  CONSTRAINT pricing_rules_court_id_fkey FOREIGN KEY (court_id) REFERENCES public.courts(id)
+);
+CREATE TABLE public.pricing_rules_backup (
+  id uuid,
+  facility_id uuid,
+  court_id text,
+  day_of_week integer,
+  start_time time without time zone,
+  end_time time without time zone,
+  price numeric,
+  rule_type text,
+  is_active boolean,
+  created_at timestamp with time zone,
+  updated_at timestamp with time zone
 );
 CREATE TABLE public.profiles (
   id uuid NOT NULL,
@@ -302,7 +396,6 @@ CREATE TABLE public.reviews (
   customer_id uuid NOT NULL,
   rating integer NOT NULL CHECK (rating >= 1 AND rating <= 5),
   comment text,
-  booking_id text,
   service_rating integer CHECK (service_rating >= 1 AND service_rating <= 5),
   facility_rating integer CHECK (facility_rating >= 1 AND facility_rating <= 5),
   value_rating integer CHECK (value_rating >= 1 AND value_rating <= 5),
@@ -319,23 +412,36 @@ CREATE TABLE public.reviews (
   helpful_count integer DEFAULT 0,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
+  booking_id uuid,
   CONSTRAINT reviews_pkey PRIMARY KEY (id),
-  CONSTRAINT reviews_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id),
   CONSTRAINT reviews_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customers(id),
+  CONSTRAINT reviews_facility_id_fkey FOREIGN KEY (facility_id) REFERENCES public.facilities(id),
   CONSTRAINT reviews_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(id)
 );
 CREATE TABLE public.time_slots (
   id uuid NOT NULL DEFAULT uuid_generate_v4(),
-  court_id text NOT NULL,
   slot_date date NOT NULL,
   time_slot text NOT NULL,
   status text DEFAULT 'available'::text CHECK (status = ANY (ARRAY['available'::text, 'occupied'::text, 'selected'::text, 'blocked'::text, 'maintenance'::text])),
-  booking_id text,
   price numeric,
   created_at timestamp with time zone DEFAULT now(),
   updated_at timestamp with time zone DEFAULT now(),
   maintenance_reason text,
+  court_id uuid NOT NULL,
+  booking_id uuid,
   CONSTRAINT time_slots_pkey PRIMARY KEY (id),
-  CONSTRAINT time_slots_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(id),
-  CONSTRAINT time_slots_court_id_fkey FOREIGN KEY (court_id) REFERENCES public.courts(id)
+  CONSTRAINT time_slots_court_id_fkey FOREIGN KEY (court_id) REFERENCES public.courts(id),
+  CONSTRAINT time_slots_booking_id_fkey FOREIGN KEY (booking_id) REFERENCES public.bookings(id)
+);
+CREATE TABLE public.time_slots_backup (
+  id uuid,
+  court_id text,
+  slot_date date,
+  time_slot text,
+  status text,
+  booking_id text,
+  price numeric,
+  created_at timestamp with time zone,
+  updated_at timestamp with time zone,
+  maintenance_reason text
 );
